@@ -6,9 +6,11 @@
 
 題目是純前端、Mock Data、無真實 API。交付物要讓審閱者能直接打開看。真實的電商首頁與商品頁則高度依賴 SEO 與 LCP，正式環境幾乎一定是 SSR / streaming。
 
+實測（2026-09-18）：momo 真實網站是以 **Next.js + Tailwind CSS** 建置的（頁面含 `next-route-announcer`，class 為 Tailwind utility），印證了「正式環境的電商是 SSR」這個前提。
+
 ## 決策
 
-用 React + Vite 做 SPA，路由用 React Router v7 的 library mode，route 層級 lazy load。
+用 React + Vite 做 SPA，路由用 React Router 8 的 library mode（`createBrowserRouter`），route 層級 lazy load。
 
 ## 理由
 

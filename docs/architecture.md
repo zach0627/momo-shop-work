@@ -141,6 +141,10 @@ src/
 | `shared/ui`           | 全專案都依賴它；長大後任何修改都讓 `nx affected` = 全部，快取失效 | 元件超過約 15 個，或 affected 雜訊明顯 → 依元件家族拆（`shared/ui-product`、`shared/ui-form`…） |
 | scope 放行清單        | scope 變多後，遇到 lint 錯誤就「加一個放行」，最後誰都能依賴誰    | 新增任何 scope 放行前必須先更新 [ADR-0006](./adr/0006-domain-dependency-map.md)                 |
 
+### 設計 Token
+
+顏色、字級、圓角、陰影走兩層 token：**Primitive**（有哪些顏色，元件不可用）→ **Semantic**（用在哪裡，元件唯一能用的一層）。Tailwind 預設的色盤與字級被關閉，所以不是 token 的顏色用不了。數值從真實網站的計算樣式量出。詳見 [`design-tokens.md`](./design-tokens.md)。
+
 ## 6. 首頁：config-driven
 
 ```ts

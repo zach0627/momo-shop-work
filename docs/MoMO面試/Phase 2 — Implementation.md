@@ -33,7 +33,7 @@ First Commit 至最後 Commit
 | ✅ | 1 | Nx workspace + `shop` app 可 build | `chore: scaffold nx workspace` | — | ✗ |
 | ✅ | 2 | 10 libs + tags + boundary lint | `chore: add domain libs and module boundary rules` | — | ✗ |
 | ✅ | 3 | architecture.md + ADR ×6 + agent-workflow.md + CLAUDE.md + 邊界驗證工具 + OpenSpec | `docs: add architecture and ADRs` | — | ✗ |
-| ⬜ | 4 ★ | Walking skeleton：兩條路由走得通 | `feat(shop): walking skeleton with routing and shell` | paths、AppLink | ✗ |
+| ✅ | 4 ★ | Walking skeleton：兩條路由走得通（+ 兩層 design token） | `feat(shop): walking skeleton with routing and shell` | paths、AppLink | ✗ |
 | ⬜ | 5 | 素材 + fixtures + catalog/data-access | `feat(catalog): mock repository, fixtures and query hooks` | #3 | ✗ |
 | ⬜ | 6 | shared util / ui | `feat(shared): price formatting and core ui components` | #1 #2 | ✗ |
 | ⬜ | 7 | Header(sticky) + 分類展開 + Footer | `feat(shell): sticky header, category nav and footer` | #6 | ✗ |
@@ -100,17 +100,23 @@ First Commit 至最後 Commit
 **Review 重點**：ADR 的 tradeoff 說法是否是你面試時願意講的版本。
 **Commit**：`docs: add architecture, ADRs and agent workflow log`
 
-### Step 4 ★ — Walking skeleton
+### Step 4 ★ — Walking skeleton ✅
 
 **目標**：最薄的一條端到端：`/` 與 `/goods/:goodsId` 都走得通，外面包著 shell。之後每一步都只是「把空殼填滿」。
-- [ ] **跨專案依賴的做法（這一步第一次出現）**：要 import 另一個 lib 的專案，先在自己的 `package.json` 宣告 `"@momo/<lib>": "workspace:*"` → `pnpm install` → `pnpm nx sync`。三個動作缺一不可（規格複查時實測：未宣告的 workspace 套件不會被解析到）。
-- [ ] 安裝：`react-router`、`@tanstack/react-query`、`tailwindcss` + `@tailwindcss/vite`。
-- [ ] **TDD**：`shared/util/paths.ts` — `paths.home()`、`paths.goods(id)`、route pattern。
-- [ ] **TDD**：`shared/ui/link` — `AppLink` 預設渲染 `<a href>`；有 `LinkProvider` 時改用注入的元件。
-- [ ] `shared/ui/styles/theme.css`：`@theme` tokens（品牌粉、價格紅、容器寬 1220px）；`apps/shop/src/styles.css` import + `@source` 掃 libs。
-- [ ] `apps/shop`：`providers.tsx`（QueryClient + LinkProvider）、`router.tsx`（lazy routes、路徑取自 `paths`）、`router-link.tsx`、3 個 route 檔。
-- [ ] `shell/feature`：`ShellLayout` 空殼（Header / Footer 先放文字）。
-- [ ] `home/page`、`goods/page`：placeholder（goods 顯示收到的 `goodsId`）。
+- [x] **跨專案依賴的做法（這一步第一次出現）**：要 import 另一個 lib 的專案，先在自己的 `package.json` 宣告 `"@momo/<lib>": "workspace:*"` → `pnpm install` → `pnpm nx sync`。三個動作缺一不可（規格複查時實測：未宣告的 workspace 套件不會被解析到）。
+  - ↳ `apps/shop` 宣告 5 個、`shell/feature` 宣告 2 個；`nx sync` 寫入兩份 tsconfig 的 references。
+- [x] 安裝：`react-router`、`@tanstack/react-query`、`tailwindcss` + `@tailwindcss/vite`。
+  - ↳ **裝到的是 React Router 8（不是 v7）**。先讀實際安裝版本的型別定義確認 API 還在才動手；v8 要求 Node `>=22.22.0`，`engines` 隨之收緊。
+- [x] **TDD**：`shared/util/paths.ts` — `paths.home()`、`paths.goods(id)`、route pattern。
+  - ↳ 6 個測試。紅燈時發現「path 符合 pattern」的測試在兩邊都是空字串時會通過 → 補上 pattern 必須以 `/` 開頭的斷言。
+- [x] **TDD**：`shared/ui/link` — `AppLink` 預設渲染 `<a href>`；有 `LinkProvider` 時改用注入的元件。
+- [x] `shared/ui/styles/theme.css`：`@theme` tokens（品牌粉、價格紅、容器寬 1220px）；`apps/shop/src/styles.css` import + `@source` 掃 libs。
+  - ↳ **大幅超出原計畫**：改為 Primitive / Semantic 兩層 token，數值從真實網站的計算樣式量出（見下方完成紀錄）。
+- [x] `apps/shop`：`providers.tsx`（QueryClient + LinkProvider）、`router.tsx`（lazy routes、路徑取自 `paths`）、`router-link.tsx`、3 個 route 檔。
+  - ↳ 路由測試 4 個 + App smoke 1 個，對應 spec `app-shell`「每個頁面都有共用外框」「Logo 連回首頁」。
+- [x] `shell/feature`：`ShellLayout` 空殼（Header / Footer 先放文字）。
+- [x] `home/page`、`goods/page`：placeholder（goods 顯示收到的 `goodsId`）。
+- [x] （計畫外）app 與 9 個 React lib 的 tsconfig 補上 DOM 型別庫 —— generator 漏掉的，只有 `typecheck` 抓得到。
 
 **驗證**：`pnpm nx run-many -t lint test` + `pnpm nx build shop` + 開 dev server 手動走 `/`、`/goods/123`、`/nope`（404）
 **Review 重點**：`react-router` 是否只出現在 `apps/shop`；Tailwind token 有沒有生效。
@@ -259,7 +265,8 @@ First Commit 至最後 Commit
 | — | 修正過期的 `pnpm-lock.yaml`（缺 8 個 lib 的 importer 條目 → 全新 clone 的 `--frozen-lockfile` 會失敗）；在乾淨環境驗證通過 | `43bff8d` |
 | — | 修正環境診斷：瓶頸是 CPU + 記憶體，不只是硬碟 | `944076e` |
 | — | **OpenSpec**：`openspec/changes/build-storefront-pages/` —— proposal（為什麼做）、6 個 capability 的 spec（32 條 requirement、54 個 scenario）、design（專案設置原因 + 11 個設計決策與放棄的方案）、tasks（46 項，對應本頁 13 步，Step 1–3 已勾選）；`openspec validate --strict` 通過 | `3cf7593` |
-| — | **OpenSpec 複查與修正**：① 補測並改寫一條沒驗證過且寫錯的規格（深層引用：相對路徑由 lint 擋、套件名稱加內部路徑由型別檢查擋）；② `config.yaml` 補上專案脈絡與撰寫規則（先前說了要做卻沒做）；③ 已實作的 `module-boundaries` 移到主規格 `openspec/specs/`；④ 一個無法測試的 scenario 改為可比對的形式；⑤ 補缺漏：限時搶購卡片內容、首頁載入中 / 失敗狀態、推薦恰好一頁、分類清單（40 個）；⑥ 補做 Step 1 漏掉的 `engines.node`；⑦ 本頁 Step 1–3 逐項核對後打勾 | 見 git log |
+| — | **OpenSpec 複查與修正**：① 補測並改寫一條沒驗證過且寫錯的規格（深層引用：相對路徑由 lint 擋、套件名稱加內部路徑由型別檢查擋）；② `config.yaml` 補上專案脈絡與撰寫規則（先前說了要做卻沒做）；③ 已實作的 `module-boundaries` 移到主規格 `openspec/specs/`；④ 一個無法測試的 scenario 改為可比對的形式；⑤ 補缺漏：限時搶購卡片內容、首頁載入中 / 失敗狀態、推薦恰好一頁、分類清單（40 個）；⑥ 補做 Step 1 漏掉的 `engines.node`；⑦ 本頁 Step 1–3 逐項核對後打勾 | `0c28e6b` |
+| 4 | **Walking skeleton**：`/`、`/goods/:goodsId`、找不到頁面三條路由走得通，外面包著 shell；`paths`（URL 單一來源）與 `AppLink`（由 app 注入 router 的 Link）走 TDD；composition root（QueryClient + LinkProvider）；第一批跨專案依賴（7 條，0 違規）。**兩層 design token**：數值從真實網站量出，關閉 Tailwind 預設色盤 | 見 git log |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -305,4 +312,17 @@ First Commit 至最後 Commit
 - 改行為前先改規格，並跑 `openspec validate build-storefront-pages --strict`。
 - 13 步全部完成後再 archive（把 delta spec 併入 `openspec/specs/`）。
 
-**下一步：Step 4 ★ — Walking skeleton（router + providers + shell 空殼 + 兩個空頁面）** → 對應 `tasks.md` 第 4 組
+**Step 4 驗證結果**
+- 全部 11 個專案 `lint / test / typecheck`（無快取、循序）33 個 task 全綠；`nx build shop` 成功，三個頁面各自成為 lazy chunk。
+- `pnpm verify:boundaries`：11 個專案、11 條規則、**7 條跨專案依賴、0 違規** —— 第一次有實質的依賴可檢查。
+- 瀏覽器實測（dev server）：三條路由都渲染正確；量到 logo `#d62872`、header 底線 `1px #cccccc`、內容寬 `1220px`、footer `#09355d`、內文 `#404040`、字體堆疊與真站一致。
+- 建置產物檢查：semantic utility 有產生、`--color-brand` 指向 `var(--momo-magenta-600)`、Tailwind 預設色盤與字級不存在。
+
+**Step 4 的設計 token（Human 要求對照真實網站後的修正）**
+- 原本的顏色是看截圖估的：品牌色估成 `#e6007f`、文字估成純黑。**實測是 `#d62872` 與 `#404040`**；價格有三種顏色（`#d62872` / `#db2777` / `#dd2222`）而不是一種。
+- 兩層：**Primitive**（`--momo-magenta-600`，純調色盤，不在 `@theme` 內 → 沒有 utility，元件用不到）→ **Semantic**（`--color-brand`、`--color-price`、`--text-ec-sm`，元件唯一能用的一層）。
+- 過程中得知：真實網站是 **Next.js + Tailwind**；首頁區塊是虛擬化渲染；字級是奇數階梯 `ec-*`（13 / 15 / 17 / 19 / 21 / 23）；頂部列是 `fixed` 不是 sticky；詳情頁三顆按鈕是 160×40、直角。
+- **沒量到的**：區塊標題（在跨來源 iframe 內讀不到，依截圖估 24px）、hover 狀態、限時搶購標題列的粉底。token 裡都標明是估計值。
+- 完整對照表：repo 的 `docs/design-tokens.md`。
+
+**下一步：Step 5 — 素材 + fixtures + `catalog/data-access`** → 對應 `tasks.md` 第 5 組

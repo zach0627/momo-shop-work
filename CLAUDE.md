@@ -13,7 +13,8 @@
 5. **Rule of Two：** 被 ≥2 個專案使用的東西才能放進 `shared/ui`、`shared/util`。只有自己用的放在該 lib 的 `ui/`（展示）或 `model/`（邏輯），且不要從 `index.ts` 匯出。
 6. **`shared/ui` 不認識 domain model。** 元件宣告自己需要的最小形狀，不要 import 任何 data-access。
 7. **不要為了讓 lint 通過而修改 `eslint.config.mjs` 的 `depConstraints` 或新增 scope 放行。** 遇到 boundary 錯誤代表設計需要討論。新增 scope 放行必須先修改 [ADR-0006](./docs/adr/0006-domain-dependency-map.md)。
-8. **UI 只透過 query hooks 取得資料**，不要直接 import fixtures 或 repository 實作。
+8. **顏色、字級、圓角、陰影只能用 semantic token**（`text-brand`、`bg-footer`、`text-ec-sm`、`rounded-card`…）。不可寫死色碼、不可用任意值語法（`text-[#d62872]`）、不可直接使用 primitive（`--momo-*`）。需要新的顏色時：先到真實網站量出數值 → 加進 `tokens.primitive.css` → 在 `tokens.semantic.css` 給它一個用途 → 記錄到 `docs/design-tokens.md`。Tailwind 預設的色盤與字級已被關閉，`text-pink-600`、`text-sm` 不存在。
+9. **UI 只透過 query hooks 取得資料**，不要直接 import fixtures 或 repository 實作。
 
 ## 做事的方式
 

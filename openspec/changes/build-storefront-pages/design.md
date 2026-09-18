@@ -46,7 +46,7 @@
 
 ### 1. SPA（Vite）而非 Next
 
-**選擇**：React 19 + Vite 的 SPA，React Router v7 library mode，route 層級 lazy load。
+**選擇**：React 19 + Vite 的 SPA，React Router 8 library mode，route 層級 lazy load。
 
 **為什麼**：mock-only 的 demo 沒有 SEO 需求；靜態檔案丟到任何靜態主機就能看。Next App Router 會引入 RSC / client boundary 的決策，這些決策在沒有真實資料來源時無法驗證，只會消耗時間。
 
@@ -147,6 +147,21 @@ UI → query hooks → useCatalogRepository() → CatalogRepository（interface�
 
 **為什麼**：若按水平分層（util → ui → data → …）做，時間用完時可能連一個完整頁面都沒有。
 
+### 12. 兩層 design token，數值從真實網站量出
+
+**選擇**：顏色、字級、圓角、陰影走兩層 token。**Primitive**（`--momo-magenta-600`）是純調色盤，定義在 `:root`、刻意不放進 `@theme`，所以 Tailwind 不會為它產生 utility、元件用不到。**Semantic**（`--color-brand`、`--color-price`、`--text-ec-sm`）指向 primitive，是元件唯一能用的一層。Tailwind 預設的色盤與字級被關閉（`--color-*: initial; --text-*: initial;`），不是 token 的顏色與字級根本不存在。
+
+**為什麼**：品牌改色只改 primitive 一行；換主題只覆寫 semantic，元件不動。同一個色碼可以有兩個用途而不互相綁死（`brand` 與 `action-primary` 目前都是同一個洋紅）。
+
+**數值來源**：以瀏覽器開啟真實網站，用 `getComputedStyle` 讀出計算樣式（首頁與一個商品詳情頁，桌機版面）。最初的 token 是看截圖估的，品牌色估成 `#e6007f`、文字估成純黑 —— 實測是 `#d62872` 與 `#404040`。這是 Human 要求對照真實網站後才修正的。
+
+**放棄的方案**：
+
+- 單層 token（語意名稱直接對色碼）—— 最初的做法。無法在不動元件的情況下換主題，也無法表達「同色不同用途」。
+- 直接用 Tailwind 預設色盤 —— 真實網站有自己的色階（`#d62872` 不在 Tailwind 色盤裡），而且預設色盤開著就等於允許繞過 token。
+
+量不到的（區塊標題、hover 狀態）在 token 裡標明為估計值。完整對照表在 `docs/design-tokens.md`。
+
 ## Risks / Trade-offs
 
 - **[結構以目前規模偏重：10 個 lib 約 80 個設定檔]** → 在 README 的 Tradeoffs 照實說明，並寫下「如果是真實的 2 頁專案我不會從這裡開始」。
@@ -155,6 +170,7 @@ UI → query hooks → useCatalogRepository() → CatalogRepository（interface�
 - **[scope 放行清單隨時間腐化，最後誰都能依賴誰]** → 新增任何放行前必須先修改 ADR-0006；`CLAUDE.md` 明令 agent 不得為了讓 lint 通過而修改規則。
 - **[標籤寫壞的 lib 會靜默地不受任何規則約束，lint 仍是綠的]** → 建立 lib 時真的發生過。`pnpm verify:boundaries` 檢查標籤格式，並已驗證會在標籤壞掉時報紅。
 - **[跨專案 import 需要三個動作才會成立：宣告 `workspace:*` 依賴、`pnpm install`、`nx sync`；漏掉任何一個，型別檢查或 Nx 的同步檢查會失敗]** → pnpm 的嚴格 `node_modules` 不會讓未宣告的 workspace 套件被解析到，這其實是好事（依賴必須明說）。做法寫成 `tasks.md` 的 4.0，並列入 `CLAUDE.md`。
+- **[Tailwind 的任意值語法 `text-[#d62872]` 仍能繞過 token]** → 目前靠 review 與 `CLAUDE.md` 的規則；要工具化可加一條 lint 規則禁止 className 出現 `[#`。
 - **[通用 block 的 props 會隨需求膨脹]** → 某個區塊的特例超過 2–3 個時，把它升級成自己的 feature，而不是繼續加 props。
 - **[純版面區塊沒有單元測試]** → 刻意的取捨：這些區塊沒有邏輯，測試只會驗證 JSX 長什麼樣。視覺正確性交給截圖對照與（P2）Playwright smoke test。
 - **[Repository 層不驗證 HTTP 細節]** → 有真實 API 契約後再引入 MSW 做 contract test，接在 HTTP 實作後面，與本設計不衝突。

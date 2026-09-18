@@ -12,6 +12,7 @@ Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情�
 | [`openspec/changes/build-storefront-pages/`](./openspec/changes/build-storefront-pages) | **待實作的行為規格**：5 個 capability、每個 scenario 都能直接轉成測試；`design.md` 說明專案設置原因與每個設計決策及放棄的方案；`tasks.md` 是可勾選的實作進度 |
 | [`openspec/config.yaml`](./openspec/config.yaml)                                        | 專案脈絡（為什麼存在、為什麼這樣設置、不能破的規則）—— 會被帶進之後每一份規格的撰寫指示                                                                      |
 | [`docs/architecture.md`](./docs/architecture.md)                                        | 系統怎麼切、為什麼這樣切、規模變大時怎麼管                                                                                                                   |
+| [`docs/design-tokens.md`](./docs/design-tokens.md)                                      | 兩層 design token（Primitive / Semantic）；每個顏色、字級、框線的數值都是從真實網站的計算樣式**量出來的**，並記錄在哪裡量到、哪些沒量到                      |
 | [`docs/adr/`](./docs/adr)                                                               | 6 個決策：背景、理由、**代價**、演進觸發條件                                                                                                                 |
 | [`docs/agent-workflow.md`](./docs/agent-workflow.md)                                    | Human ↔ Agent 怎麼協作；Human 糾正了 Agent 什麼；Agent 在哪裡出錯                                                                                            |
 | [`docs/MoMO面試/`](./docs/MoMO面試)                                                     | 原始的需求解析、設計筆記與逐步計畫                                                                                                                           |
@@ -20,7 +21,7 @@ Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情�
 ## 技術選型
 
 Nx（pnpm workspaces）· React 19 · TypeScript strict · Vite · Vitest + Testing Library
-預計引入：React Router v7 · TanStack Query v5 · Tailwind CSS v4 · embla-carousel
+已引入：React Router 8（library mode）· TanStack Query v5 · Tailwind CSS v4（兩層 design token）　預計引入：embla-carousel
 
 刻意**沒有**安裝全域 store：兩個頁面都是展示用，盤點後全域 client state 為 0（[ADR-0003](./docs/adr/0003-server-state-only-no-global-store.md)）。
 
@@ -74,4 +75,4 @@ pnpm verify:boundaries                     # 確認依賴規則套用到每個�
 openspec validate build-storefront-pages --strict   # 驗證行為規格的格式
 ```
 
-需要 Node `^20.19.0 || >=22.12.0`（Vite 8 的要求；本專案以 Node 24 開發與驗證）與 pnpm 12。`package.json` 的 `packageManager` 鎖定 `pnpm@12.4.2`，較舊的 pnpm 會自動切換到這個版本。
+需要 Node `>=22.22.0`（React Router 8 的要求；本專案以 Node 24 開發與驗證）與 pnpm 12。`package.json` 的 `packageManager` 鎖定 `pnpm@12.4.2`，較舊的 pnpm 會自動切換到這個版本。

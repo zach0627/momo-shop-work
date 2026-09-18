@@ -35,6 +35,6 @@
 
 - **新增**：`apps/shop` 的路由與 composition root；10 個 lib 的實作內容（目前皆為空殼）。
 - **既有**：不改動已建立的分層與 lint 規則（主規格 `module-boundaries`）。這個 change 會第一次在專案之間產生真正的依賴，`pnpm verify:boundaries` 從此有實質的東西可檢查。
-- **相依套件**：React Router v7、TanStack Query v5、Tailwind CSS v4、embla-carousel（目前尚未安裝）。
+- **相依套件**：React Router 8、TanStack Query v5、Tailwind CSS v4（已安裝）；embla-carousel（尚未安裝）。React Router 8 要求 Node `>=22.22.0`，`package.json` 的 `engines` 以此為準。
 - **文件**：與 `docs/architecture.md`、`docs/adr/` 並存 —— ADR 記錄「為什麼選這個方案」，本 change 的規格記錄「系統該有什麼可觀察的行為」。
 - **不影響**：無真實後端、無資料庫、無使用者資料；全部為靜態部署。
