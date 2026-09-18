@@ -45,6 +45,8 @@ Thumbs.db
 
 .claude/worktrees
 .claude/settings.local.json
+# session state written by a local Claude Code plugin; machine-specific
+.omc/
 .nx/polygraph
 .nx/self-healing
 .nx/migrate-runs
