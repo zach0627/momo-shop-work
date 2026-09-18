@@ -238,16 +238,17 @@ First Commit 至最後 Commit
 |---|---|---|
 | 1a | 空的 Nx 23 workspace（pnpm workspaces + TS project references）+ `@nx/react`；清掉範本附帶的約 70 個無關檔案；scope 改 `@momo`；建立 public repo 並 push | `0f64f2d` |
 | 1b | `shop` app（React 19 + Vite + Vitest，minimal、無 router）；測試改為同層 `*.spec.tsx`；`.gitattributes` 統一 LF；`lint / test / typecheck / build` 全綠（無快取） | `07e0bcc` |
+| — | 規劃筆記（本資料夾）複製進 repo `docs/MoMO面試/` | `b88ee0e` |
+| — | 17 張真站截圖進 `docs/pictures/`（依頁面順序重新命名）；repo 內 Phase 1 的圖片改為 GitHub 可渲染的標準語法；2 張登入狀態截圖的帳號姓名已在複本上遮蓋（vault 原圖未動） | `a42640b` |
+| 2 | 10 個 lib（`@nx/react:lib` ×9、`@nx/js:lib` ×1）+ tags；`depConstraints`（type 6 條 + scope 5 條）；`no-restricted-imports`（預設全禁，`apps/shop` 放行 router、`shared/ui` 放行 embla）；各 lib README 改寫為職責說明；移除用不到的 `.babelrc` 與範例碼 | `4e44054` |
+| — | 移除計畫中所有時間紀錄與時間預估；記錄「專案維持在 D: 槽」的決定 | `d4cfdd3` |
+| 3 | `docs/architecture.md`、ADR ×6（新增 0006：domain 依賴地圖）、`docs/agent-workflow.md`、專案自己的 `CLAUDE.md`、README（含照實寫的 Tradeoffs）；`tools/verify-boundaries.mjs` + `pnpm verify:boundaries`；9 個 lib 補上 `"private": true` | 見 git log |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
 - `--workspaces=false` 無效 → 採 Nx 現行標準（pnpm workspaces + project references）；`@momo/*` alias 由各 lib 的 package name 提供，Phase 1 設計不受影響。**Step 2 產生 lib 時 tags 寫在各 lib 的 `package.json` → `nx.tags`。**
 - pnpm 12 預設擋 postinstall → `allowBuilds` 只明確核准 `nx`、`@swc/core`。
 - 環境備註：此機器上每次 `pnpm nx …` 約 20–60 秒、裝依賴約 3 分鐘；`NX_DAEMON=false` 可避免卡住。
-
-| — | 規劃筆記（本資料夾）複製進 repo `docs/MoMO面試/` | `b88ee0e` |
-| — | 17 張真站截圖進 `docs/pictures/`（依頁面順序重新命名）；repo 內 Phase 1 的圖片改為 GitHub 可渲染的標準語法；2 張登入狀態截圖的帳號姓名已在複本上遮蓋（vault 原圖未動） | `a42640b` |
-| 2 | 10 個 lib（`@nx/react:lib` ×9、`@nx/js:lib` ×1）+ tags；`depConstraints`（type 6 條 + scope 5 條）；`no-restricted-imports`（預設全禁，`apps/shop` 放行 router、`shared/ui` 放行 embla）；各 lib README 改寫為職責說明；移除用不到的 `.babelrc` 與範例碼 | `4e44054` |
 
 **Step 2 驗證結果**
 - 基準：11 個專案 × `lint / test / typecheck` = 33 個 task 全綠（無快取）。
@@ -263,4 +264,17 @@ First Commit 至最後 Commit
 - 目前的因應：`NX_DAEMON=false` + `NX_ISOLATE_PLUGINS=false`（否則 plugin worker 會連線逾時）、`--parallel=1`（否則 Vitest worker 會逾時）。
 - **決定：專案維持在 D: 槽，不搬移。** 以上述參數因應，並善用 Nx 快取（只有驗證關卡才加 `--skip-nx-cache`）。
 
-**下一步：Step 3 — 設計文件進 repo（`docs/architecture.md` + ADR ×5 + `agent-workflow.md` + 專案自己的 `CLAUDE.md`）**
+**架構復盤（Step 2 之後）**
+- 提問：「大量寫在 libs，日後擴充購物車、結帳、品牌頁、刷卡時 libs 不會變很肥嗎？」
+- 結論：`libs/` 變大不是問題（它就是 `src/`），要防的是**單一 lib 變肥**；成長方式是新增 scope，現有 10 個 lib 不需要改。
+- 承認的三個弱點：`catalog/data-access` 最可能先變肥、`shared/ui` 長大後讓 `nx affected` 失去意義、scope 放行清單會隨時間腐化 → 各自寫下拆分觸發條件（`architecture.md` §5）與 ADR-0006。
+- 承認的事實：**以目前 2 頁的規模，這個結構是偏重的**；真實的 2 頁專案不會從這裡開始。已照實寫進 README 的 Tradeoffs。
+
+**Step 3 的 module boundary 確認結果**
+- `pnpm verify:boundaries`：11 個專案、11 條限制、0 個問題。每個專案實際解析出的 ESLint 設定中 boundary 規則皆為 `error`；只有 `shop` 能 import router、只有 `shared-ui` 能 import embla。
+- 專案間的依賴目前是 **0 條**（libs 都還是空的），所以「符合」在現階段是必然的；真正的保障是「規則已套用到每個專案」+ Step 2 的負向驗證。之後每一步有了真的 import，這支腳本與 lint 才開始有實質的東西可擋。
+- 腳本自我測試：故意把一個 lib 的 tags 改壞 → exit 1 並指出問題 → 已還原。
+- 順帶抓到：9 個 React lib 的 `package.json` 缺 `"private": true`（generator 沒加）→ 已補上並納入檢查。
+- 順帶清掉：先前 plugin worker 逾時留下的 7 個 Nx 孤兒行程（掛了 23–55 分鐘）。
+
+**下一步：Step 4 ★ — Walking skeleton（router + providers + shell 空殼 + 兩個空頁面）**

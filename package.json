@@ -2,7 +2,9 @@
   "name": "@momo/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "verify:boundaries": "node tools/verify-boundaries.mjs"
+  },
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.14.5",
