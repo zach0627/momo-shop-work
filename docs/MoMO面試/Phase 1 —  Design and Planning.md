@@ -9,62 +9,62 @@ Implementation Strategy
 ## 初步內容解析
 ### 首頁:
 https://www.momoshop.com.tw/main/Main.jsp?mdiv=1099800000-bt_0_243_01-bt_0_243_01_e1&ctype=B
-![[Pasted image 20260918141833.png]]
+![首頁頂部：Header、分類列、主要活動、官方優惠](../pictures/01-home-top.png)
 可以選擇分類，下面為點擊展開後的分類
-![[Pasted image 20260918142238.png]]
+![分類列點擊展開後的「選擇分類」面板](../pictures/02-category-panel-expanded.png)
 本身這塊為header scroll保留區塊,當我往下滾動時這一塊要保留
-![[Pasted image 20260918153423.png]]
+![捲動時要保留的 TopBar 區塊](../pictures/03-topbar-sticky-region.png)
 
 滾動時樣式,可以看到他被保留了
-![[Pasted image 20260918153442.png]]
+![捲動後被保留的 compact TopBar（含搜尋框）](../pictures/04-topbar-compact-on-scroll.png)
 我們首頁整體順序
 header 包含還有momo logo
 以及往下的種類可展開圖
 下面的主要活動
-![[Pasted image 20260918153524.png]]
+![主要活動輪播 + 今日大牌](../pictures/05-main-events.png)
 官方優惠
-![[Pasted image 20260918153820.png]]
+![官方優惠](../pictures/06-official-deals.png)
 
 往下繼續滑動
 降價好貨
-![[Pasted image 20260918153850.png]]
+![降價好貨](../pictures/07-price-drop.png)
 
 再往下滑區塊
 品牌折扣
 詐騙發票提醒
-![[Pasted image 20260918153922.png]]
+![品牌折扣與詐騙發票提醒](../pictures/08-brand-discount-and-fraud-notice.png)
 
 再往下區塊
 官方旗艦名店
-![[Pasted image 20260918154124.png]]
+![官方旗艦名店](../pictures/09-flagship-stores.png)
 再往下
 momo店取
 momo信用卡優惠
 猜你想搜
-![[Pasted image 20260918154212.png]]
+![momo 店取、信用卡優惠、猜你想搜](../pictures/10-store-pickup-card-offers-search.png)
 
 限時搶購
-![[Pasted image 20260918154320.png]]
+![限時搶購](../pictures/11-flash-sale.png)
 
 今日暢銷榜
 moPro訂閱享會員專屬價
-![[Pasted image 20260918154413.png]]
+![今日暢銷榜與 moPro 會員專屬價](../pictures/12-best-sellers-and-mopro.png)
 
 你可能會喜歡
-![[Pasted image 20260918154449.png]]
+![你可能會喜歡](../pictures/13-you-may-like.png)
 因為裡面內容太多滾到一定程度後,下面會看到有個看更多,就可以點擊後出現更多商品了
-![[Pasted image 20260918154541.png]]
+![你可能會喜歡底部的「看更多」](../pictures/14-you-may-like-load-more.png)
 
 我們先設定假設3列就要出現看更多了
 首頁最下面的Footer,偏深藍色那個區塊
-![[Pasted image 20260918154815.png]]
+![首頁最下方的深藍色 Footer](../pictures/15-footer.png)
 
 ### goods detail 頁面
 https://www.momoshop.com.tw/product/15687497?Area=search&mdiv=403&oid=1_1&cid=index&kw=iPhone+18+Pro&ecTagNos=
 
-![[Pasted image 20260918152638.png]]
+![商品詳情頁全貌](../pictures/16-goods-detail-full.png)
 由於時間不夠,我們首頁做完後優先做出這個頁面的這個畫面即可其餘可選擇性暫時忽略,左邊有商品圖右邊有描述,描述要有title 還有商品說明即可,下面要有直接購買與放入購物車與加入追蹤的button
-![[Pasted image 20260918152934.png]]
+![商品詳情頁：本次要實作的畫面](../pictures/17-goods-detail-target.png)
 滑到下面要有footer
 
 我有個素材區域,後續作出repo可以從素材區域搬遷需要且對應的內容到專案當中
