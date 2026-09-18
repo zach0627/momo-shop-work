@@ -1,0 +1,11 @@
+{
+  "name": "@momo/shop",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "shop",
+    "tags": [
+      "type:app"
+    ]
+  }
+}
