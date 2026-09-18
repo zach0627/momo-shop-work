@@ -1,5 +1,5 @@
 {
-  "name": "@momo/shell-feature",
+  "name": "@momo/layout-feature",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
@@ -13,10 +13,10 @@
     "./package.json": "./package.json"
   },
   "nx": {
-    "name": "shell-feature",
+    "name": "layout-feature",
     "tags": [
       "type:feature",
-      "scope:shell"
+      "scope:layout"
     ]
   },
   "dependencies": {

@@ -13,6 +13,6 @@
     "@momo/home-page": "workspace:*",
     "@momo/shared-ui": "workspace:*",
     "@momo/shared-util": "workspace:*",
-    "@momo/shell-feature": "workspace:*"
+    "@momo/layout-feature": "workspace:*"
   }
 }

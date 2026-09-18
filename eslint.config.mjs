@@ -48,8 +48,8 @@ const scopeConstraints = [
     onlyDependOnLibsWithTags: ['scope:goods', 'scope:catalog', 'scope:shared'],
   },
   {
-    sourceTag: 'scope:shell',
-    onlyDependOnLibsWithTags: ['scope:shell', 'scope:catalog', 'scope:shared'],
+    sourceTag: 'scope:layout',
+    onlyDependOnLibsWithTags: ['scope:layout', 'scope:catalog', 'scope:shared'],
   },
   {
     sourceTag: 'scope:catalog',

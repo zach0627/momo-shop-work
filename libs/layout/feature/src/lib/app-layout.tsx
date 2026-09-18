@@ -6,9 +6,9 @@ import { paths } from '@momo/shared-util';
 /**
  * The chrome every page is rendered inside. Walking-skeleton version: the
  * landmarks and the logo link are real; the sticky top bar, category
- * navigation and the full footer arrive with the shell step.
+ * navigation and the full footer arrive with the layout step.
  */
-export function ShellLayout({ children }: { children: ReactNode }) {
+export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-surface text-ink">
       <header className="border-b border-line-strong">

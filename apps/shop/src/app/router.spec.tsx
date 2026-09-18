@@ -15,21 +15,21 @@ function renderAt(path: string) {
   );
 }
 
-function expectShell() {
+function expectLayout() {
   expect(screen.getByRole('banner')).toBeTruthy();
   expect(screen.getByRole('main')).toBeTruthy();
   expect(screen.getByRole('contentinfo')).toBeTruthy();
 }
 
-// spec: app-shell / 每個頁面都有共用外框
+// spec: app-layout / 每個頁面都有共用外框
 describe('routes', () => {
-  it('shows the home page inside the shell at /', async () => {
+  it('shows the home page inside the layout at /', async () => {
     renderAt('/');
 
     expect(
       await screen.findByRole('heading', { level: 1, name: '首頁' }),
     ).toBeTruthy();
-    expectShell();
+    expectLayout();
   });
 
   it('passes the goods id from the URL to the goods detail page', async () => {
@@ -39,19 +39,19 @@ describe('routes', () => {
       await screen.findByRole('heading', { level: 1, name: '商品詳情' }),
     ).toBeTruthy();
     expect(within(screen.getByRole('main')).getByText('15687497')).toBeTruthy();
-    expectShell();
+    expectLayout();
   });
 
-  it('shows a not-found page inside the shell for an unknown path', async () => {
+  it('shows a not-found page inside the layout for an unknown path', async () => {
     renderAt('/nope');
 
     expect(
       await screen.findByRole('heading', { level: 1, name: '找不到頁面' }),
     ).toBeTruthy();
-    expectShell();
+    expectLayout();
   });
 
-  // spec: app-shell / Logo 連回首頁
+  // spec: app-layout / Logo 連回首頁
   it('links the logo back to the home page', async () => {
     renderAt('/goods/15687497');
     await screen.findByRole('heading', { level: 1, name: '商品詳情' });

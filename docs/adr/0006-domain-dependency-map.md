@@ -30,14 +30,14 @@
 
 ```mermaid
 graph TD
-  shell --> catalog
+  layout --> catalog
   home --> catalog
   goods --> catalog
   brand -.-> catalog
   cart -.-> catalog
   goods -.-> cart
-  shell -.-> cart
-  shell -.-> member
+  layout -.-> cart
+  layout -.-> member
   checkout -.-> cart
   checkout -.-> payment
   checkout -.-> member
@@ -55,9 +55,9 @@ graph TD
 | `member`   | 登入、會員資料                          | shared                                                   |
 | `payment`  | 刷卡、分期                              | shared                                                   |
 | `checkout` | 結帳流程                                | cart, payment, member, catalog, shared                   |
-| `shell`    | 全站外框                                | catalog, shared（＋ cart 的數量徽章、member 的登入狀態） |
+| `layout`    | 全站外框                                | catalog, shared（＋ cart 的數量徽章、member 的登入狀態） |
 
-`shell` 是刻意的例外：它是全站的外框，本來就會讀多個 domain 的摘要資料。它只能依賴對方的 `data-access`，不能依賴 feature。
+`layout` 是刻意的例外：它是全站的外框，本來就會讀多個 domain 的摘要資料。它只能依賴對方的 `data-access`，不能依賴 feature。
 
 `payment` 不依賴 `checkout`、也不依賴 `cart`：付款元件不該知道自己被誰使用。這同時讓它日後能被隔離（信用卡表單屬於 PCI-DSS 範圍，見 ADR-0002）。
 

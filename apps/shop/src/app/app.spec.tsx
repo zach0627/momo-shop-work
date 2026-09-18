@@ -4,7 +4,7 @@ import { App } from './app';
 
 // Smoke test of the real browser router; route behaviour is covered in router.spec.tsx.
 describe('App', () => {
-  it('boots at / and renders the home page inside the shell', async () => {
+  it('boots at / and renders the home page inside the layout', async () => {
     render(<App />);
 
     expect(

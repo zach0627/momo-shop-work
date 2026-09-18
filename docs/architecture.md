@@ -30,14 +30,14 @@
 ```mermaid
 graph TD
   APP["apps/shop<br/>type:app"] --> PAGE["home/page · goods/page<br/>type:page"]
-  APP --> SHELL["shell/feature<br/>type:feature"]
+  APP --> LAYOUT["layout/feature<br/>type:feature"]
   PAGE --> FEAT["feature-flash-sale · feature-ranking<br/>feature-recommendation<br/>type:feature"]
   PAGE --> UI
   PAGE --> DA
   FEAT --> UI["shared/ui<br/>type:ui"]
   FEAT --> DA["catalog/data-access · home/data-access<br/>type:data-access"]
-  SHELL --> UI
-  SHELL --> DA
+  LAYOUT --> UI
+  LAYOUT --> DA
   UI --> UTIL["shared/util<br/>type:util"]
   DA --> UTIL
 ```
@@ -53,13 +53,13 @@ graph TD
 
 `scope:` 規則（domain 之間誰能依賴誰，治理方式見 [ADR-0006](./adr/0006-domain-dependency-map.md)）：
 
-| scope     | 可依賴的 scope         |
-| --------- | ---------------------- |
-| `home`    | home, catalog, shared  |
-| `goods`   | goods, catalog, shared |
-| `shell`   | shell, catalog, shared |
-| `catalog` | catalog, shared        |
-| `shared`  | shared                 |
+| scope     | 可依賴的 scope          |
+| --------- | ----------------------- |
+| `home`    | home, catalog, shared   |
+| `goods`   | goods, catalog, shared  |
+| `layout`  | layout, catalog, shared |
+| `catalog` | catalog, shared         |
+| `shared`  | shared                  |
 
 一個專案必須**同時**滿足自己的 `type:` 與 `scope:` 限制。`apps/shop` 只有 `type:app`，所以能組合所有 scope。
 
@@ -92,7 +92,7 @@ libs/home/feature-flash-sale           @momo/home-feature-flash-sale         typ
 libs/home/feature-ranking              @momo/home-feature-ranking            type:feature      scope:home
 libs/home/page                         @momo/home-page                       type:page         scope:home
 libs/goods/page                        @momo/goods-page                      type:page         scope:goods
-libs/shell/feature                     @momo/shell-feature                   type:feature      scope:shell
+libs/layout/feature                     @momo/layout-feature                   type:feature      scope:layout
 ```
 
 每個 lib 的 README 寫明它的職責、可依賴的層、以及 `src/index.ts` 是唯一公開 API。
@@ -140,6 +140,26 @@ src/
 | `catalog/data-access` | 目前同時放商品、分類、限時搶購、暢銷榜、推薦                      | 出現第 2 種促銷型別，或促銷有自己的後端 → 抽 `promotion/data-access`                            |
 | `shared/ui`           | 全專案都依賴它；長大後任何修改都讓 `nx affected` = 全部，快取失效 | 元件超過約 15 個，或 affected 雜訊明顯 → 依元件家族拆（`shared/ui-product`、`shared/ui-form`…） |
 | scope 放行清單        | scope 變多後，遇到 lint 錯誤就「加一個放行」，最後誰都能依賴誰    | 新增任何 scope 放行前必須先更新 [ADR-0006](./adr/0006-domain-dependency-map.md)                 |
+
+### Layout：跨頁保留的外框
+
+TopBar、主 header、分類列與 footer 屬於 **layout**，不屬於任何一頁。它們在每一條路由都存在，換頁時不會重新掛載。
+
+```
+RouterProvider
+└─ LayoutRoute（沒有 path 的 layout route）        apps/shop/src/app/router.tsx
+   └─ <AppLayout>                                   libs/layout/feature
+      ├─ TopBar          fixed；主 header 捲出視窗後轉為 compact 並顯示搜尋框
+      ├─ MainHeader      logo（連回首頁）+ 搜尋框（展示用）
+      ├─ CategoryNav     橫向分類列 + 可展開的「選擇分類」面板
+      ├─ <main> <Outlet /> </main>                  ← 只有這裡隨路由替換
+      └─ Footer
+```
+
+- **機制**：`AppLayout` 掛在一條沒有 path 的 layout route 上，`/`、`/goods/:goodsId`、找不到頁面都是它的子路由，頁面內容透過 `<Outlet />` 換進去。路由的概念只存在於 `apps/shop`；`libs/layout/feature` 只拿到 `children`，不知道 router 的存在。
+- **驗證**：`router.spec.tsx` 對三條路由都檢查 `banner`、`main`、`contentinfo` 三個 landmark 都在（規格 `app-layout`「每個頁面都有共用外框」）。
+- **加第二種 layout**（例：結帳流程用沒有分類列、精簡 footer 的外框）：在 router 再掛一條 layout route 指向另一個 layout 元件，把結帳的路由放到它底下。現有的 `AppLayout` 與頁面都不用改。
+- **命名**：這個 lib 原本叫 `shell`。改名為 `layout` 是因為 (1) 它就是一般所說的 layout；(2) 「shell library」在 Nx 社群有既定意思 —— 串接某個 domain 路由的進入點 lib —— 而這個 lib 做的是全站外框，沿用 `shell` 會讓熟悉 Nx 的讀者誤判它的用途。
 
 ### 設計 Token
 

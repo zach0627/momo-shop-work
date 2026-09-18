@@ -1,13 +1,13 @@
 import { Outlet, type RouteObject } from 'react-router';
 
 import { ROUTE_PATTERNS } from '@momo/shared-util';
-import { ShellLayout } from '@momo/shell-feature';
+import { AppLayout } from '@momo/layout-feature';
 
-function ShellRoute() {
+function LayoutRoute() {
   return (
-    <ShellLayout>
+    <AppLayout>
       <Outlet />
-    </ShellLayout>
+    </AppLayout>
   );
 }
 
@@ -20,7 +20,7 @@ function ShellRoute() {
  */
 export const routes: RouteObject[] = [
   {
-    Component: ShellRoute,
+    Component: LayoutRoute,
     children: [
       { path: ROUTE_PATTERNS.home, lazy: () => import('./routes/home.route') },
       {

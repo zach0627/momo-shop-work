@@ -2,14 +2,14 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../../node_modules/.vite/libs/shell/feature',
+  cacheDir: '../../../node_modules/.vite/libs/layout/feature',
   plugins: [react()],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [],
   // },
   test: {
-    name: 'shell-feature',
+    name: 'layout-feature',
     watch: false,
     passWithNoTests: true,
     globals: true,
