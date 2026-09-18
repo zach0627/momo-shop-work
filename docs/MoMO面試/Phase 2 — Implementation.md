@@ -140,6 +140,7 @@ First Commit 至最後 Commit
 - [x] `ui/main-header`：logo（連回首頁）+ 搜尋框 + 熱搜關鍵字列。右側三張活動小圖沒有素材 → 不做，記入 Known Gaps。
 - [x] `ui/footer`：背景 `footer`、內容寬 1220px；防詐騙提醒框（3px `footer-accent-line`、圓角 8px）；六欄連結（標題 19px / 700 `footer-accent`、連結 13px 白字，皆為純文字）。
 - [x] 以上全部為 lib 私有，`index.ts` 只匯出 `AppLayout`；移除本 lib 的 `passWithNoTests`。
+- [x] （計畫外，Human review 後）查證 Nx 對 layout 的放法並比較三種方案 → 維持現在的位置，寫成 ADR-0007。
 - [x] （計畫外，Human review 後）**layout 升為 `type:layout` 一層**，lib 搬到 `libs/shop/layout`。先用探針確認改規則前 layout→feature 會被擋（紅燈），改規則後通過；page→layout、feature→layout、`scope:shop`→`scope:home` 被擋；app→layout 通過。
 
 **驗證**：`pnpm nx run-many -t lint test typecheck`（無快取）+ `pnpm nx build shop` + `pnpm verify:boundaries`；dev server 上實際捲動確認 TopBar 保留並轉 compact、分類面板可展開；**切到 `/goods/:id` 確認 TopBar 與 footer 仍在**；用 `getComputedStyle` 抽查數值與真站一致。
@@ -282,7 +283,8 @@ First Commit 至最後 Commit
 | — | **步驟重新編排**：Layout 由 Step 7 提前為 Step 5（它是每一頁的骨架）；原 Step 5、6 順延為 6、7；`tasks.md` 同步重新編號 | `4140d12` |
 | 5 | **Layout**：`fixed` 的 TopBar（捲動後轉 compact 顯示搜尋框）、主 header（logo + 展示用搜尋框 + 熱搜關鍵字）、可展開的分類列（40 個分類、五種色調）、footer（防詐騙提醒框 + 六欄 + QR code）。三份 spec 共 11 個測試（TDD）。分類面板的樣式從真站量出並進入兩層 token。拆成 5 個 commit，中間的 3 個都匯出到乾淨環境單獨驗證為綠 | `8063454` `fc73d14` `0d2a0ef` `4678d8e` `3e8caf5` |
 | — | **全專案健檢**（Human 回報編輯器在 `tsconfig.app.json` 顯示 not found）：85 個 tsconfig 引用全部存在；直接驅動 tsserver（TS 6.0.3 與 5.9.3）取得編輯器層級的診斷 → 0 個，並以故意寫壞的 tsconfig 確認這個檢查抓得到 `TS6053 … not found`；歷史上每個 commit 的引用也都存在。磁碟上的狀態沒有問題，研判是編輯器留著改名當下的過期診斷。順帶發現並修正：本機外掛的狀態資料夾 `.omc/` 沒有被 ignore | `5142b29` |
-| — | **Layout 升為正式的一層**：`libs/layout/feature` → `libs/shop/layout`（`@momo/shop-layout`）；新增 `type:layout`（與 `page` 同層、可組合 feature、只有 app 能依賴）；`scope:layout` 改名為 `scope:shop`；ADR-0006 改寫，並記錄為什麼推翻原本「外框不能依賴 feature」那句話；主規格 `module-boundaries` 新增 3 個 scenario。起因：Human 質疑「layout 裡面卻有 feature，這是好的設計嗎？」 | `5966dcf` `d815c11`（+ 文件與步驟的 commit） |
+| — | **Layout 升為正式的一層**：`libs/layout/feature` → `libs/shop/layout`（`@momo/shop-layout`）；新增 `type:layout`（與 `page` 同層、可組合 feature、只有 app 能依賴）；`scope:layout` 改名為 `scope:shop`；ADR-0006 改寫，並記錄為什麼推翻原本「外框不能依賴 feature」那句話；主規格 `module-boundaries` 新增 3 個 scenario。起因：Human 質疑「layout 裡面卻有 feature，這是好的設計嗎？」 | `5966dcf` `d815c11` `6bb5b32` |
+| — | **layout 該放哪：查證與定案（ADR-0007）**。Human 連續追問：放 `apps/shop/src/layouts` 會不會比較好？Nx 以往怎麼放？是不是該叫 `feature-shell`？查證 Nx 文件、`nrwl/react-template`、`nrwl/nx-examples` 與 feature-shell 模式後，比較三種放法，**維持 `libs/shop/layout`，不搬程式**。`architecture.md` §3 註明 `page` 與 `layout` 是我們在 Nx 四種 type 之上自訂的延伸；README 的取捨表新增這一項 | 見 git log |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -356,5 +358,10 @@ First Commit 至最後 Commit
 - 一個探針回報「通過」其實是探針檔沒寫進去（那個 lib 還是空殼，沒有 `src/lib/`）。沒有把它當成通過，換位置重跑後確認被擋。
 - `git mv` 整個資料夾再次遇到 Permission denied（這次 dev server 已停，佔用者無法辨識）→ 改為逐檔 `git mv`，git 記錄的 rename 完全相同。
 - 自己把 `CI=true` 帶進 `pnpm install`，pnpm 因此以 frozen 模式拒絕更新 lockfile → 安裝這一步不帶 `CI`。
+
+**layout 該放哪：討論的結論與 Agent 的失誤**
+- 查證到的事實：Nx 官方的兩個範例都把 layout **外框**放在 app，只把可重用的**零件**（header）抽成 lib；`feature-shell` 是「擁有頂層路由」的 lib，為的是同一個應用出多個平台版本，和我們的情境不同，而且會破壞「router 只存在於 app」（ADR-0001）。
+- 結論：維持 `libs/shop/layout`。理由是 app 是唯一不受邊界規則約束的專案，所以只放接線；`page` 與 `layout` 同屬「路由層級的組合」這一層，都在 lib。與另一個方案的實質差距只有約 12 行排版 JSX 與一條規則。
+- Agent 的失誤：同一個決定換了三次建議，每一輪都是先有結論再找理由，被要求查證才去讀文件與範例；引用 `nx-examples` 時把「header 零件」與「layout 外框」混為一談（Human 糾正用詞時才發現）；說錯「拆掉 `type:layout` 就全部是 Nx 標準 type」（`type:page` 本來就是自訂的）。已照實寫進 `docs/agent-workflow.md`。
 
 **下一步：Step 6 — 素材 + fixtures + `catalog/data-access`**（分類清單會從 `shop/layout` 搬進 catalog fixtures）→ 對應 `tasks.md` 第 6 組

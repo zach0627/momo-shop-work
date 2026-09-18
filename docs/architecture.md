@@ -53,6 +53,8 @@ graph TD
 | `data-access` | util                                         | 型別、repository interface 與實作、query hooks、fixtures。**data-access ✗ data-access**                   |
 | `util`        | util                                         | 純函式                                                                                                    |
 
+Nx 文件只列四種 type：feature、ui、data-access、util。**`page` 與 `layout` 是我們自訂的延伸**，兩者合起來是「路由層級的組合」這一層。為什麼這樣分、比較過哪些放法（包含 Nx 社群的 `feature-shell`），見 [ADR-0007](./adr/0007-layout-as-a-lib-and-a-tier.md)。
+
 `scope:` 規則（domain 之間誰能依賴誰，治理方式見 [ADR-0006](./adr/0006-domain-dependency-map.md)）：
 
 | scope     | 可依賴的 scope         |
@@ -163,6 +165,7 @@ RouterProvider
 - **機制**：`AppLayout` 掛在一條沒有 path 的 layout route 上，`/`、`/goods/:goodsId`、找不到頁面都是它的子路由，頁面內容透過 `<Outlet />` 換進去。路由的概念只存在於 `apps/shop`；`libs/shop/layout` 只拿到 `children`，不知道 router 的存在。
 - **驗證**：`router.spec.tsx` 對三條路由都檢查 `banner`、`main`、`contentinfo` 三個 landmark 都在（規格 `app-layout`「每個頁面都有共用外框」）。
 - **層級**：layout 是 `type:layout`，與 `page` 同層（§3）。只有 `apps/shop` 的 router 能 import 它；page 與 feature import 它都是 lint 錯誤。它可以組合 feature，所以日後 header 裡由別的 domain 擁有的互動元件（mini-cart、搜尋自動完成）能以 feature 的形式放進來，而不必把對方的邏輯寫進外框。摘要資料（購物車數量、登入狀態）則直接讀對方的 `data-access`。見 [ADR-0006](./adr/0006-domain-dependency-map.md)。
+- **為什麼整個 layout 放在 lib 而不是 `apps/shop/src/layouts`**：Nx 官方的兩個範例都把 layout 外框放在 app、只把可重用的零件抽成 lib，所以這是一個需要說明的選擇。比較與理由見 [ADR-0007](./adr/0007-layout-as-a-lib-and-a-tier.md)；簡短地說，app 是唯一不受邊界規則約束的專案，所以只放接線。
 - **加第二種 layout**（例：結帳流程用沒有分類列、精簡 footer 的外框）：新增 `libs/checkout/layout`（`type:layout`），在 router 再掛一條 layout route 指向它，把結帳的路由放到它底下。現有的 `AppLayout` 與頁面都不用改。
 - **命名**：這個 lib 改過兩次名，兩次都是 Human 提出質疑後才改的。(1) `shell/feature` → `layout/feature`：它就是一般所說的 layout，而「shell library」在 Nx 社群另有所指（串接某個 domain 路由的進入點 lib），沿用會讓熟悉 Nx 的讀者誤判用途。(2) `layout/feature` → `shop/layout`：路徑的寫法是 `libs/<誰的>/<哪一種>`，「layout」是種類而不是擁有者，放在 scope 的位置讀起來是「layout 的 feature」，說不通；第一次改名只換了字，沒有檢查換完之後整條路徑還通不通。
 
@@ -242,11 +245,12 @@ TDD 只打有邏輯的地方：純函式、repository、分頁與「看更多」
 
 ## 9. 決策紀錄與演進方向
 
-| ADR                                                          | 決策                                | 演進觸發條件                         |
-| ------------------------------------------------------------ | ----------------------------------- | ------------------------------------ |
-| [0001](./adr/0001-spa-over-next.md)                          | SPA（Vite）而非 Next                | 需要 SEO / LCP                       |
-| [0002](./adr/0002-single-app-with-domain-libs.md)            | 單一 app + domain libs              | 不同團隊負責不同路由群；需要獨立部署 |
-| [0003](./adr/0003-server-state-only-no-global-store.md)      | 只有 TanStack Query，沒有全域 store | 出現購物車、會員                     |
-| [0004](./adr/0004-config-driven-home-page.md)                | 首頁 config-driven                  | 接 CMS API                           |
-| [0005](./adr/0005-repository-seam-with-context-injection.md) | Repository + Context 注入，而非 MSW | 需要 contract test / 網路層模擬      |
-| [0006](./adr/0006-domain-dependency-map.md)                  | Domain 依賴地圖與 scope 放行的治理  | 新增任何 domain                      |
+| ADR                                                          | 決策                                   | 演進觸發條件                               |
+| ------------------------------------------------------------ | -------------------------------------- | ------------------------------------------ |
+| [0001](./adr/0001-spa-over-next.md)                          | SPA（Vite）而非 Next                   | 需要 SEO / LCP                             |
+| [0002](./adr/0002-single-app-with-domain-libs.md)            | 單一 app + domain libs                 | 不同團隊負責不同路由群；需要獨立部署       |
+| [0003](./adr/0003-server-state-only-no-global-store.md)      | 只有 TanStack Query，沒有全域 store    | 出現購物車、會員                           |
+| [0004](./adr/0004-config-driven-home-page.md)                | 首頁 config-driven                     | 接 CMS API                                 |
+| [0005](./adr/0005-repository-seam-with-context-injection.md) | Repository + Context 注入，而非 MSW    | 需要 contract test / 網路層模擬            |
+| [0006](./adr/0006-domain-dependency-map.md)                  | Domain 依賴地圖與 scope 放行的治理     | 新增任何 domain                            |
+| [0007](./adr/0007-layout-as-a-lib-and-a-tier.md)             | 全站 layout 放在 lib，並作為自訂的一層 | 同一個應用要出多個平台版本；出現第二個 app |

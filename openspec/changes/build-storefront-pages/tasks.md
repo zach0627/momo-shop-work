@@ -45,6 +45,7 @@
 - [x] 5.5 TDD：`AppLayout` 的 compact 行為 —— 主 header 離開視窗時頂部列出現搜尋框、回到視窗時恢復；以替身 `IntersectionObserver` 驅動；驗證：spec 通過（spec `app-layout`「頂部列在捲動時保留並轉為 compact」）
 - [x] 5.6 `top-bar`（`position: fixed`、高 40px，版面預留空間）、`main-header`（logo 連回首頁 + 搜尋框 + 熱搜關鍵字）、`footer`（防詐騙提醒框 + 六欄連結）；全部為 lib 私有，`index.ts` 只匯出 `AppLayout`；驗證：dev server 實際捲動確認頂部列保留並轉 compact；切到 `/goods/:id` 外框仍在；以 `getComputedStyle` 抽查數值與真站一致；與截圖 `01`–`04`、`15` 對照
 - [x] 5.7 （計畫外，Human review 後）外框升為 `type:layout` 一層並搬到 `libs/shop/layout`；`scope:layout` 改名為 `scope:shop`；驗證：5 個探針 —— 改規則前 layout→feature 被擋、改規則後通過；page→layout、feature→layout、`scope:shop`→`scope:home` 被擋；app→layout 通過（主規格 `module-boundaries`「依賴方向是單向的」新增的 3 個 scenario）；`pnpm verify:boundaries` 12 條規則、0 違規
+- [x] 5.8 （計畫外，Human review 後）查證 Nx 對 layout 的放法（官方文件、`nrwl/react-template`、`nrwl/nx-examples`、`feature-shell` 模式），比較三種方案後維持 `libs/shop/layout`；寫成 `docs/adr/0007-layout-as-a-lib-and-a-tier.md`，並在 `architecture.md` §3 註明 `page` 與 `layout` 是自訂的 type；驗證：文件內相對連結可開啟
 
 ## 6. 素材與商品資料（Step 6）
 

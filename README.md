@@ -13,7 +13,7 @@ Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情�
 | [`openspec/config.yaml`](./openspec/config.yaml)                                        | 專案脈絡（為什麼存在、為什麼這樣設置、不能破的規則）—— 會被帶進之後每一份規格的撰寫指示                                                                      |
 | [`docs/architecture.md`](./docs/architecture.md)                                        | 系統怎麼切、為什麼這樣切、規模變大時怎麼管                                                                                                                   |
 | [`docs/design-tokens.md`](./docs/design-tokens.md)                                      | 兩層 design token（Primitive / Semantic）；每個顏色、字級、框線的數值都是從真實網站的計算樣式**量出來的**，並記錄在哪裡量到、哪些沒量到                      |
-| [`docs/adr/`](./docs/adr)                                                               | 6 個決策：背景、理由、**代價**、演進觸發條件                                                                                                                 |
+| [`docs/adr/`](./docs/adr)                                                               | 7 個決策：背景、理由、**代價**、演進觸發條件                                                                                                                 |
 | [`docs/agent-workflow.md`](./docs/agent-workflow.md)                                    | Human ↔ Agent 怎麼協作；Human 糾正了 Agent 什麼；Agent 在哪裡出錯                                                                                            |
 | [`docs/MoMO面試/`](./docs/MoMO面試)                                                     | 原始的需求解析、設計筆記與逐步計畫                                                                                                                           |
 | [`docs/pictures/`](./docs/pictures)                                                     | 目標畫面（真實網站）的截圖，依頁面由上到下編號                                                                                                               |
@@ -58,12 +58,13 @@ app → layout / page → feature → ui / data-access → util
 
 其他取捨：
 
-| 決策                          | 換到什麼                                            | 付出什麼                                                                                             |
-| ----------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| SPA 而非 Next                 | 靜態部署、沒有 server、沒有 RSC 邊界的決策          | 沒有 SSR 的 SEO 與 LCP —— 不適合直接上正式環境的電商（[ADR-0001](./docs/adr/0001-spa-over-next.md)） |
-| 首頁 config-driven            | 13 個區塊只需要 9 種 renderer；調整版位只改資料     | 多一層間接；通用 block 的 props 會膨脹（[ADR-0004](./docs/adr/0004-config-driven-home-page.md)）     |
-| Repository + Context 而非 MSW | 接縫在 TypeScript interface 上；測試可注入小的 fake | 不驗證 HTTP 細節（[ADR-0005](./docs/adr/0005-repository-seam-with-context-injection.md)）            |
-| TDD 只打有邏輯的地方          | 測試數量少、每個都有意義                            | 純版面區塊沒有單元測試保護                                                                           |
+| 決策                                             | 換到什麼                                                   | 付出什麼                                                                                                        |
+| ------------------------------------------------ | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| SPA 而非 Next                                    | 靜態部署、沒有 server、沒有 RSC 邊界的決策                 | 沒有 SSR 的 SEO 與 LCP —— 不適合直接上正式環境的電商（[ADR-0001](./docs/adr/0001-spa-over-next.md)）            |
+| 首頁 config-driven                               | 13 個區塊只需要 9 種 renderer；調整版位只改資料            | 多一層間接；通用 block 的 props 會膨脹（[ADR-0004](./docs/adr/0004-config-driven-home-page.md)）                |
+| Repository + Context 而非 MSW                    | 接縫在 TypeScript interface 上；測試可注入小的 fake        | 不驗證 HTTP 細節（[ADR-0005](./docs/adr/0005-repository-seam-with-context-injection.md)）                       |
+| 整個 layout 放 lib，而非 `apps/shop/src/layouts` | app 只有接線；路由層級的組合（page、layout）都受 lint 約束 | 多一條自訂的型別規則，而且和 Nx 官方範例的放法不同（[ADR-0007](./docs/adr/0007-layout-as-a-lib-and-a-tier.md)） |
+| TDD 只打有邏輯的地方                             | 測試數量少、每個都有意義                                   | 純版面區塊沒有單元測試保護                                                                                      |
 
 ## 開發
 
