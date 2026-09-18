@@ -1,0 +1,44 @@
+/*
+ * PRIMITIVE TOKENS - "which colours exist".
+ *
+ * A raw palette with no meaning attached. Components must NEVER use these
+ * directly; they are deliberately plain custom properties (not inside
+ * `@theme`), so Tailwind generates no utility for them - there is no
+ * `text-momo-magenta-600` to reach for. Meaning is added one layer up, in
+ * tokens.semantic.css.
+ *
+ * Every value was read from the computed styles of the live site
+ * (www.momoshop.com.tw home page and a goods detail page, desktop layout,
+ * 2026-09-18). See docs/design-tokens.md for where each one was found.
+ */
+:root {
+  /* magenta / pink / red */
+  --momo-magenta-600: #d62872; /* the brand colour */
+  --momo-pink-600: #db2777;
+  --momo-rose-500: #ff4c76;
+  --momo-red-600: #dd2222;
+
+  /* blue / amber */
+  --momo-blue-600: #1c6fbc;
+  --momo-amber-700: #bb7711;
+
+  /* navy / cyan (footer) */
+  --momo-navy-900: #09355d;
+  --momo-cyan-400: #53d6df;
+  --momo-cyan-200: #a9eaef;
+
+  /* neutrals, dark to light */
+  --momo-gray-950: #222222;
+  --momo-gray-900: #262626;
+  --momo-gray-800: #404040;
+  --momo-gray-750: #454545;
+  --momo-gray-700: #515151;
+  --momo-gray-500: #888888;
+  --momo-gray-450: #999999;
+  --momo-gray-400: #b3b3b3;
+  --momo-gray-300: #cccccc;
+  --momo-gray-200: #e5e5e5;
+  --momo-gray-150: #f0f0f0;
+  --momo-gray-100: #f2f2f2;
+  --momo-white: #ffffff;
+}

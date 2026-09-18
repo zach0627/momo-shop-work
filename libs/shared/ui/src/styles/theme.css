@@ -1,0 +1,8 @@
+/*
+ * Design system entry point. The app imports this one file.
+ *
+ *   tokens.primitive.css  which colours exist      (never used by components)
+ *   tokens.semantic.css   what each one is for     (the only layer components use)
+ */
+@import './tokens.primitive.css';
+@import './tokens.semantic.css';

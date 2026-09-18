@@ -1,0 +1,154 @@
+/*
+ * SEMANTIC TOKENS - "what a colour is for".
+ *
+ * The only layer components may use. Each token names a purpose and points
+ * at a primitive; Tailwind turns it into utilities:
+ *   --color-brand     -> text-brand / bg-brand / border-brand
+ *   --text-ec-sm      -> text-ec-sm (with its measured line-height)
+ *   --container-shop  -> max-w-shop
+ *
+ * Why two layers: a rebrand edits one primitive; a theme (dark mode, a
+ * campaign skin) overrides semantic tokens - and no component changes in
+ * either case.
+ *
+ * The default Tailwind colour palette and type scale are switched off
+ * below, so `text-pink-600` or `text-sm` do not exist in this workspace.
+ * A colour or size that is not a token cannot be used by accident.
+ */
+@theme {
+  --color-*: initial;
+  --text-*: initial;
+
+  /* ---- Brand and actions ------------------------------------------------ */
+
+  /* logo, active nav item + its underline, hot keywords, price-drop price */
+  --color-brand: var(--momo-magenta-600);
+  /* "直接購買" */
+  --color-action-primary: var(--momo-magenta-600);
+  /* "放入購物車" */
+  --color-action-cart: var(--momo-blue-600);
+  /* "加入追蹤" */
+  --color-action-neutral: var(--momo-gray-300);
+  /* text on any filled button or dark surface */
+  --color-on-action: var(--momo-white);
+
+  /* ---- Prices and promotion -------------------------------------------- */
+
+  /* store pickup, best sellers, moPro, recommendations */
+  --color-price: var(--momo-pink-600);
+  /* flash sale price, "限搶價", promo line */
+  --color-sale: var(--momo-red-600);
+  /* countdown digit chip */
+  --color-countdown: var(--momo-rose-500);
+
+  /* ---- Ink (text) ------------------------------------------------------- */
+
+  /* flash sale header */
+  --color-ink-strong: var(--momo-gray-950);
+  /* goods description lines */
+  --color-ink-emphasis: var(--momo-gray-900);
+  /* the default: product names, titles, nav items, field labels */
+  --color-ink: var(--momo-gray-800);
+  /* sales count */
+  --color-ink-meta: var(--momo-gray-750);
+  /* "促銷價", struck price on the detail page */
+  --color-ink-label: var(--momo-gray-500);
+  /* struck original price, goods code */
+  --color-ink-muted: var(--momo-gray-450);
+  /* original price in the recommendation grid */
+  --color-ink-subtle: var(--momo-gray-400);
+  /* "Home" in the breadcrumb */
+  --color-breadcrumb-root: var(--momo-amber-700);
+
+  /* ---- Lines ------------------------------------------------------------ */
+
+  /* product card border */
+  --color-line: var(--momo-gray-200);
+  /* flash sale card border */
+  --color-line-soft: var(--momo-gray-150);
+  /* bottom border of the top bar */
+  --color-line-strong: var(--momo-gray-300);
+  /* search field border and search button */
+  --color-control: var(--momo-gray-700);
+
+  /* ---- Surfaces --------------------------------------------------------- */
+
+  --color-surface: var(--momo-white);
+  /* top bar */
+  --color-surface-muted: var(--momo-gray-100);
+  --color-footer: var(--momo-navy-900);
+  /* footer headings, fraud notice text */
+  --color-footer-accent: var(--momo-cyan-400);
+  /* fraud notice border (3px) */
+  --color-footer-accent-line: var(--momo-cyan-200);
+
+  /* ---- Font family ------------------------------------------------------
+     Measured on the live site. It is the sans stack of the Tailwind version
+     the site was built with; Tailwind 4.3 changed its own default, so the
+     value is pinned here instead of inherited. Resolves to the platform's
+     CJK UI font (Microsoft JhengHei UI on Windows, PingFang TC on macOS). */
+  --font-sans:
+    ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+
+  /* ---- Type scale -------------------------------------------------------
+     The real site uses an odd-numbered scale it calls `ec-*`; the names are
+     kept so the two can be compared. Each size carries its measured
+     line-height. */
+
+  /* "限搶價", sales count */
+  --text-ec-2xs: 11px;
+  --text-ec-2xs--line-height: 16px;
+  /* top bar, hot keywords, original price, field labels, goods code */
+  --text-ec-sm: 13px;
+  --text-ec-sm--line-height: 18px;
+  /* product name, promo line, search button, goods description */
+  --text-ec-base: 15px;
+  --text-ec-base--line-height: 20px;
+  /* action buttons, search input */
+  --text-ec-md: 16px;
+  --text-ec-md--line-height: 24px;
+  /* category nav item (weight 600) */
+  --text-ec-lg: 17px;
+  --text-ec-lg--line-height: 25.5px;
+  /* goods title (weight 700), recommendation price, footer heading */
+  --text-ec-xl: 19px;
+  --text-ec-xl--line-height: 25px;
+  /* price in rails */
+  --text-ec-2xl: 21px;
+  --text-ec-2xl--line-height: 26px;
+  /* flash sale price */
+  --text-ec-3xl: 23px;
+  --text-ec-3xl--line-height: 28.75px;
+  /* price on the goods detail page */
+  --text-ec-4xl: 25px;
+  --text-ec-4xl--line-height: 37.5px;
+  /* NOT measured: the section titles ("降價好貨" ...) are not in the readable
+     DOM (they sit in a cross-origin frame). Estimated from the screenshots. */
+  --text-ec-title: 24px;
+  --text-ec-title--line-height: 32px;
+
+  /* ---- Radius ----------------------------------------------------------- */
+
+  /* product cards, fraud notice */
+  --radius-card: 8px;
+  /* recommendation tile, countdown digit */
+  --radius-tile: 4px;
+  /* Action buttons on the detail page are square (0px): use `rounded-none`. */
+
+  /* ---- Shadow ----------------------------------------------------------- */
+
+  /* price-drop card */
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  /* flash sale card */
+  --shadow-card-raised: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+
+  /* ---- Layout ----------------------------------------------------------- */
+
+  /* Desktop-first: the real desktop site uses a fixed 1220px content width. */
+  --container-shop: 1220px;
+  /* top bar height; 41px with its border */
+  --spacing-topbar: 40px;
+  /* action button height (buttons are 160px wide) */
+  --spacing-action: 40px;
+}
