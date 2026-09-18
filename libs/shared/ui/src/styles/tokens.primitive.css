@@ -27,6 +27,17 @@
   --momo-cyan-400: #53d6df;
   --momo-cyan-200: #a9eaef;
 
+  /* pastels - category pill backgrounds (used at 40-50% opacity) */
+  --momo-sky-100: #e1eff6;
+  --momo-lavender-100: #e6e6f9;
+  --momo-rose-100: #f2d7de;
+  --momo-mint-100: #e2f8e2;
+  --momo-peach-100: #ffe9cc;
+
+  /* slate - category panel title and icons */
+  --momo-slate-800: #1f2937;
+  --momo-slate-600: #4b5563;
+
   /* neutrals, dark to light */
   --momo-gray-950: #222222;
   --momo-gray-900: #262626;
@@ -40,5 +51,6 @@
   --momo-gray-200: #e5e5e5;
   --momo-gray-150: #f0f0f0;
   --momo-gray-100: #f2f2f2;
+  --momo-gray-50: #fafafa;
   --momo-white: #ffffff;
 }

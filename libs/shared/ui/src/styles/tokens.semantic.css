@@ -60,6 +60,41 @@
   /* "Home" in the breadcrumb */
   --color-breadcrumb-root: var(--momo-amber-700);
 
+  /* "選擇分類", the title of the expanded category panel */
+  --color-ink-title: var(--momo-slate-800);
+  /* the chevron of the category toggle */
+  --color-ink-icon: var(--momo-slate-600);
+
+  /* ---- Category pills ---------------------------------------------------
+     Each row of the "選擇分類" panel has its own tint. The live site paints
+     them semi-transparent (measured: 0.5, rose 0.4) over the white panel, so
+     the opacity is part of the token rather than baked into a new hex. */
+  --color-category-sky: color-mix(
+    in srgb,
+    var(--momo-sky-100) 50%,
+    transparent
+  );
+  --color-category-lavender: color-mix(
+    in srgb,
+    var(--momo-lavender-100) 50%,
+    transparent
+  );
+  --color-category-rose: color-mix(
+    in srgb,
+    var(--momo-rose-100) 40%,
+    transparent
+  );
+  --color-category-mint: color-mix(
+    in srgb,
+    var(--momo-mint-100) 50%,
+    transparent
+  );
+  --color-category-peach: color-mix(
+    in srgb,
+    var(--momo-peach-100) 50%,
+    transparent
+  );
+
   /* ---- Lines ------------------------------------------------------------ */
 
   /* product card border */
@@ -76,6 +111,8 @@
   --color-surface: var(--momo-white);
   /* top bar */
   --color-surface-muted: var(--momo-gray-100);
+  /* the category toggle button */
+  --color-surface-control: var(--momo-gray-50);
   --color-footer: var(--momo-navy-900);
   /* footer headings, fraud notice text */
   --color-footer-accent: var(--momo-cyan-400);
@@ -123,6 +160,9 @@
   /* price on the goods detail page */
   --text-ec-4xl: 25px;
   --text-ec-4xl--line-height: 37.5px;
+  /* "選擇分類": the one even size on the site, so it is named by role */
+  --text-panel-title: 18px;
+  --text-panel-title--line-height: 28px;
   /* NOT measured: the section titles ("降價好貨" ...) are not in the readable
      DOM (they sit in a cross-origin frame). Estimated from the screenshots. */
   --text-ec-title: 24px;
@@ -134,6 +174,10 @@
   --radius-card: 8px;
   /* recommendation tile, countdown digit */
   --radius-tile: 4px;
+  /* category pill (44px tall, fully rounded ends) */
+  --radius-pill: 22px;
+  /* bottom corners of the expanded category panel */
+  --radius-panel: 12px;
   /* Action buttons on the detail page are square (0px): use `rounded-none`. */
 
   /* ---- Shadow ----------------------------------------------------------- */
@@ -142,13 +186,16 @@
   --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   /* flash sale card */
   --shadow-card-raised: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  /* expanded category panel */
+  --shadow-panel: 0 2px 8px 0 rgb(0 0 0 / 0.08);
 
   /* ---- Layout ----------------------------------------------------------- */
 
   /* Desktop-first: the real desktop site uses a fixed 1220px content width. */
   --container-shop: 1220px;
-  /* top bar height; 41px with its border */
-  --spacing-topbar: 40px;
+  /* the fixed top bar: 40px of content + its 1px bottom border. The layout
+     reserves exactly this much space above the page. */
+  --spacing-topbar: 41px;
   /* action button height (buttons are 160px wide) */
   --spacing-action: 40px;
 }
