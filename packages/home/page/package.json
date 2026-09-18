@@ -18,5 +18,8 @@
       "type:page",
       "scope:home"
     ]
+  },
+  "dependencies": {
+    "react": "catalog:"
   }
 }

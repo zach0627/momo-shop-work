@@ -1,4 +1,5 @@
 import nx from '@nx/eslint-plugin';
+import * as jsoncParser from 'jsonc-eslint-parser';
 
 /**
  * Layering rules (see docs/MoMO面試/Phase 1 §3).
@@ -111,6 +112,49 @@ export function restrictedImports(allowed = []) {
   };
 }
 
+/**
+ * A package declares what its `src/` imports (pnpm gives it access to nothing
+ * else once the root stops providing it). Versions come from the catalog in
+ * pnpm-workspace.yaml.
+ *
+ * `buildTargets` matters twice over. The rule silently checks NOTHING for a
+ * project that has none of the listed targets, and the default is ['build'],
+ * which only the app has. And a workspace package only counts as a dependency
+ * if it has the same target as the project being checked - so everything is
+ * matched through `typecheck`, the one target every project has.
+ *
+ * Out of scope on purpose: spec files and tool configs. Test and build
+ * tooling is shared and lives in the root package.json.
+ *
+ * Always ignored: tslib. tsconfig.base.json sets `importHelpers`, so the rule
+ * assumes compiled output needs it; these packages only emit declarations and
+ * Vite transpiles the source, so nothing ever imports it.
+ *
+ * A project may pass more names to ignore from its own eslint config - the
+ * exception is written where it applies, like `restrictedImports`.
+ */
+export function dependencyChecks(ignoredDependencies = []) {
+  return {
+    files: ['**/package.json'],
+    languageOptions: { parser: jsoncParser },
+    rules: {
+      '@nx/dependency-checks': [
+        'error',
+        {
+          buildTargets: ['typecheck'],
+          ignoredDependencies: ['tslib', ...ignoredDependencies],
+          ignoredFiles: [
+            '{projectRoot}/**/*.spec.{ts,tsx}',
+            '{projectRoot}/eslint.config.{js,cjs,mjs}',
+            '{projectRoot}/vite.config.{js,ts,mjs,mts}',
+            '{projectRoot}/vitest.config.{js,ts,mjs,mts}',
+          ],
+        },
+      ],
+    },
+  };
+}
+
 export default [
   ...nx.configs['flat/base'],
   ...nx.configs['flat/typescript'],
@@ -137,4 +181,5 @@ export default [
     },
   },
   restrictedImports(),
+  dependencyChecks(),
 ];

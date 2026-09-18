@@ -5,8 +5,10 @@
 //
 // Lint already enforces the rules per file. This script answers the questions
 // lint cannot: "is the rule actually switched on in every project?" and "are
-// the tags well-formed?". A lib whose tags are malformed is silently exempt
-// from every constraint, and lint stays green.
+// the tags well-formed?". A package whose tags are malformed is silently exempt
+// from every constraint, and lint stays green. The same goes for the rule that
+// makes packages declare their dependencies: it silently skips a project that
+// lacks the target it is matched through.
 //
 // The constraints are read from the *effective* ESLint config, so there is no
 // second copy of the rules to keep in sync.
@@ -22,6 +24,7 @@ const { ESLint } = createRequire(join(root, 'package.json'))('eslint');
 
 const BOUNDARIES = '@nx/enforce-module-boundaries';
 const RESTRICTED = 'no-restricted-imports';
+const DEPENDENCY_CHECKS = '@nx/dependency-checks';
 // package -> the only project allowed to import it
 const SINGLE_OWNER = { 'react-router': 'shop', 'embla-carousel': 'shared-ui' };
 
@@ -104,8 +107,27 @@ for (const p of projects) {
       fail(`${p.name}: must not be allowed to import ${pkg}`);
   }
 
+  // @nx/dependency-checks does nothing, without a word, for a project that has
+  // none of the targets listed in `buildTargets`. So "the rule is on" has to
+  // mean: severity error AND the project really has one of those targets.
+  const { rules: manifestRules = {} } = await new ESLint({
+    cwd: dir,
+  }).calculateConfigForFile(join(dir, 'package.json'));
+  const [depSeverity, depOptions] = [].concat(
+    manifestRules[DEPENDENCY_CHECKS] ?? [0],
+  );
+  const depTarget = (depOptions?.buildTargets ?? ['build']).find(
+    (target) => p.data.targets?.[target],
+  );
+  if (depSeverity !== 2) fail(`${p.name}: ${DEPENDENCY_CHECKS} is not "error"`);
+  else if (!depTarget)
+    fail(
+      `${p.name}: ${DEPENDENCY_CHECKS} is on but the project has none of its buildTargets, so it checks nothing`,
+    );
+
   console.log(
     `   ${p.name.padEnd(32)} boundaries=error  constraints=${depConstraints.length}` +
+      `  dependency-checks=${depTarget ? `via ${depTarget}` : 'OFF'}` +
       `  may import: ${allowed.length ? allowed.join(', ') : '-'}`,
   );
 }

@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@momo/shared-ui": "workspace:*",
-    "@momo/shared-util": "workspace:*"
+    "@momo/shared-util": "workspace:*",
+    "react": "catalog:"
   }
 }

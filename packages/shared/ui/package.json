@@ -19,5 +19,8 @@
       "type:ui",
       "scope:shared"
     ]
+  },
+  "dependencies": {
+    "react": "catalog:"
   }
 }

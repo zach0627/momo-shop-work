@@ -18,5 +18,8 @@
       "type:page",
       "scope:goods"
     ]
+  },
+  "dependencies": {
+    "react": "catalog:"
   }
 }

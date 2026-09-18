@@ -13,6 +13,13 @@
     "@momo/home-page": "workspace:*",
     "@momo/shared-ui": "workspace:*",
     "@momo/shared-util": "workspace:*",
-    "@momo/shop-layout": "workspace:*"
+    "@momo/shop-layout": "workspace:*",
+    "@tanstack/react-query": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-router": "catalog:"
+  },
+  "devDependencies": {
+    "tailwindcss": "catalog:"
   }
 }
