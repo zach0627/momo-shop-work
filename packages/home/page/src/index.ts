@@ -1,1 +1,1 @@
-export { HomePage } from './lib/home-page';
+export { HomePage } from './home-page';

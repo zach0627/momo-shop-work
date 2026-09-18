@@ -1,4 +1,4 @@
 export {
   GoodsDetailPage,
   type GoodsDetailPageProps,
-} from './lib/goods-detail-page';
+} from './goods-detail-page';

@@ -1,1 +1,1 @@
-export { paths, ROUTE_PATTERNS } from './lib/paths.js';
+export { paths, ROUTE_PATTERNS } from './paths.js';
