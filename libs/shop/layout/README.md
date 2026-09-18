@@ -1,4 +1,4 @@
-# layout-feature
+# shop-layout
 
 `type:layout · scope:shop`
 

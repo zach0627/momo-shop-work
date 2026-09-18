@@ -30,7 +30,7 @@
 ```mermaid
 graph TD
   APP["apps/shop<br/>type:app"] --> PAGE["home/page · goods/page<br/>type:page"]
-  APP --> LAYOUT["layout/feature<br/>type:layout"]
+  APP --> LAYOUT["shop/layout<br/>type:layout"]
   PAGE --> FEAT["feature-flash-sale · feature-ranking<br/>feature-recommendation<br/>type:feature"]
   PAGE --> UI
   PAGE --> DA
@@ -96,7 +96,7 @@ libs/home/feature-flash-sale           @momo/home-feature-flash-sale         typ
 libs/home/feature-ranking              @momo/home-feature-ranking            type:feature      scope:home
 libs/home/page                         @momo/home-page                       type:page         scope:home
 libs/goods/page                        @momo/goods-page                      type:page         scope:goods
-libs/layout/feature                    @momo/layout-feature                  type:layout       scope:shop
+libs/shop/layout                       @momo/shop-layout                     type:layout       scope:shop
 ```
 
 每個 lib 的 README 寫明它的職責、可依賴的層、以及 `src/index.ts` 是唯一公開 API。
@@ -108,7 +108,7 @@ libs/layout/feature                    @momo/layout-feature                  typ
 
 ## 5. Lib 的內部結構、共用門檻與粒度準則
 
-### 內部結構（feature / page lib 一致）
+### 內部結構（layout / page / feature lib 一致）
 
 ```
 src/
@@ -152,7 +152,7 @@ TopBar、主 header、分類列與 footer 屬於 **layout**，不屬於任何一
 ```
 RouterProvider
 └─ LayoutRoute（沒有 path 的 layout route）        apps/shop/src/app/router.tsx
-   └─ <AppLayout>                                   libs/layout/feature
+   └─ <AppLayout>                                   libs/shop/layout
       ├─ TopBar          fixed；主 header 捲出視窗後轉為 compact 並顯示搜尋框
       ├─ MainHeader      logo（連回首頁）+ 搜尋框（展示用）
       ├─ CategoryNav     橫向分類列 + 可展開的「選擇分類」面板
@@ -160,10 +160,11 @@ RouterProvider
       └─ Footer
 ```
 
-- **機制**：`AppLayout` 掛在一條沒有 path 的 layout route 上，`/`、`/goods/:goodsId`、找不到頁面都是它的子路由，頁面內容透過 `<Outlet />` 換進去。路由的概念只存在於 `apps/shop`；`libs/layout/feature` 只拿到 `children`，不知道 router 的存在。
+- **機制**：`AppLayout` 掛在一條沒有 path 的 layout route 上，`/`、`/goods/:goodsId`、找不到頁面都是它的子路由，頁面內容透過 `<Outlet />` 換進去。路由的概念只存在於 `apps/shop`；`libs/shop/layout` 只拿到 `children`，不知道 router 的存在。
 - **驗證**：`router.spec.tsx` 對三條路由都檢查 `banner`、`main`、`contentinfo` 三個 landmark 都在（規格 `app-layout`「每個頁面都有共用外框」）。
-- **加第二種 layout**（例：結帳流程用沒有分類列、精簡 footer 的外框）：在 router 再掛一條 layout route 指向另一個 layout 元件，把結帳的路由放到它底下。現有的 `AppLayout` 與頁面都不用改。
-- **命名**：這個 lib 原本叫 `shell`。改名為 `layout` 是因為 (1) 它就是一般所說的 layout；(2) 「shell library」在 Nx 社群有既定意思 —— 串接某個 domain 路由的進入點 lib —— 而這個 lib 做的是全站外框，沿用 `shell` 會讓熟悉 Nx 的讀者誤判它的用途。
+- **層級**：layout 是 `type:layout`，與 `page` 同層（§3）。只有 `apps/shop` 的 router 能 import 它；page 與 feature import 它都是 lint 錯誤。它可以組合 feature，所以日後 header 裡由別的 domain 擁有的互動元件（mini-cart、搜尋自動完成）能以 feature 的形式放進來，而不必把對方的邏輯寫進外框。摘要資料（購物車數量、登入狀態）則直接讀對方的 `data-access`。見 [ADR-0006](./adr/0006-domain-dependency-map.md)。
+- **加第二種 layout**（例：結帳流程用沒有分類列、精簡 footer 的外框）：新增 `libs/checkout/layout`（`type:layout`），在 router 再掛一條 layout route 指向它，把結帳的路由放到它底下。現有的 `AppLayout` 與頁面都不用改。
+- **命名**：這個 lib 改過兩次名，兩次都是 Human 提出質疑後才改的。(1) `shell/feature` → `layout/feature`：它就是一般所說的 layout，而「shell library」在 Nx 社群另有所指（串接某個 domain 路由的進入點 lib），沿用會讓熟悉 Nx 的讀者誤判用途。(2) `layout/feature` → `shop/layout`：路徑的寫法是 `libs/<誰的>/<哪一種>`，「layout」是種類而不是擁有者，放在 scope 的位置讀起來是「layout 的 feature」，說不通；第一次改名只換了字，沒有檢查換完之後整條路徑還通不通。
 
 ### 設計 Token
 

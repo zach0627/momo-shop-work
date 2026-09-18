@@ -311,9 +311,9 @@ importers:
       '@momo/shared-util':
         specifier: workspace:*
         version: link:../../libs/shared/util
-      '@momo/layout-feature':
+      '@momo/shop-layout':
         specifier: workspace:*
-        version: link:../../libs/layout/feature
+        version: link:../../libs/shop/layout
 
   libs/catalog/data-access: {}
 
@@ -333,7 +333,7 @@ importers:
 
   libs/shared/util: {}
 
-  libs/layout/feature:
+  libs/shop/layout:
     dependencies:
       '@momo/shared-ui':
         specifier: workspace:*

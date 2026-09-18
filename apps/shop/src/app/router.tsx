@@ -1,7 +1,7 @@
 import { Outlet, type RouteObject } from 'react-router';
 
 import { ROUTE_PATTERNS } from '@momo/shared-util';
-import { AppLayout } from '@momo/layout-feature';
+import { AppLayout } from '@momo/shop-layout';
 
 function LayoutRoute() {
   return (

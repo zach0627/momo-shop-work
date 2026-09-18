@@ -34,7 +34,7 @@
       "path": "./libs/goods/page"
     },
     {
-      "path": "./libs/layout/feature"
+      "path": "./libs/shop/layout"
     }
   ],
   "compilerOptions": {}

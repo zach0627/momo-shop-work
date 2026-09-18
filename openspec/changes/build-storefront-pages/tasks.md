@@ -30,7 +30,7 @@
 - [x] 4.3 TDD：`shared/ui` 的 `AppLink` —— 預設渲染 `<a href>`，有 `LinkProvider` 時改用注入的元件；驗證：兩個情境的 spec 皆通過，並移除該 lib 的 `passWithNoTests`
 - [x] 4.4 `shared/ui/styles/theme.css` 的 `@theme` tokens（品牌粉、價格紅、容器寬 1220px），app 的 `styles.css` 引入並以 `@source` 掃描 libs；驗證：dev server 上 token 生效
 - [x] 4.5 `apps/shop` 的 providers、router（lazy routes、路徑取自 `paths`）、router-link adapter、3 個 route 檔；驗證：`/`、`/goods/123`、`/nope` 皆可開啟，`/nope` 顯示找不到頁面（spec `app-layout`「每個頁面都有共用外框」）
-- [x] 4.6 `layout/feature` 的 `AppLayout` 空殼，`home/page` 與 `goods/page` 的 placeholder（goods 顯示收到的 `goodsId`）；驗證：`pnpm verify:boundaries` 出現第一批依賴且 0 違規
+- [x] 4.6 `shop/layout`（當時名為 `shell/feature`）的 `AppLayout` 空殼，`home/page` 與 `goods/page` 的 placeholder（goods 顯示收到的 `goodsId`）；驗證：`pnpm verify:boundaries` 出現第一批依賴且 0 違規
 - [x] 4.7 以瀏覽器量測真實網站（首頁與商品詳情頁）的計算樣式，建立兩層 design token（`tokens.primitive.css` / `tokens.semantic.css`）並關閉 Tailwind 預設色盤與字級；驗證：建置產物含 semantic utility、`--color-brand` 指向 primitive、不含 `--color-pink-600` 與 `--text-sm`；dev server 上量到 logo `#d62872`、footer `#09355d`、內容寬 1220px、字體堆疊與真站一致；對照表記錄於 `docs/design-tokens.md`
 - [x] 4.8 補上 generator 漏掉的 DOM 型別庫：app 與 9 個 React lib 的 tsconfig 設 `lib: [es2022, dom, dom.iterable]`；驗證：`typecheck` 從失敗（TS2812：`HTMLElement` 沒有 `getAttribute`）變為通過
 
