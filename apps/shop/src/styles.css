@@ -1,7 +1,11 @@
 @import 'tailwindcss';
 
-/* Design tokens belong to the design system; the app only imports them. */
-@import '../../../packages/shared/ui/src/styles/theme.css';
+/*
+ * Design tokens belong to the design system; the app only imports them.
+ * Through the package's `exports`, like any other import across packages -
+ * never by a relative path into its folder.
+ */
+@import '@momo/shared-ui/theme.css';
 
 /* Class names live in the packages, so Tailwind has to scan them too. */
 @source '../../../packages';

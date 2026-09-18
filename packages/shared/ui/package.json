@@ -10,6 +10,7 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./theme.css": "./src/styles/theme.css",
     "./package.json": "./package.json"
   },
   "nx": {
