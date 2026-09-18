@@ -10,6 +10,11 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./testing": {
+      "types": "./src/testing.tsx",
+      "import": "./src/testing.tsx",
+      "default": "./src/testing.tsx"
+    },
     "./package.json": "./package.json"
   },
   "nx": {
@@ -18,5 +23,9 @@
       "type:data-access",
       "scope:catalog"
     ]
+  },
+  "dependencies": {
+    "@tanstack/react-query": "catalog:",
+    "react": "catalog:"
   }
 }

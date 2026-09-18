@@ -1,0 +1,11 @@
+/** Every cache key of this package, in one place so they cannot collide. */
+export const catalogKeys = {
+  all: ['catalog'] as const,
+  product: (id: string) => ['catalog', 'product', id] as const,
+  collection: (key: string) => ['catalog', 'collection', key] as const,
+  recommendations: (pageSize: number) =>
+    ['catalog', 'recommendations', pageSize] as const,
+  flashSale: () => ['catalog', 'flash-sale'] as const,
+  ranking: () => ['catalog', 'ranking'] as const,
+  categories: () => ['catalog', 'categories'] as const,
+};

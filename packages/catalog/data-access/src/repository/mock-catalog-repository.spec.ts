@@ -184,10 +184,15 @@ describe('the generated fixtures', () => {
     ];
     expect(shown.length).toBeGreaterThan(100);
 
-    for (const item of shown) {
-      const found = await real.getProduct(item.id);
-      expect(found).toMatchObject({ name: item.name, price: item.price });
-    }
+    const found = await Promise.all(
+      shown.map((item) => real.getProduct(item.id)),
+    );
+    shown.forEach((item, index) => {
+      expect(found[index]).toMatchObject({
+        name: item.name,
+        price: item.price,
+      });
+    });
   });
 
   it('sells every flash sale product below its original price', async () => {
