@@ -18,7 +18,7 @@
 
 ## 2. 設計原則
 
-1. **依賴方向單向，且由 lint 強制**，不靠自律：`app → page → feature → ui / data-access → util`。
+1. **依賴方向單向，且由 lint 強制**，不靠自律：`app → layout / page → feature → ui / data-access → util`。
 2. **Lib 依職責切分，並有明確的共用門檻**（見 §5 的 Rule of Two 與粒度準則）。
 3. **首頁是資料驅動的**：區塊順序與內容來自 `HomeSection[]`，不是寫死在 JSX。
 4. **框架耦合集中在一處**：`react-router` 只准出現在 `apps/shop`，`embla` 只准出現在 `libs/shared/ui`。換 SSR 框架或換輪播套件是單一專案的修改。
@@ -30,46 +30,50 @@
 ```mermaid
 graph TD
   APP["apps/shop<br/>type:app"] --> PAGE["home/page · goods/page<br/>type:page"]
-  APP --> LAYOUT["layout/feature<br/>type:feature"]
+  APP --> LAYOUT["layout/feature<br/>type:layout"]
   PAGE --> FEAT["feature-flash-sale · feature-ranking<br/>feature-recommendation<br/>type:feature"]
   PAGE --> UI
   PAGE --> DA
   FEAT --> UI["shared/ui<br/>type:ui"]
   FEAT --> DA["catalog/data-access · home/data-access<br/>type:data-access"]
+  LAYOUT --> FEAT
   LAYOUT --> UI
   LAYOUT --> DA
   UI --> UTIL["shared/util<br/>type:util"]
   DA --> UTIL
 ```
 
-| `type:`       | 可依賴                               | 職責                                                                                    |
-| ------------- | ------------------------------------ | --------------------------------------------------------------------------------------- |
-| `app`         | page, feature, ui, data-access, util | 薄殼 + **composition root**：router、providers、注入 Link 與 repository 實作            |
-| `page`        | feature, ui, data-access, util       | 把多個 feature 組合成一頁。**唯一能同時 import 多個 feature 的層**                      |
-| `feature`     | ui, data-access, util                | 有邏輯的業務區塊（smart component）。**feature ✗ feature**                              |
-| `ui`          | ui, util                             | 純展示元件。不碰資料、不碰 router、不認識 domain model                                  |
-| `data-access` | util                                 | 型別、repository interface 與實作、query hooks、fixtures。**data-access ✗ data-access** |
-| `util`        | util                                 | 純函式                                                                                  |
+| `type:`       | 可依賴                                       | 職責                                                                                                      |
+| ------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `app`         | layout, page, feature, ui, data-access, util | 薄殼 + **composition root**：router、providers、注入 Link 與 repository 實作                              |
+| `layout`      | feature, ui, data-access, util               | 跨頁保留的外框。與 `page` 同層：由 router 巢狀組合，**layout ✗ page、page ✗ layout**；只有 `app` 能依賴它 |
+| `page`        | feature, ui, data-access, util               | 把多個 feature 組合成一頁。**只有 `layout` 與 `page` 能同時 import 多個 feature**                         |
+| `feature`     | ui, data-access, util                        | 有邏輯的業務區塊（smart component）。**feature ✗ feature**                                                |
+| `ui`          | ui, util                                     | 純展示元件。不碰資料、不碰 router、不認識 domain model                                                    |
+| `data-access` | util                                         | 型別、repository interface 與實作、query hooks、fixtures。**data-access ✗ data-access**                   |
+| `util`        | util                                         | 純函式                                                                                                    |
 
 `scope:` 規則（domain 之間誰能依賴誰，治理方式見 [ADR-0006](./adr/0006-domain-dependency-map.md)）：
 
-| scope     | 可依賴的 scope          |
-| --------- | ----------------------- |
-| `home`    | home, catalog, shared   |
-| `goods`   | goods, catalog, shared  |
-| `layout`  | layout, catalog, shared |
-| `catalog` | catalog, shared         |
-| `shared`  | shared                  |
+| scope     | 可依賴的 scope         |
+| --------- | ---------------------- |
+| `home`    | home, catalog, shared  |
+| `goods`   | goods, catalog, shared |
+| `shop`    | shop, catalog, shared  |
+| `catalog` | catalog, shared        |
+| `shared`  | shared                 |
+
+`shop` 是「整個店面共用、但不是通用工具」的 scope，與 `apps/shop` 同名；目前只有外框。它和 `shared` 的差別：`shared` 不能依賴任何 domain，而外框需要 `catalog` 的分類資料。
 
 一個專案必須**同時**滿足自己的 `type:` 與 `scope:` 限制。`apps/shop` 只有 `type:app`，所以能組合所有 scope。
 
 ### 怎麼強制、怎麼驗證
 
-- 規則寫在根目錄 [`eslint.config.mjs`](../eslint.config.mjs)：`@nx/enforce-module-boundaries`（6 條 type + 5 條 scope）與 `no-restricted-imports`。tags 宣告在各專案 `package.json` 的 `nx.tags`。
+- 規則寫在根目錄 [`eslint.config.mjs`](../eslint.config.mjs)：`@nx/enforce-module-boundaries`（7 條 type + 5 條 scope）與 `no-restricted-imports`。tags 宣告在各專案 `package.json` 的 `nx.tags`。
 - `no-restricted-imports` 採「預設全禁、單點放行」：根設定兩個套件都禁，`apps/shop` 與 `libs/shared/ui` 在**自己的** eslint 設定用 `restrictedImports([...])` 明確放行 —— 例外寫在它生效的地方。
 - **lib 的「私有」由兩道關卡保證**（都實際放入違規樣本驗證過）：每個 lib 的 `package.json` 的 `exports` 只公開 `.`（即 `src/index.ts`），所以以「套件名稱 + 內部路徑」引用會在**型別檢查**失敗（TS2307）；以相對路徑跨專案引用會被 **lint** 擋下。沒有從 `index.ts` 匯出的東西就是 lib 私有的。因為兩道關卡來自不同工具，驗證時 `lint` 與 `typecheck` 都要跑。
 - **跨專案 import 要先宣告依賴**：在自己的 `package.json` 加上 `"@momo/<lib>": "workspace:*"`，執行 `pnpm install` 與 `nx sync`（更新 TypeScript project references）。pnpm 的嚴格 `node_modules` 不會解析未宣告的 workspace 套件 —— 依賴必須明說。
-- **這些規則被驗證過會擋，而不只是存在**：建立時放入 5 個故意違規的探針檔（feature→feature、ui→data-access、scope:goods→scope:home、lib 內 import router、`shared/ui` 以外 import embla），全部被 lint 擋下；2 個合法的對照組通過。紀錄見 [`agent-workflow.md`](./agent-workflow.md)。
+- **這些規則被驗證過會擋，而不只是存在**：建立時放入 5 個故意違規的探針檔（feature→feature、ui→data-access、scope:goods→scope:home、lib 內 import router、`shared/ui` 以外 import embla），全部被 lint 擋下；2 個合法的對照組通過。新增 `layout` 層時再放入 5 個：改規則前 layout→feature 被擋（紅燈），改規則後通過；page→layout、feature→layout、`scope:shop`→`scope:home` 被擋；app→layout 通過。紀錄見 [`agent-workflow.md`](./agent-workflow.md)。
 - **lint 回答不了的問題由 [`tools/verify-boundaries.mjs`](../tools/verify-boundaries.mjs) 回答**（`pnpm verify:boundaries`）：
   1. 每個專案的 tags 格式正確、恰好一個 `type:`、lib 恰好一個 `scope:`、且都是 private。**tags 寫壞的 lib 會靜默地不受任何規則約束，而 lint 依然是綠的** —— 這個錯誤在建立 lib 時真的發生過。
   2. 每個專案**實際解析出來的** ESLint 設定裡，boundary 規則是 `error`、限制條數一致；只有 `shop` 能 import router、只有 `shared-ui` 能 import embla。
@@ -92,7 +96,7 @@ libs/home/feature-flash-sale           @momo/home-feature-flash-sale         typ
 libs/home/feature-ranking              @momo/home-feature-ranking            type:feature      scope:home
 libs/home/page                         @momo/home-page                       type:page         scope:home
 libs/goods/page                        @momo/goods-page                      type:page         scope:goods
-libs/layout/feature                     @momo/layout-feature                   type:feature      scope:layout
+libs/layout/feature                    @momo/layout-feature                  type:layout       scope:shop
 ```
 
 每個 lib 的 README 寫明它的職責、可依賴的層、以及 `src/index.ts` 是唯一公開 API。

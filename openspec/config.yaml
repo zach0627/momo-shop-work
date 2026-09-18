@@ -28,8 +28,8 @@ context: |
   - 首頁由版位資料驅動（config-driven），因為真實網站是 CMS 區塊制（docs/adr/0004）。
 
   ## 不能破的規則（細節見 openspec/specs/module-boundaries 與 CLAUDE.md）
-  - 依賴方向：app → page → feature → ui / data-access → util。feature ✗ feature，
-    data-access ✗ data-access；只有 page 可以組合多個 feature。
+  - 依賴方向：app → layout / page → feature → ui / data-access → util。feature ✗ feature，
+    data-access ✗ data-access；只有 layout 與 page 可以組合多個 feature，兩者同層、互不依賴。
   - react-router 只准出現在 apps/shop；embla 只准出現在 libs/shared/ui。
   - Rule of Two：被 ≥2 個專案使用的東西才能進 shared/*；其餘留在該 lib 私有的
     ui/ 或 model/，不從 index.ts 匯出。

@@ -8,7 +8,7 @@
 
 1. **設計先於實作。** 設計有變動時先改 `docs/architecture.md`（必要時加 ADR），再改 code。不要讓文件與 code 脫鉤。
 2. **不要擴張範圍。** 詳情頁是展示用，三顆按鈕不綁任何行為；搜尋框是展示用；Banner 不可點。需求以 `docs/MoMO面試/` 的筆記為準，沒寫的就不要做。
-3. **依賴方向：** `app → page → feature → ui / data-access → util`。`feature ✗ feature`、`data-access ✗ data-access`。只有 `page` 可以組合多個 feature。
+3. **依賴方向：** `app → layout / page → feature → ui / data-access → util`。`feature ✗ feature`、`data-access ✗ data-access`。只有 `layout` 與 `page` 可以組合多個 feature；兩者同層、互不依賴，只有 app 能依賴 `layout`。
 4. **`react-router` 只准出現在 `apps/shop`；`embla` 只准出現在 `libs/shared/ui`。** libs 以 props 接收路由參數，連結一律用 `@momo/shared-ui` 的 `AppLink`。
 5. **Rule of Two：** 被 ≥2 個專案使用的東西才能放進 `shared/ui`、`shared/util`。只有自己用的放在該 lib 的 `ui/`（展示）或 `model/`（邏輯），且不要從 `index.ts` 匯出。
 6. **`shared/ui` 不認識 domain model。** 元件宣告自己需要的最小形狀，不要 import 任何 data-access。

@@ -1,6 +1,6 @@
 # layout-feature
 
-`type:feature · scope:layout`
+`type:layout · scope:shop`
 
 Application chrome shared by every page: sticky top bar (compact on scroll), main header, expandable category navigation and footer. Exposes a single `AppLayout`.
 

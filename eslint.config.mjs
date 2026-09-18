@@ -3,17 +3,30 @@ import nx from '@nx/eslint-plugin';
 /**
  * Layering rules (see docs/MoMO面試/Phase 1 §3).
  *
- *   app -> page -> feature -> ui / data-access -> util
+ *   app -> layout / page -> feature -> ui / data-access -> util
  *
  * A project must satisfy BOTH its `type:` and its `scope:` constraint.
- * `page` is the only layer that may compose several features, so
- * feature -> feature (and data-access -> data-access) is an error.
+ * `layout` and `page` are the two layers that may compose several features,
+ * so feature -> feature (and data-access -> data-access) is an error.
+ *
+ * `layout` and `page` are siblings: the router nests a page inside a layout,
+ * neither imports the other. Only the app may depend on a layout.
  */
 const typeConstraints = [
   {
     sourceTag: 'type:app',
     onlyDependOnLibsWithTags: [
+      'type:layout',
       'type:page',
+      'type:feature',
+      'type:ui',
+      'type:data-access',
+      'type:util',
+    ],
+  },
+  {
+    sourceTag: 'type:layout',
+    onlyDependOnLibsWithTags: [
       'type:feature',
       'type:ui',
       'type:data-access',
@@ -47,9 +60,10 @@ const scopeConstraints = [
     sourceTag: 'scope:goods',
     onlyDependOnLibsWithTags: ['scope:goods', 'scope:catalog', 'scope:shared'],
   },
+  // what the whole storefront shares: the chrome around every page
   {
-    sourceTag: 'scope:layout',
-    onlyDependOnLibsWithTags: ['scope:layout', 'scope:catalog', 'scope:shared'],
+    sourceTag: 'scope:shop',
+    onlyDependOnLibsWithTags: ['scope:shop', 'scope:catalog', 'scope:shared'],
   },
   {
     sourceTag: 'scope:catalog',

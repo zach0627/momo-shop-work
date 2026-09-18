@@ -19,8 +19,8 @@
 
 現有的 `type:` 規則已經保證跨 domain 的依賴只會有兩種形式，不需要額外規則：
 
-- `feature` / `page` → 對方的 `data-access`（讀資料）
-- `page` → 對方的 `feature`（組合，例：首頁與詳情頁都掛 `catalog/feature-recommendation`）
+- `feature` / `page` / `layout` → 對方的 `data-access`（讀資料）
+- `page` / `layout` → 對方的 `feature`（組合，例：首頁與詳情頁都掛 `catalog/feature-recommendation`）
 
 `feature → feature` 與 `data-access → data-access` 不論是否跨 domain 都是 lint 錯誤。
 
@@ -30,14 +30,14 @@
 
 ```mermaid
 graph TD
-  layout --> catalog
+  shop --> catalog
   home --> catalog
   goods --> catalog
   brand -.-> catalog
   cart -.-> catalog
   goods -.-> cart
-  layout -.-> cart
-  layout -.-> member
+  shop -.-> cart
+  shop -.-> member
   checkout -.-> cart
   checkout -.-> payment
   checkout -.-> member
@@ -45,19 +45,30 @@ graph TD
   catalog --> shared
 ```
 
-| Domain     | 預期內容                                | 可依賴                                                   |
-| ---------- | --------------------------------------- | -------------------------------------------------------- |
-| `catalog`  | 商品、分類、推薦                        | shared                                                   |
-| `home`     | 首頁版位、限時搶購、暢銷榜              | catalog, shared                                          |
-| `goods`    | 商品詳情                                | catalog, shared（＋ cart：加入購物車）                   |
-| `brand`    | 品牌頁                                  | catalog, shared                                          |
-| `cart`     | 購物車（此時才引入 store，見 ADR-0003） | catalog, shared                                          |
-| `member`   | 登入、會員資料                          | shared                                                   |
-| `payment`  | 刷卡、分期                              | shared                                                   |
-| `checkout` | 結帳流程                                | cart, payment, member, catalog, shared                   |
-| `layout`    | 全站外框                                | catalog, shared（＋ cart 的數量徽章、member 的登入狀態） |
+| Domain     | 預期內容                                | 可依賴                                   |
+| ---------- | --------------------------------------- | ---------------------------------------- |
+| `catalog`  | 商品、分類、推薦                        | shared                                   |
+| `home`     | 首頁版位、限時搶購、暢銷榜              | catalog, shared                          |
+| `goods`    | 商品詳情                                | catalog, shared（＋ cart：加入購物車）   |
+| `brand`    | 品牌頁                                  | catalog, shared                          |
+| `cart`     | 購物車（此時才引入 store，見 ADR-0003） | catalog, shared                          |
+| `member`   | 登入、會員資料                          | shared                                   |
+| `payment`  | 刷卡、分期                              | shared                                   |
+| `checkout` | 結帳流程                                | cart, payment, member, catalog, shared   |
+| `shop`     | 整個店面共用的部分，目前只有全站外框    | catalog, shared（＋ cart、member，見下） |
 
-`layout` 是刻意的例外：它是全站的外框，本來就會讀多個 domain 的摘要資料。它只能依賴對方的 `data-access`，不能依賴 feature。
+`shop` 是刻意的例外：全站外框本來就會用到多個 domain 的東西。怎麼用，分兩種：
+
+- **摘要資料**（購物車數量徽章、登入狀態）→ 讀對方的 `data-access`，由外框自己的私有元件顯示。
+- **對方擁有的互動元件**（mini-cart 下拉、搜尋自動完成）→ 那是對方 domain 的 `feature`，由外框組合。
+
+### 修訂：外框從 `type:feature` 改為 `type:layout`
+
+這份 ADR 原本寫的是「外框只能依賴對方的 `data-access`，不能依賴 feature」。那句話不是獨立的設計目標，而是外框當時被標成 `type:feature`、受 `feature ✗ feature` 約束的**結果**。它對摘要資料成立，但對互動元件只留下兩條路：把購物車或搜尋的邏輯寫進外框 lib（外框變肥，且擁有不屬於它的邏輯），或是破壞規則。
+
+外框實際所在的層級與 `page` 相同 —— 只有 app 的 router 會 import 它，它與 page 由路由巢狀組合、彼此不 import。因此新增 `type:layout` 一層，權限與 `page` 相同（可組合 feature），並把 scope 從 `layout` 改名為 `shop`：`layout` 描述的是「哪一種專案」，屬於 `type:`，不是一個 domain。
+
+風險與原本的顧慮相同：外框依賴的 domain 越多，任何 domain 的修改都越容易讓它被判定為 affected。控制方式不變 —— 每一個新的放行仍然要先改這份地圖。
 
 `payment` 不依賴 `checkout`、也不依賴 `cart`：付款元件不該知道自己被誰使用。這同時讓它日後能被隔離（信用卡表單屬於 PCI-DSS 範圍，見 ADR-0002）。
 

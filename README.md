@@ -28,11 +28,11 @@ Nx（pnpm workspaces）· React 19 · TypeScript strict · Vite · Vitest + Test
 ## 架構一頁摘要
 
 ```
-app → page → feature → ui / data-access → util
+app → layout / page → feature → ui / data-access → util
 ```
 
-- 一個薄殼 app + 10 個依 domain 與職責切分的 lib。依賴方向由 `@nx/enforce-module-boundaries` 強制（6 條 type 規則 + 5 條 scope 規則），不靠自律。
-- `page` 是唯一能組合多個 feature 的層；`feature ✗ feature`。
+- 一個薄殼 app + 10 個依 domain 與職責切分的 lib。依賴方向由 `@nx/enforce-module-boundaries` 強制（7 條 type 規則 + 5 條 scope 規則），不靠自律。
+- 只有 `layout`（跨頁保留的外框）與 `page` 能組合多個 feature；`feature ✗ feature`。兩者同層，由 router 巢狀組合、互不 import —— 和 Next.js 的 `layout.tsx` / `page.tsx` 是同一種關係。
 - `react-router` 只准出現在 `apps/shop`、`embla` 只准出現在 `libs/shared/ui`（`no-restricted-imports`，預設全禁、單點放行）。
 - **Rule of Two**：被 ≥2 個專案使用的東西才能進 `shared/*`；其餘留在各 lib 私有的 `ui/`、`model/`。
 - 首頁由 `HomeSection[]` 驅動（config-driven）；資料走 Repository interface + Context 注入。

@@ -10,9 +10,11 @@
 
 ### Requirement: 依賴方向是單向的
 
-每個專案 SHALL 屬於恰好一種層級：app、page、feature、ui、data-access、util。依賴 MUST 只朝下層：app → page → feature → ui / data-access → util。feature 之間與 data-access 之間 MUST NOT 互相依賴；只有 page 可以組合多個 feature。
+每個專案 SHALL 屬於恰好一種層級：app、layout、page、feature、ui、data-access、util。依賴 MUST 只朝下層：app → layout / page → feature → ui / data-access → util。feature 之間與 data-access 之間 MUST NOT 互相依賴；只有 layout 與 page 可以組合多個 feature。
 
-因為層級是嚴格排序的，任何循環依賴都必然違反其中一條層級規則，所以依賴圖保持無環。
+layout 與 page 是同一層的兩種角色：layout 是跨頁保留的外框，page 是換入外框的內容。兩者由 app 的路由巢狀組合，彼此 MUST NOT 互相依賴；只有 app 可以依賴 layout。
+
+因為層級是嚴格排序的（同層之間不允許依賴），任何循環依賴都必然違反其中一條層級規則，所以依賴圖保持無環。
 
 #### Scenario: feature 依賴另一個 feature
 
@@ -28,6 +30,21 @@
 
 - **WHEN** 一個 page 專案 import 一個 feature 專案
 - **THEN** lint 通過
+
+#### Scenario: layout 組合 feature
+
+- **WHEN** 一個 layout 專案 import 一個它的 domain 允許依賴的 feature 專案
+- **THEN** lint 通過
+
+#### Scenario: page 依賴 layout
+
+- **WHEN** 一個 page 專案 import 一個 layout 專案
+- **THEN** lint 失敗，錯誤指出 page 只能依賴 feature、ui、data-access、util
+
+#### Scenario: feature 依賴 layout
+
+- **WHEN** 一個 feature 專案 import 一個 layout 專案
+- **THEN** lint 失敗，錯誤指出 feature 只能依賴 ui、data-access、util
 
 ### Requirement: Domain 之間的依賴受限
 

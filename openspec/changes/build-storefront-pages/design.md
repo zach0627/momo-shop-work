@@ -69,7 +69,7 @@
 
 ### 3. 分層：新增 `type:page` 作為唯一的組合層
 
-**選擇**：`app → page → feature → ui / data-access → util`。`feature ✗ feature`；只有 `page` 能同時 import 多個 feature。
+**選擇**：`app → layout / page → feature → ui / data-access → util`。`feature ✗ feature`；只有 `layout` 與 `page` 能同時 import 多個 feature。`layout`（跨頁保留的外框）與 `page` 同層：由 router 巢狀組合，彼此不 import。
 
 **為什麼**：首頁要組合限時搶購、暢銷榜、你可能會喜歡三個 feature，但 feature 之間不能互相依賴。若沒有 page 層，只能讓其中一個 feature 依賴其他 feature，規則就破了。
 

@@ -15,8 +15,8 @@
   "nx": {
     "name": "layout-feature",
     "tags": [
-      "type:feature",
-      "scope:layout"
+      "type:layout",
+      "scope:shop"
     ]
   },
   "dependencies": {
