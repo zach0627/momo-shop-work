@@ -1,10 +1,10 @@
 @import 'tailwindcss';
 
 /* Design tokens belong to the design system; the app only imports them. */
-@import '../../../libs/shared/ui/src/styles/theme.css';
+@import '../../../packages/shared/ui/src/styles/theme.css';
 
-/* Class names live in the libs, so Tailwind has to scan them too. */
-@source '../../../libs';
+/* Class names live in the packages, so Tailwind has to scan them too. */
+@source '../../../packages';
 
 /*
  * The font family is a token too (--font-sans in tokens.semantic.css), so

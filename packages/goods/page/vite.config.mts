@@ -2,14 +2,14 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../../node_modules/.vite/libs/home/feature-ranking',
+  cacheDir: '../../../node_modules/.vite/packages/goods/page',
   plugins: [react()],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [],
   // },
   test: {
-    name: 'home-feature-ranking',
+    name: 'goods-page',
     watch: false,
     passWithNoTests: true,
     globals: true,

@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../../node_modules/.vite/libs/shared/util',
+  cacheDir: '../../../node_modules/.vite/packages/shared/util',
   test: {
     name: 'shared-util',
     watch: false,

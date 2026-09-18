@@ -7,34 +7,34 @@
       "path": "./apps/shop"
     },
     {
-      "path": "./libs/shared/util"
+      "path": "./packages/catalog/feature-recommendation"
     },
     {
-      "path": "./libs/shared/ui"
+      "path": "./packages/home/feature-flash-sale"
     },
     {
-      "path": "./libs/catalog/data-access"
+      "path": "./packages/home/feature-ranking"
     },
     {
-      "path": "./libs/home/data-access"
+      "path": "./packages/catalog/data-access"
     },
     {
-      "path": "./libs/catalog/feature-recommendation"
+      "path": "./packages/home/data-access"
     },
     {
-      "path": "./libs/home/feature-flash-sale"
+      "path": "./packages/shared/util"
     },
     {
-      "path": "./libs/home/feature-ranking"
+      "path": "./packages/shop/layout"
     },
     {
-      "path": "./libs/home/page"
+      "path": "./packages/goods/page"
     },
     {
-      "path": "./libs/goods/page"
+      "path": "./packages/home/page"
     },
     {
-      "path": "./libs/shop/layout"
+      "path": "./packages/shared/ui"
     }
   ],
   "compilerOptions": {}

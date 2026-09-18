@@ -2,16 +2,15 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../../node_modules/.vite/libs/goods/page',
+  cacheDir: '../../../node_modules/.vite/packages/shop/layout',
   plugins: [react()],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [],
   // },
   test: {
-    name: 'goods-page',
+    name: 'shop-layout',
     watch: false,
-    passWithNoTests: true,
     globals: true,
     environment: 'jsdom',
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],

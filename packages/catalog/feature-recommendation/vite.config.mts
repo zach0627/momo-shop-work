@@ -2,14 +2,14 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../../node_modules/.vite/libs/home/data-access',
+  cacheDir: '../../../node_modules/.vite/packages/catalog/feature-recommendation',
   plugins: [react()],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [],
   // },
   test: {
-    name: 'home-data-access',
+    name: 'catalog-feature-recommendation',
     watch: false,
     passWithNoTests: true,
     globals: true,

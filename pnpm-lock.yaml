@@ -301,39 +301,39 @@ importers:
     dependencies:
       '@momo/goods-page':
         specifier: workspace:*
-        version: link:../../libs/goods/page
+        version: link:../../packages/goods/page
       '@momo/home-page':
         specifier: workspace:*
-        version: link:../../libs/home/page
+        version: link:../../packages/home/page
       '@momo/shared-ui':
         specifier: workspace:*
-        version: link:../../libs/shared/ui
+        version: link:../../packages/shared/ui
       '@momo/shared-util':
         specifier: workspace:*
-        version: link:../../libs/shared/util
+        version: link:../../packages/shared/util
       '@momo/shop-layout':
         specifier: workspace:*
-        version: link:../../libs/shop/layout
+        version: link:../../packages/shop/layout
 
-  libs/catalog/data-access: {}
+  packages/catalog/data-access: {}
 
-  libs/catalog/feature-recommendation: {}
+  packages/catalog/feature-recommendation: {}
 
-  libs/goods/page: {}
+  packages/goods/page: {}
 
-  libs/home/data-access: {}
+  packages/home/data-access: {}
 
-  libs/home/feature-flash-sale: {}
+  packages/home/feature-flash-sale: {}
 
-  libs/home/feature-ranking: {}
+  packages/home/feature-ranking: {}
 
-  libs/home/page: {}
+  packages/home/page: {}
 
-  libs/shared/ui: {}
+  packages/shared/ui: {}
 
-  libs/shared/util: {}
+  packages/shared/util: {}
 
-  libs/shop/layout:
+  packages/shop/layout:
     dependencies:
       '@momo/shared-ui':
         specifier: workspace:*

@@ -33,19 +33,19 @@
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
-      "path": "../../libs/shop/layout/tsconfig.lib.json"
+      "path": "../../packages/shop/layout/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/util/tsconfig.lib.json"
+      "path": "../../packages/shared/util/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/ui/tsconfig.lib.json"
+      "path": "../../packages/shared/ui/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/home/page/tsconfig.lib.json"
+      "path": "../../packages/home/page/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/goods/page/tsconfig.lib.json"
+      "path": "../../packages/goods/page/tsconfig.lib.json"
     }
   ]
 }

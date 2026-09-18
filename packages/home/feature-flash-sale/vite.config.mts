@@ -2,14 +2,14 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../../node_modules/.vite/libs/catalog/data-access',
+  cacheDir: '../../../node_modules/.vite/packages/home/feature-flash-sale',
   plugins: [react()],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [],
   // },
   test: {
-    name: 'catalog-data-access',
+    name: 'home-feature-flash-sale',
     watch: false,
     passWithNoTests: true,
     globals: true,
