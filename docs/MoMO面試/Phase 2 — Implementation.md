@@ -244,6 +244,8 @@ First Commit 至最後 Commit
 | — | 移除計畫中所有時間紀錄與時間預估；記錄「專案維持在 D: 槽」的決定 | `d4cfdd3` |
 | 3 | `docs/architecture.md`、ADR ×6（新增 0006：domain 依賴地圖）、`docs/agent-workflow.md`、專案自己的 `CLAUDE.md`、README（含照實寫的 Tradeoffs）；`tools/verify-boundaries.mjs` + `pnpm verify:boundaries`；9 個 lib 補上 `"private": true` | `b414f2e` |
 | — | 修正過期的 `pnpm-lock.yaml`（缺 8 個 lib 的 importer 條目 → 全新 clone 的 `--frozen-lockfile` 會失敗）；在乾淨環境驗證通過 | `43bff8d` |
+| — | 修正環境診斷：瓶頸是 CPU + 記憶體，不只是硬碟 | `944076e` |
+| — | **OpenSpec**：`openspec/changes/build-storefront-pages/` —— proposal（為什麼做）、6 個 capability 的 spec（32 條 requirement、54 個 scenario）、design（專案設置原因 + 11 個設計決策與放棄的方案）、tasks（46 項，對應本頁 13 步，Step 1–3 已勾選）；`openspec validate --strict` 通過 | 見 git log |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -283,4 +285,10 @@ First Commit 至最後 Commit
 - 順帶抓到：9 個 React lib 的 `package.json` 缺 `"private": true`（generator 沒加）→ 已補上並納入檢查。
 - 順帶清掉：先前 plugin worker 逾時留下的 7 個 Nx 孤兒行程（掛了 23–55 分鐘）。
 
-**下一步：Step 4 ★ — Walking skeleton（router + providers + shell 空殼 + 兩個空頁面）**
+**OpenSpec 的用法（之後每一步都照這個對照）**
+- 規格：`openspec/changes/build-storefront-pages/specs/<capability>/spec.md` —— 每個 `#### Scenario` 就是一個應該存在的測試。
+- 進度：`openspec/changes/build-storefront-pages/tasks.md` —— 每完成一項立刻 `- [ ]` → `- [x]`；本頁的「完成項目」繼續記 commit。
+- 改行為前先改規格，並跑 `openspec validate build-storefront-pages --strict`。
+- 13 步全部完成後再 archive（把 delta spec 併入 `openspec/specs/`）。
+
+**下一步：Step 4 ★ — Walking skeleton（router + providers + shell 空殼 + 兩個空頁面）** → 對應 `tasks.md` 第 4 組

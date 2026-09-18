@@ -2,6 +2,8 @@
 
 先讀 [`docs/architecture.md`](./docs/architecture.md)。這份檔案只列**不能違反的規則**與**怎麼驗證自己做對了**。
 
+**行為規格在 OpenSpec**：`openspec/changes/build-storefront-pages/`。實作任何功能前，先讀對應的 `specs/<capability>/spec.md`；每個 `#### Scenario` 就是一個應該存在的測試。完成 `tasks.md` 的任務後立刻把 `- [ ]` 改成 `- [x]`。改行為之前先改規格，並跑 `openspec validate build-storefront-pages --strict`。
+
 ## 不能違反的規則
 
 1. **設計先於實作。** 設計有變動時先改 `docs/architecture.md`（必要時加 ADR），再改 code。不要讓文件與 code 脫鉤。

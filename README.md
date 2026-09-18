@@ -2,17 +2,18 @@
 
 Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情頁。全程使用 Mock Data，不呼叫任何真實 API。
 
-> **狀態：進行中。** 目前完成 workspace、10 個 domain lib 與由 lint 強制的依賴規則、設計文件與 ADR。頁面實作依[逐步計畫](./docs/MoMO面試/Phase%202%20—%20Implementation.md)進行，進度以該文件的「完成項目」與 commit history 為準。
+> **狀態：進行中。** 目前完成 workspace、10 個 domain lib 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
 
 ## 先看這幾份
 
-| 文件                                                 | 內容                                                              |
-| ---------------------------------------------------- | ----------------------------------------------------------------- |
-| [`docs/architecture.md`](./docs/architecture.md)     | 系統怎麼切、為什麼這樣切、規模變大時怎麼管                        |
-| [`docs/adr/`](./docs/adr)                            | 6 個決策：背景、理由、**代價**、演進觸發條件                      |
-| [`docs/agent-workflow.md`](./docs/agent-workflow.md) | Human ↔ Agent 怎麼協作；Human 糾正了 Agent 什麼；Agent 在哪裡出錯 |
-| [`docs/MoMO面試/`](./docs/MoMO面試)                  | 原始的需求解析、設計筆記與逐步計畫                                |
-| [`docs/pictures/`](./docs/pictures)                  | 目標畫面（真實網站）的截圖，依頁面由上到下編號                    |
+| 文件                                                                                    | 內容                                                                                                                                           |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`openspec/changes/build-storefront-pages/`](./openspec/changes/build-storefront-pages) | **行為規格**（OpenSpec）：32 條 requirement、54 個可測試的 scenario；`design.md` 說明專案設置原因與每個設計決策；`tasks.md` 是可勾選的實作進度 |
+| [`docs/architecture.md`](./docs/architecture.md)                                        | 系統怎麼切、為什麼這樣切、規模變大時怎麼管                                                                                                     |
+| [`docs/adr/`](./docs/adr)                                                               | 6 個決策：背景、理由、**代價**、演進觸發條件                                                                                                   |
+| [`docs/agent-workflow.md`](./docs/agent-workflow.md)                                    | Human ↔ Agent 怎麼協作；Human 糾正了 Agent 什麼；Agent 在哪裡出錯                                                                              |
+| [`docs/MoMO面試/`](./docs/MoMO面試)                                                     | 原始的需求解析、設計筆記與逐步計畫                                                                                                             |
+| [`docs/pictures/`](./docs/pictures)                                                     | 目標畫面（真實網站）的截圖，依頁面由上到下編號                                                                                                 |
 
 ## 技術選型
 
@@ -67,6 +68,8 @@ pnpm nx dev shop                           # 開發伺服器
 pnpm nx run-many -t lint test typecheck    # 全部專案
 pnpm nx build shop
 pnpm nx graph                              # 看依賴圖
+pnpm verify:boundaries                     # 確認依賴規則套用到每個專案、依賴圖 0 違規
+openspec validate build-storefront-pages --strict   # 驗證行為規格的格式
 ```
 
 需要 Node 24、pnpm 12。
