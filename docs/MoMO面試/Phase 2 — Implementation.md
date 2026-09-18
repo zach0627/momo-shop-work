@@ -28,61 +28,73 @@ First Commit 至最後 Commit
 
 ### 總覽
 
-| Step | 產出 | Commit | TDD | 可砍 |
-|---|---|---|---|---|
-| 1 | Nx workspace + `shop` app 可 build | `chore: scaffold nx workspace` | — | ✗ |
-| 2 | 10 libs + tags + boundary lint | `chore: add domain libs and module boundary rules` | — | ✗ |
-| 3 | architecture.md + ADR ×5 + agent-workflow.md | `docs: add architecture and ADRs` | — | ✗ |
-| 4 ★ | Walking skeleton：兩條路由走得通 | `feat(shop): walking skeleton with routing and shell` | paths、AppLink | ✗ |
-| 5 | 素材 + fixtures + catalog/data-access | `feat(catalog): mock repository, fixtures and query hooks` | #3 | ✗ |
-| 6 | shared util / ui | `feat(shared): price formatting and core ui components` | #1 #2 | ✗ |
-| 7 | Header(sticky) + 分類展開 + Footer | `feat(shell): sticky header, category nav and footer` | #6 | ✗ |
-| 8 ★ | 首頁 config-driven + 6 blocks | `feat(home): config-driven section renderer and blocks` | #5 | ✗ |
-| 9 | 你可能會喜歡：3 列 + 看更多 | `feat(recommendation): paginated grid with load more` | #4 | ✗ |
-| 10 ★ | 商品詳情頁（純展示） | `feat(goods): display-only goods detail page` | #8 | ✗ |
-| 11 | 限時搶購：倒數 + 2 列輪播 | `feat(flash-sale): countdown and two-row carousel` | #7 | ✓ |
-| 12 | 今日暢銷榜 | `feat(ranking): best sellers with rank badge` | — | ✓ |
-| 13 ★ | README + CI | `docs: readme with tradeoffs and roadmap` / `ci: nx affected` | — | README ✗ / CI ✓ |
-| P2 | Playwright / SectionBoundary / Skeleton / 部署 | 各自一個 commit | — | ✓ |
+| 狀態 | Step | 產出 | Commit | TDD | 可砍 |
+|---|---|---|---|---|---|
+| ✅ | 1 | Nx workspace + `shop` app 可 build | `chore: scaffold nx workspace` | — | ✗ |
+| ✅ | 2 | 10 libs + tags + boundary lint | `chore: add domain libs and module boundary rules` | — | ✗ |
+| ✅ | 3 | architecture.md + ADR ×6 + agent-workflow.md + CLAUDE.md + 邊界驗證工具 + OpenSpec | `docs: add architecture and ADRs` | — | ✗ |
+| ⬜ | 4 ★ | Walking skeleton：兩條路由走得通 | `feat(shop): walking skeleton with routing and shell` | paths、AppLink | ✗ |
+| ⬜ | 5 | 素材 + fixtures + catalog/data-access | `feat(catalog): mock repository, fixtures and query hooks` | #3 | ✗ |
+| ⬜ | 6 | shared util / ui | `feat(shared): price formatting and core ui components` | #1 #2 | ✗ |
+| ⬜ | 7 | Header(sticky) + 分類展開 + Footer | `feat(shell): sticky header, category nav and footer` | #6 | ✗ |
+| ⬜ | 8 ★ | 首頁 config-driven + 6 blocks | `feat(home): config-driven section renderer and blocks` | #5 | ✗ |
+| ⬜ | 9 | 你可能會喜歡：3 列 + 看更多 | `feat(recommendation): paginated grid with load more` | #4 | ✗ |
+| ⬜ | 10 ★ | 商品詳情頁（純展示） | `feat(goods): display-only goods detail page` | #8 | ✗ |
+| ⬜ | 11 | 限時搶購：倒數 + 2 列輪播 | `feat(flash-sale): countdown and two-row carousel` | #7 | ✓ |
+| ⬜ | 12 | 今日暢銷榜 | `feat(ranking): best sellers with rank badge` | — | ✓ |
+| ⬜ | 13 ★ | README + CI | `docs: readme with tradeoffs and roadmap` / `ci: nx affected` | — | README ✗ / CI ✓ |
+| ⬜ | P2 | Playwright / SectionBoundary / Skeleton / 部署 | 各自一個 commit | — | ✓ |
 
 > ★ = 里程碑，建議至少在這四步停下來看畫面。不可砍的路徑是 Step 1–10 + 13；Step 11 / 12 若最後沒做，要在 README 的 Known Gaps 照實寫明。
 
 ---
 
-### Step 1 — Nx scaffold
+### Step 1 — Nx scaffold ✅
 
 **目標**：空資料夾 → 可 build、可 test 的 Nx + React + Vite workspace。
-- [ ] 在 `D:\repo` 以 `create-nx-workspace` 建立（preset react-monorepo、app 名 `shop`、bundler vite、vitest、pnpm、不開 Nx Cloud、`--skipGit`）；確切 flags 以當下 Nx 版本為準。若因 `momo-shop-work` 已存在而失敗 → 建在暫存名稱再把內容搬進去。
-- [ ] `git init -b main`；確認 `.gitignore` 含 `node_modules` `dist` `.nx`。
-- [ ] TypeScript `strict: true`；`package.json` 加 `engines.node`。
-- [ ] 刪掉 scaffold 的歡迎頁樣板（`nx-welcome`）。
+- [x] 在 `D:\repo` 以 `create-nx-workspace` 建立（preset react-monorepo、app 名 `shop`、bundler vite、vitest、pnpm、不開 Nx Cloud、`--skipGit`）；確切 flags 以當下 Nx 版本為準。若因 `momo-shop-work` 已存在而失敗 → 建在暫存名稱再把內容搬進去。
+  - ↳ **實際做法不同**：Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本並忽略 flags → 改用 `--template=empty` + `@nx/react:app` generator（`--minimal`、無 router）。
+- [x] `git init -b main`；確認 `.gitignore` 含 `node_modules` `dist` `.nx`。
+- [x] TypeScript `strict: true`；`package.json` 加 `engines.node`。
+  - ↳ `strict` 在 Step 1 就有；**`engines.node` 當時漏做**，於規格複查時補上（連同 `packageManager`），值依 Vite 8 的實際要求 `^20.19.0 || >=22.12.0`。
+- [x] 刪掉 scaffold 的歡迎頁樣板（`nx-welcome`）。
+  - ↳ 用 `--minimal` 產生，樣板從未出現；另外清掉了範本附帶的約 70 個無關檔案。
 
 **驗證**：`pnpm nx build shop`、`pnpm nx test shop`
 **Review 重點**：目錄是否乾淨、沒有多餘樣板。
 **退路**：超過 10 分鐘仍卡住 → 改單一 Vite app（Phase 1 §9）。
 **Commit**：`chore: scaffold nx workspace (react 19 + vite + vitest)`
 
-### Step 2 — 10 libs + 依賴規則
+### Step 2 — 10 libs + 依賴規則 ✅
 
 **目標**：架構的「骨架與法律」先到位，之後每一行 code 都受 lint 約束。
-- [ ] 用 `@nx/react:lib` 產生 10 個 lib（路徑、import alias、tags 依 Phase 1 §3 / §4）：
+- [x] 用 `@nx/react:lib` 產生 10 個 lib（路徑、import alias、tags 依 Phase 1 §3 / §4）：
   `shared/ui` `shared/util` `catalog/data-access` `catalog/feature-recommendation` `home/data-access` `home/feature-flash-sale` `home/feature-ranking` `home/page` `goods/page` `shell/feature`
-- [ ] `apps/shop` 標 `type:app`。
-- [ ] `eslint.config.mjs`：`@nx/enforce-module-boundaries` 的 `depConstraints`（type 6 條 + scope 5 條）。
-- [ ] `no-restricted-imports`：`libs/**` 禁 `react-router`；`libs/shared/ui` 以外禁 `embla-carousel-react`。
-- [ ] 每個 lib 的 `index.ts` 只留最小 stub（3 個 feature lib 先匯出 placeholder container，讓 Step 8 的 registry 編得過）。
-- [ ] **負向驗證**：暫時在 `home/feature-ranking` import `home/feature-flash-sale` → 確認 lint **報錯** → 還原。（證明規則真的有在擋）
+  - ↳ `shared/util` 是純函式，改用 `@nx/js:lib`；其餘 9 個用 `@nx/react:lib`。10 個 lib 的 tags 逐一核對過。
+- [x] `apps/shop` 標 `type:app`。
+- [x] `eslint.config.mjs`：`@nx/enforce-module-boundaries` 的 `depConstraints`（type 6 條 + scope 5 條）。
+- [x] `no-restricted-imports`：`libs/**` 禁 `react-router`；`libs/shared/ui` 以外禁 `embla-carousel-react`。
+  - ↳ 實作為「預設全禁、單點放行」：根設定兩個都禁，`apps/shop` 與 `shared/ui` 在自己的 eslint 設定放行。
+- [x] 每個 lib 的 `index.ts` 只留最小 stub。
+  - ↳ **3 個 feature lib 的 placeholder container 沒做**，延到 Step 8（registry 真的需要時）—— 已移到 Step 8 的清單。
+- [x] **負向驗證**：暫時在 `home/feature-ranking` import `home/feature-flash-sale` → 確認 lint **報錯** → 還原。（證明規則真的有在擋）
+  - ↳ 實際測了 5 種違規 + 2 個對照組；規格複查時又補測 2 種深層引用（相對路徑由 lint 擋、套件名稱加內部路徑由型別檢查擋）。
 
 **驗證**：`pnpm nx run-many -t lint test`、`pnpm nx graph`（看依賴圖）
 **Review 重點**：tags 是否與 Phase 1 §3 的表一致；負向驗證的錯誤訊息。
 **Commit**：`chore: add domain libs and module boundary rules`
 
-### Step 3 — 設計文件進 repo
+### Step 3 — 設計文件進 repo ✅
 
 **目標**：設計先於實作，留在 git history 裡給面試官看。
-- [ ] `docs/architecture.md`：Phase 1 筆記 v2 整理版（含 mermaid 依賴圖）。
-- [ ] `docs/adr/0001~0005-*.md`：每份 = Context / Decision / Consequences / 演進觸發條件（短）。
-- [ ] `docs/agent-workflow.md`：協作規則 + **設計階段你糾正 Agent 的 3 次紀錄**（① 詳情頁不做互動 ② 首頁區塊要拆 feature ③ shared/ui 的 Rule of Two）+ v1→v2 自我審查的 8 點。
+- [x] `docs/architecture.md`：Phase 1 筆記 v2 整理版（含 mermaid 依賴圖）。
+  - ↳ 另加了架構復盤後的「lib 粒度準則與拆分觸發條件」。
+- [x] `docs/adr/0001~0005-*.md`：每份 = Context / Decision / Consequences / 演進觸發條件（短）。
+  - ↳ 多一份 ADR-0006（domain 依賴地圖），每份都有「代價」一節。
+- [x] `docs/agent-workflow.md`：協作規則 + **設計階段你糾正 Agent 的 3 次紀錄**（① 詳情頁不做互動 ② 首頁區塊要拆 feature ③ shared/ui 的 Rule of Two）+ v1→v2 自我審查的 8 點。
+  - ↳ 糾正紀錄現為 4 次（加上架構復盤）；另有 Agent 出錯與事故紀錄。
+- [x] （計畫外）專案自己的 `CLAUDE.md`、README 的 Tradeoffs、`tools/verify-boundaries.mjs`、修正過期的 lockfile、`package.json` 的 `engines`。
+- [x] （計畫外）OpenSpec：`openspec/config.yaml`、主規格 `module-boundaries`、change `build-storefront-pages`（proposal / 5 份 spec / design / tasks）；`openspec validate --all --strict` 通過。
 
 **驗證**：Markdown 連結 / mermaid 可渲染。
 **Review 重點**：ADR 的 tradeoff 說法是否是你面試時願意講的版本。
@@ -91,6 +103,7 @@ First Commit 至最後 Commit
 ### Step 4 ★ — Walking skeleton
 
 **目標**：最薄的一條端到端：`/` 與 `/goods/:goodsId` 都走得通，外面包著 shell。之後每一步都只是「把空殼填滿」。
+- [ ] **跨專案依賴的做法（這一步第一次出現）**：要 import 另一個 lib 的專案，先在自己的 `package.json` 宣告 `"@momo/<lib>": "workspace:*"` → `pnpm install` → `pnpm nx sync`。三個動作缺一不可（規格複查時實測：未宣告的 workspace 套件不會被解析到）。
 - [ ] 安裝：`react-router`、`@tanstack/react-query`、`tailwindcss` + `@tailwindcss/vite`。
 - [ ] **TDD**：`shared/util/paths.ts` — `paths.home()`、`paths.goods(id)`、route pattern。
 - [ ] **TDD**：`shared/ui/link` — `AppLink` 預設渲染 `<a href>`；有 `LinkProvider` 時改用注入的元件。
@@ -107,7 +120,7 @@ First Commit 至最後 Commit
 
 **目標**：所有商品資料的單一來源 + 可抽換的 repository。
 - [ ] 素材 `D:\repo\momo素材` → `apps/shop/public/assets/`（依 Phase 1 §7 的 slug 對照；只搬用得到的）。
-- [ ] `tools/gen-fixtures.mjs`：掃 `public/assets` → `products.generated.ts`（id 取自檔名、名稱 / 價格決定性產生、不用亂數）；`collections.ts`、`categories.ts`（分類取自截圖的 41 個）。
+- [ ] `tools/gen-fixtures.mjs`：掃 `public/assets` → `products.generated.ts`（id 取自檔名、名稱 / 價格決定性產生、不用亂數）；`collections.ts`、`categories.ts`（分類取自截圖的 40 個：9 + 9 + 9 + 9 + 4，第一項為「首頁」）。
 - [ ] models：`Product`、`FlashSaleItem`、`Category`、`Page<T>`。
 - [ ] **TDD #3**：`createMockCatalogRepository({ now, latencyMs })`
   - [ ] `getProduct`：存在 → 商品；不存在 → `null`
@@ -157,7 +170,7 @@ First Commit 至最後 Commit
 - [ ] **TDD #5**：`SectionRenderer`
   - [ ] 依 `type` 渲染對應元件
   - [ ] 未知 `type` → 不渲染、不 throw、呼叫 `reportError`
-- [ ] `registry.ts`：mapped type（漏寫 renderer → 編譯錯誤）；3 個 feature type 先指向 Step 2 的 placeholder。
+- [ ] `registry.ts`：mapped type（漏寫 renderer → 編譯錯誤）；3 個 feature lib 各建立一個 placeholder container（從 Step 2 移過來的項目），registry 先指向它們。
 - [ ] 6 個私有 blocks：`hero`、`banner-carousel`、`banner-grid`、`shortcut-bar`、`notice`、`product-rail`（商品卡連到 `paths.goods(id)`）。
 - [ ] `HomePage`：`useHomeLayout` → loading / error / `<SectionRenderer>`。
 
@@ -245,7 +258,8 @@ First Commit 至最後 Commit
 | 3 | `docs/architecture.md`、ADR ×6（新增 0006：domain 依賴地圖）、`docs/agent-workflow.md`、專案自己的 `CLAUDE.md`、README（含照實寫的 Tradeoffs）；`tools/verify-boundaries.mjs` + `pnpm verify:boundaries`；9 個 lib 補上 `"private": true` | `b414f2e` |
 | — | 修正過期的 `pnpm-lock.yaml`（缺 8 個 lib 的 importer 條目 → 全新 clone 的 `--frozen-lockfile` 會失敗）；在乾淨環境驗證通過 | `43bff8d` |
 | — | 修正環境診斷：瓶頸是 CPU + 記憶體，不只是硬碟 | `944076e` |
-| — | **OpenSpec**：`openspec/changes/build-storefront-pages/` —— proposal（為什麼做）、6 個 capability 的 spec（32 條 requirement、54 個 scenario）、design（專案設置原因 + 11 個設計決策與放棄的方案）、tasks（46 項，對應本頁 13 步，Step 1–3 已勾選）；`openspec validate --strict` 通過 | 見 git log |
+| — | **OpenSpec**：`openspec/changes/build-storefront-pages/` —— proposal（為什麼做）、6 個 capability 的 spec（32 條 requirement、54 個 scenario）、design（專案設置原因 + 11 個設計決策與放棄的方案）、tasks（46 項，對應本頁 13 步，Step 1–3 已勾選）；`openspec validate --strict` 通過 | `3cf7593` |
+| — | **OpenSpec 複查與修正**：① 補測並改寫一條沒驗證過且寫錯的規格（深層引用：相對路徑由 lint 擋、套件名稱加內部路徑由型別檢查擋）；② `config.yaml` 補上專案脈絡與撰寫規則（先前說了要做卻沒做）；③ 已實作的 `module-boundaries` 移到主規格 `openspec/specs/`；④ 一個無法測試的 scenario 改為可比對的形式；⑤ 補缺漏：限時搶購卡片內容、首頁載入中 / 失敗狀態、推薦恰好一頁、分類清單（40 個）；⑥ 補做 Step 1 漏掉的 `engines.node`；⑦ 本頁 Step 1–3 逐項核對後打勾 | 見 git log |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。

@@ -3,7 +3,7 @@
 > 這份文件描述「系統現在長什麼樣、為什麼這樣切、規模變大時怎麼管」。
 > 設計有變動時**先改這份文件再改 code**。決策的來龍去脈在 [`adr/`](./adr)，設計過程的原始筆記在 [`MoMO面試/`](./MoMO面試)。
 >
-> 三者的分工：**本文件**說明結構；**ADR** 說明每個決策為什麼這樣選、代價是什麼；**OpenSpec**（[`openspec/changes/build-storefront-pages/`](../openspec/changes/build-storefront-pages)）說明系統**對外可觀察的行為**，每條 requirement 都附可直接轉成測試的 scenario。判斷「實作對不對」時以 OpenSpec 為準。
+> 三者的分工：**本文件**說明結構；**ADR** 說明每個決策為什麼這樣選、代價是什麼；**OpenSpec** 說明系統**對外可觀察的行為** —— [`openspec/specs/`](../openspec/specs) 是已實作的現況，[`openspec/changes/build-storefront-pages/`](../openspec/changes/build-storefront-pages) 是待實作的部分，每條 requirement 都附可直接轉成測試的 scenario。判斷「實作對不對」時以 OpenSpec 為準。
 
 ## 1. 範圍
 
@@ -67,7 +67,8 @@ graph TD
 
 - 規則寫在根目錄 [`eslint.config.mjs`](../eslint.config.mjs)：`@nx/enforce-module-boundaries`（6 條 type + 5 條 scope）與 `no-restricted-imports`。tags 宣告在各專案 `package.json` 的 `nx.tags`。
 - `no-restricted-imports` 採「預設全禁、單點放行」：根設定兩個套件都禁，`apps/shop` 與 `libs/shared/ui` 在**自己的** eslint 設定用 `restrictedImports([...])` 明確放行 —— 例外寫在它生效的地方。
-- Nx 同時禁止 deep import：只能從 `@momo/<lib>`（即 `src/index.ts`）匯入，所以沒有從 `index.ts` 匯出的東西就是 lib 私有的。
+- **lib 的「私有」由兩道關卡保證**（都實際放入違規樣本驗證過）：每個 lib 的 `package.json` 的 `exports` 只公開 `.`（即 `src/index.ts`），所以以「套件名稱 + 內部路徑」引用會在**型別檢查**失敗（TS2307）；以相對路徑跨專案引用會被 **lint** 擋下。沒有從 `index.ts` 匯出的東西就是 lib 私有的。因為兩道關卡來自不同工具，驗證時 `lint` 與 `typecheck` 都要跑。
+- **跨專案 import 要先宣告依賴**：在自己的 `package.json` 加上 `"@momo/<lib>": "workspace:*"`，執行 `pnpm install` 與 `nx sync`（更新 TypeScript project references）。pnpm 的嚴格 `node_modules` 不會解析未宣告的 workspace 套件 —— 依賴必須明說。
 - **這些規則被驗證過會擋，而不只是存在**：建立時放入 5 個故意違規的探針檔（feature→feature、ui→data-access、scope:goods→scope:home、lib 內 import router、`shared/ui` 以外 import embla），全部被 lint 擋下；2 個合法的對照組通過。紀錄見 [`agent-workflow.md`](./agent-workflow.md)。
 - **lint 回答不了的問題由 [`tools/verify-boundaries.mjs`](../tools/verify-boundaries.mjs) 回答**（`pnpm verify:boundaries`）：
   1. 每個專案的 tags 格式正確、恰好一個 `type:`、lib 恰好一個 `scope:`、且都是 private。**tags 寫壞的 lib 會靜默地不受任何規則約束，而 lint 依然是綠的** —— 這個錯誤在建立 lib 時真的發生過。

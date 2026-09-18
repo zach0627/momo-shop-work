@@ -1,26 +1,30 @@
 # Tasks
 
 > 與 `docs/MoMO面試/Phase 2 — Implementation.md` 的 13 個步驟一一對應（每組 = 一個 commit）。
-> 規格見 `specs/`，做法見 `design.md`。有邏輯的任務先寫 spec、確認紅燈且理由正確，再實作到綠燈。
+> 規格見 `specs/`（本 change 新增的行為）與主規格 `openspec/specs/module-boundaries/`（所有任務都必須遵守的既有約束），做法見 `design.md`。有邏輯的任務先寫 spec、確認紅燈且理由正確，再實作到綠燈。
 
 ## 1. Workspace（Step 1）
 
 - [x] 1.1 建立 Nx 23 workspace（pnpm workspaces + TS project references）並安裝 `@nx/react`；清掉範本附帶的無關檔案；驗證：`git status` 只剩自己說得清楚的檔案
 - [x] 1.2 產生 `shop` app（React 19 + Vite + Vitest）；驗證：`nx run-many -t lint test typecheck build` 全綠（無快取），App spec 先紅後綠
+- [x] 1.3 根 `package.json` 宣告 `packageManager` 與 `engines.node`（依 Vite 8 的實際要求）；驗證：`pnpm install --frozen-lockfile` 成功
 
 ## 2. Libs 與依賴規則（Step 2）
 
 - [x] 2.1 產生 10 個 lib 並加上 `type:` 與 `scope:` 標籤；驗證：逐一核對 10 個 `package.json` 的 `nx.tags` 為兩個獨立字串
-- [x] 2.2 設定 `depConstraints`（6 條 type + 5 條 scope）與 `no-restricted-imports`（router 只放行 `apps/shop`、embla 只放行 `shared/ui`）；驗證：5 個違規探針全部被 lint 擋下、2 個對照組通過（spec `module-boundaries`）
+- [x] 2.2 設定 `depConstraints`（6 條 type + 5 條 scope）與 `no-restricted-imports`（router 只放行 `apps/shop`、embla 只放行 `shared/ui`）；驗證：5 個違規探針全部被 lint 擋下、2 個對照組通過（主規格 `module-boundaries`）
 
-## 3. 設計文件與驗證工具（Step 3）
+## 3. 設計文件、驗證工具與規格（Step 3）
 
 - [x] 3.1 撰寫 `docs/architecture.md`、ADR 0001–0006、`docs/agent-workflow.md`、`CLAUDE.md`、README（含照實的 Tradeoffs）；驗證：文件內相對連結可開啟
-- [x] 3.2 新增 `tools/verify-boundaries.mjs`（`pnpm verify:boundaries`）；驗證：全部符合時 exit 0，故意把一個 lib 的標籤改壞時 exit 1 並指出該 lib（spec `module-boundaries`「約束本身被自動驗證」）
-- [x] 3.3 補齊 `pnpm-lock.yaml` 的 workspace importer；驗證：在沒有 `node_modules` 的乾淨環境 `pnpm install --frozen-lockfile` 成功
+- [x] 3.2 新增 `tools/verify-boundaries.mjs`（`pnpm verify:boundaries`）；驗證：全部符合時 exit 0，故意把一個 lib 的標籤改壞時 exit 1 並指出該 lib（主規格 `module-boundaries`「約束本身被自動驗證」）
+- [x] 3.3 補齊 `pnpm-lock.yaml` 的 workspace importer；驗證：在沒有 `node_modules` 的乾淨環境 `pnpm install --frozen-lockfile` 成功（主規格「全新環境可以重現安裝」）
+- [x] 3.4 建立 OpenSpec：`config.yaml`（專案脈絡與撰寫規則）、主規格 `module-boundaries`（已實作的約束）、本 change 的 proposal / 5 份 spec / design / tasks；驗證：`openspec validate --all --strict` 通過
+- [x] 3.5 補驗主規格中「只能透過公開入口使用一個 lib」：相對路徑引用被 lint 擋下、套件名稱加內部路徑被型別檢查擋下（TS2307）；驗證：兩個探針的實際輸出記錄在 `docs/agent-workflow.md`，探針已移除
 
 ## 4. Walking skeleton（Step 4）
 
+- [ ] 4.0 建立跨專案依賴的做法：要 import 另一個 lib 的專案，先在自己的 `package.json` 宣告 `"@momo/<lib>": "workspace:*"`，執行 `pnpm install` 與 `nx sync`；驗證：`nx sync:check` 通過、lockfile 的 importer 有對應的依賴
 - [ ] 4.1 安裝 `react-router`、`@tanstack/react-query`、`tailwindcss`、`@tailwindcss/vite`；驗證：`pnpm install` 成功且 lockfile 有更新
 - [ ] 4.2 TDD：`shared/util` 的 `paths`（`paths.home()`、`paths.goods(id)`、route pattern）；驗證：spec 先紅後綠，並移除該 lib 的 `passWithNoTests`
 - [ ] 4.3 TDD：`shared/ui` 的 `AppLink` —— 預設渲染 `<a href>`，有 `LinkProvider` 時改用注入的元件；驗證：兩個情境的 spec 皆通過，並移除該 lib 的 `passWithNoTests`
@@ -31,7 +35,7 @@
 ## 5. 素材與商品資料（Step 5）
 
 - [ ] 5.1 將 `D:\repo\momo素材` 依 slug 對照搬到 `apps/shop/public/assets/`（只搬用得到的）；驗證：圖片路徑無中文、總大小記錄在 commit 訊息
-- [ ] 5.2 `tools/gen-fixtures.mjs` 由素材產生 `products.generated.ts`、`collections.ts`、`categories.ts`；驗證：連續執行兩次產出完全相同（spec `product-catalog`「資料是決定性的」）
+- [ ] 5.2 `tools/gen-fixtures.mjs` 由素材產生 `products.generated.ts`、`collections.ts`、`categories.ts`（40 個分類，順序依截圖 `02-category-panel-expanded.png`）；驗證：連續執行兩次產出完全相同（spec `product-catalog`「資料是決定性的」「查詢分類清單」）
 - [ ] 5.3 TDD：`createMockCatalogRepository({ now, latencyMs })`；驗證：spec 涵蓋商品存在 / 不存在、未知集合回空清單、分頁 `nextOffset` 與最後一頁、`endsAt` 晚於注入的 `now`（spec `product-catalog`）
 - [ ] 5.4 `CatalogRepositoryProvider`、`useCatalogRepository`、6 個 query hooks、`query-keys.ts`、`testing.ts`（fake repository + wrapper）；於 app 的 providers 注入 mock；驗證：`nx test catalog-data-access` 通過
 
@@ -56,6 +60,7 @@
 - [ ] 8.3 TDD：`SectionRenderer` —— 依型別渲染、未知型別不渲染且呼叫 `reportError`；驗證：spec 通過（spec `home-page`「未知的區塊型別不影響頁面」）
 - [ ] 8.4 以 mapped type 定義 registry，3 個 feature 型別先指向 placeholder；驗證：暫時從 union 多加一個型別時 `typecheck` 失敗，還原後通過
 - [ ] 8.5 6 個通用 block（hero、banner-carousel、banner-grid、shortcut-bar、notice、product-rail）；驗證：dev server 依截圖 01–12 由上到下對照；點降價好貨的商品導到 `/goods/:id`；banner 不可點
+- [ ] 8.5a TDD：`HomePage` 的載入中與載入失敗狀態（注入會延遲 / 會失敗的 fake repository）；驗證：spec 通過（spec `home-page`「載入中與載入失敗有明確狀態」）
 - [ ] 8.6 驗證 config-driven：調換 `home-layout.ts` 兩行，畫面順序跟著變；驗證完還原（spec `home-page`「區塊順序由版位資料決定」）
 
 ## 9. 你可能會喜歡（Step 9）
@@ -72,7 +77,7 @@
 ## 11. 限時搶購（Step 11，可砍）
 
 - [ ] 11.1 TDD：`get-remaining`（含過期歸零）、`chunk`，以 fake timers 驗證倒數每秒遞減；驗證：spec 通過（spec `home-page`「限時搶購顯示倒數」）
-- [ ] 11.2 私有 ui（header、countdown、stock-left、grab-badge）、每張 slide 10 件；registry 換成真的元件；驗證：dev server 上倒數在跳，與截圖 `11-flash-sale.png` 對照
+- [ ] 11.2 私有 ui（header、countdown、stock-left、grab-badge）、每張 slide 10 件；registry 換成真的元件；驗證：spec 確認卡片顯示限搶價、劃線原價與「最後 N 組」（spec `home-page`「限時搶購商品顯示限搶價與剩餘組數」）；dev server 上倒數在跳，與截圖 `11-flash-sale.png` 對照
 
 ## 12. 今日暢銷榜（Step 12，可砍）
 

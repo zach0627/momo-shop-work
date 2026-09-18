@@ -16,7 +16,8 @@
 ### 目前的狀態
 
 - Nx 23 workspace（pnpm workspaces + TypeScript project references）、1 個 app + 10 個 lib，皆已建立但內容為空殼。
-- 依賴規則已由 lint 強制，並經負向驗證（5 個違規探針全部被擋）與 `pnpm verify:boundaries` 確認套用到每個專案。
+- 依賴規則已由 lint 強制，並經負向驗證（5 個違規探針全部被擋）與 `pnpm verify:boundaries` 確認套用到每個專案。這些已實作的約束寫在主規格 `openspec/specs/module-boundaries/`，本 change 在它的約束下實作、不修改它。
+- 專案之間目前沒有任何依賴（libs 都是空的）。本 change 的第一步會產生第一批跨專案 import。
 - 目標畫面的截圖在 `docs/pictures/`，依頁面由上到下編號。
 
 ### 限制
@@ -126,6 +127,8 @@ UI → query hooks → useCatalogRepository() → CatalogRepository（interface�
 
 **為什麼**：`shared/ui` 是全專案都依賴的 lib，長大後任何修改都讓 `nx affected` 等於全部。設計討論時 Human 指出原案把只有一個使用者的「看更多」按鈕與倒數計時放進 shared，修正後 `shared/ui` 從 10 個元件瘦身到 6 個。
 
+**「私有」由誰保證**（實際驗證過，不是假設）：每個 lib 的 `package.json` 的 `exports` 只公開 `.`（即 `src/index.ts`）。以「套件名稱 + 內部路徑」引用會在型別檢查失敗（TS2307）；以相對路徑跨專案引用會被 lint 擋下。兩道關卡來自不同工具，所以驗證關卡必須同時跑 `lint` 與 `typecheck`。
+
 ### 9. `shared/ui` 不認識 domain model
 
 **選擇**：共用元件只宣告自己需要的最小形狀（例：`ProductCardItem`），domain 的 `Product` 靠 TypeScript structural typing 直接傳入。
@@ -151,6 +154,7 @@ UI → query hooks → useCatalogRepository() → CatalogRepository（interface�
 - **[`shared/ui` 長大後 `nx affected` 失去意義]** → 觸發條件：元件超過約 15 個 → 依元件家族拆分。
 - **[scope 放行清單隨時間腐化，最後誰都能依賴誰]** → 新增任何放行前必須先修改 ADR-0006；`CLAUDE.md` 明令 agent 不得為了讓 lint 通過而修改規則。
 - **[標籤寫壞的 lib 會靜默地不受任何規則約束，lint 仍是綠的]** → 建立 lib 時真的發生過。`pnpm verify:boundaries` 檢查標籤格式，並已驗證會在標籤壞掉時報紅。
+- **[跨專案 import 需要三個動作才會成立：宣告 `workspace:*` 依賴、`pnpm install`、`nx sync`；漏掉任何一個，型別檢查或 Nx 的同步檢查會失敗]** → pnpm 的嚴格 `node_modules` 不會讓未宣告的 workspace 套件被解析到，這其實是好事（依賴必須明說）。做法寫成 `tasks.md` 的 4.0，並列入 `CLAUDE.md`。
 - **[通用 block 的 props 會隨需求膨脹]** → 某個區塊的特例超過 2–3 個時，把它升級成自己的 feature，而不是繼續加 props。
 - **[純版面區塊沒有單元測試]** → 刻意的取捨：這些區塊沒有邏輯，測試只會驗證 JSX 長什麼樣。視覺正確性交給截圖對照與（P2）Playwright smoke test。
 - **[Repository 層不驗證 HTTP 細節]** → 有真實 API 契約後再引入 MSW 做 contract test，接在 HTTP 實作後面，與本設計不衝突。
