@@ -242,7 +242,8 @@ First Commit 至最後 Commit
 | — | 17 張真站截圖進 `docs/pictures/`（依頁面順序重新命名）；repo 內 Phase 1 的圖片改為 GitHub 可渲染的標準語法；2 張登入狀態截圖的帳號姓名已在複本上遮蓋（vault 原圖未動） | `a42640b` |
 | 2 | 10 個 lib（`@nx/react:lib` ×9、`@nx/js:lib` ×1）+ tags；`depConstraints`（type 6 條 + scope 5 條）；`no-restricted-imports`（預設全禁，`apps/shop` 放行 router、`shared/ui` 放行 embla）；各 lib README 改寫為職責說明；移除用不到的 `.babelrc` 與範例碼 | `4e44054` |
 | — | 移除計畫中所有時間紀錄與時間預估；記錄「專案維持在 D: 槽」的決定 | `d4cfdd3` |
-| 3 | `docs/architecture.md`、ADR ×6（新增 0006：domain 依賴地圖）、`docs/agent-workflow.md`、專案自己的 `CLAUDE.md`、README（含照實寫的 Tradeoffs）；`tools/verify-boundaries.mjs` + `pnpm verify:boundaries`；9 個 lib 補上 `"private": true` | 見 git log |
+| 3 | `docs/architecture.md`、ADR ×6（新增 0006：domain 依賴地圖）、`docs/agent-workflow.md`、專案自己的 `CLAUDE.md`、README（含照實寫的 Tradeoffs）；`tools/verify-boundaries.mjs` + `pnpm verify:boundaries`；9 個 lib 補上 `"private": true` | `b414f2e` |
+| — | 修正過期的 `pnpm-lock.yaml`（缺 8 個 lib 的 importer 條目 → 全新 clone 的 `--frozen-lockfile` 會失敗）；在乾淨環境驗證通過 | 見 git log |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -263,6 +264,9 @@ First Commit 至最後 Commit
 - 專案在 **D: 槽 = 5400 轉傳統硬碟**（C: 才是 NVMe SSD），且 Defender 即時掃描開啟 → 每個 Nx / Vitest 指令光讀檔就 30 秒以上（實測一個 0.5 秒的測試總耗時 34 秒）。與程式碼無關。
 - 目前的因應：`NX_DAEMON=false` + `NX_ISOLATE_PLUGINS=false`（否則 plugin worker 會連線逾時）、`--parallel=1`（否則 Vitest worker 會逾時）。
 - **決定：專案維持在 D: 槽，不搬移。** 以上述參數因應，並善用 Nx 快取（只有驗證關卡才加 `--skip-nx-cache`）。
+- **C: 槽測試複本（僅供跑測試）**：`C:\Users\Zach\momo-shop-work-mirror`。**D: 是唯一的基準** —— 只在 D: 編輯與 commit；複本沒有 `.git`，無法從那裡 commit。同步方向只有 D: → C:：
+  `robocopy D:\repo\momo-shop-work C:\Users\Zach\momo-shop-work-mirror /MIR /XD node_modules .nx dist .git out-tsc test-output`
+  （robocopy 的 exit code 0–7 都是成功。）複本是「沒有 `node_modules` 的乾淨環境」，第一次使用就抓到 lockfile 過期的假綠燈。
 
 **架構復盤（Step 2 之後）**
 - 提問：「大量寫在 libs，日後擴充購物車、結帳、品牌頁、刷卡時 libs 不會變很肥嗎？」

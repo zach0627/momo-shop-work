@@ -18,6 +18,7 @@
 - 有邏輯的程式碼走 TDD：先寫 spec → 確認它因為正確的理由失敗 → 最小實作 → 通過。純版面不寫單元測試。
 - 測試檔 `*.spec.ts(x)` 與原始碼同層。某個 lib 加入第一個 spec 時，把它 vite / vitest 設定裡的 `passWithNoTests` 拿掉。
 - 新增 lib 用 generator，tags 要加引號（PowerShell 會把逗號當陣列）：`"--tags=type:feature,scope:home"`。產生後**核對 `package.json` 的 `nx.tags` 是兩個獨立的字串**。
+- 新增 lib 後確認 `pnpm-lock.yaml` 的 `importers` 有它的條目（`libs/<scope>/<name>: {}`）。pnpm 12 不會自動補，少了的話本機正常、但全新 clone 的 `pnpm install --frozen-lockfile` 會失敗。
 - 每個 commit 都要是綠的，使用 Conventional Commits。
 
 ## 驗證

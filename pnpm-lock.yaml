@@ -129,9 +129,25 @@ importers:
 
   apps/shop: {}
 
+  libs/catalog/data-access: {}
+
+  libs/catalog/feature-recommendation: {}
+
+  libs/goods/page: {}
+
+  libs/home/data-access: {}
+
+  libs/home/feature-flash-sale: {}
+
+  libs/home/feature-ranking: {}
+
+  libs/home/page: {}
+
   libs/shared/ui: {}
 
   libs/shared/util: {}
+
+  libs/shell/feature: {}
 
 packages:
 
