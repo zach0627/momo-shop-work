@@ -1,0 +1,75 @@
+/** The tint of a category pill. Each row of the live "選擇分類" panel has one. */
+export type CategoryTone = 'sky' | 'lavender' | 'rose' | 'mint' | 'peach';
+
+export interface Category {
+  id: string;
+  name: string;
+  tone: CategoryTone;
+}
+
+function row(tone: CategoryTone, entries: [id: string, name: string][]) {
+  return entries.map(([id, name]): Category => ({ id, name, tone }));
+}
+
+/**
+ * The 40 categories of the live site, in its order and with its row tints.
+ *
+ * They live here only until the catalog data layer exists: they then move to
+ * the catalog fixtures and `AppLayout` reads them through `useCategories`.
+ * `CategoryNav` takes them as a prop, so it does not change when that happens.
+ */
+export const CATEGORIES: Category[] = [
+  ...row('sky', [
+    ['home', '首頁'],
+    ['flash-sale', '限時搶購'],
+    ['live', '直播'],
+    ['mo-store', 'mo店+'],
+    ['look-and-buy', '看看買'],
+    ['appliances', '家電'],
+    ['gaming', '電玩'],
+    ['mobile-camera', '手機/相機'],
+    ['computer', '電腦/組件'],
+  ]),
+  ...row('lavender', [
+    ['3c-accessories', '3C週邊'],
+    ['health', '保健/醫療'],
+    ['food-drink', '食品/飲料'],
+    ['fresh', '生鮮'],
+    ['women-fashion', '女時尚'],
+    ['men-fashion', '男時尚'],
+    ['luxury', '精品/飾品'],
+    ['beauty', '彩妝保養'],
+    ['personal-care', '個人清潔'],
+  ]),
+  ...row('rose', [
+    ['household', '日用/紙品'],
+    ['baby-toys', '母嬰/玩具'],
+    ['kitchen', '餐廚'],
+    ['furniture', '家具收納'],
+    ['diy-garden', '修繕園藝'],
+    ['bedding', '傢飾寢具'],
+    ['pets', '寵物'],
+    ['sports', '運動/按摩'],
+    ['outdoor', '戶外'],
+  ]),
+  ...row('mint', [
+    ['automotive', '車類'],
+    ['books-media', '圖書影音'],
+    ['stationery', '文具樂器'],
+    ['art-religion', '藝術宗教'],
+    ['travel', '旅遊/住宿'],
+    ['tickets', '票券'],
+    ['top-up-software', '加值/軟體'],
+    ['green-living', '綠色生活'],
+    ['supermarket', '生活超市'],
+  ]),
+  ...row('peach', [
+    ['cross-border', '跨境好物'],
+    ['momo-insurance', 'momo富立保險'],
+    ['charity', '樂公益'],
+    ['brand-flagship', '品牌旗艦館'],
+  ]),
+];
+
+/** "首頁" stays highlighted on every page, as it does on the live site. */
+export const ACTIVE_CATEGORY_ID = 'home';
