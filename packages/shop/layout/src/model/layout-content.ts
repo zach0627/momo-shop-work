@@ -72,6 +72,9 @@ export const FOOTER_COLUMNS: { heading: string; items: string[] }[] = [
 
 export const APP_COLUMN_HEADING = '行動購物APP';
 
+/** "首頁" stays highlighted on every page, as it does on the live site. */
+export const ACTIVE_CATEGORY_ID = 'home';
+
 // Relative to the document base (<base href> in index.html), so the packages do
 // not need to know under which sub-path the app is deployed.
 export const LOGO_SRC = 'assets/brand/momo-logo.png';

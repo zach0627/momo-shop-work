@@ -1,13 +1,12 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import type { Category } from '../model/categories';
 import { CategoryNav } from './category-nav';
 
-const categories: Category[] = [
-  { id: 'home', name: '首頁', tone: 'sky' },
-  { id: 'flash-sale', name: '限時搶購', tone: 'sky' },
-  { id: '3c', name: '3C週邊', tone: 'lavender' },
-  { id: 'daily', name: '日用/紙品', tone: 'rose' },
+const categories = [
+  { id: 'home', name: '首頁' },
+  { id: 'flash-sale', name: '限時搶購' },
+  { id: '3c', name: '3C週邊' },
+  { id: 'daily', name: '日用/紙品' },
 ];
 
 function renderNav() {
@@ -67,5 +66,27 @@ describe('CategoryNav', () => {
     expect(
       screen.getByText('3C週邊').closest('[aria-current="page"]'),
     ).toBeNull();
+  });
+
+  // The live panel tints each row of nine. The data does not carry a colour,
+  // so it has to come from the position.
+  it('tints the pills by the row they land on, nine to a row', () => {
+    const many = Array.from({ length: 20 }, (_, index) => ({
+      id: `c${index}`,
+      name: `分類${index}`,
+    }));
+    render(<CategoryNav categories={many} activeId="none" />);
+    fireEvent.click(screen.getByRole('button', { name: /分類/ }));
+
+    const tintOf = (name: string) =>
+      [...screen.getByText(name).classList].find((c) =>
+        c.startsWith('bg-category-'),
+      );
+
+    expect(tintOf('分類0')).toBe('bg-category-sky');
+    expect(tintOf('分類8')).toBe('bg-category-sky');
+    expect(tintOf('分類9')).toBe('bg-category-lavender');
+    expect(tintOf('分類17')).toBe('bg-category-lavender');
+    expect(tintOf('分類18')).toBe('bg-category-rose');
   });
 });

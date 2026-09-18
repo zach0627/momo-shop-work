@@ -9,6 +9,7 @@
     ]
   },
   "dependencies": {
+    "@momo/catalog-data-access": "workspace:*",
     "@momo/goods-page": "workspace:*",
     "@momo/home-page": "workspace:*",
     "@momo/shared-ui": "workspace:*",

@@ -46,6 +46,9 @@
     },
     {
       "path": "../../packages/goods/page/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/catalog/data-access/tsconfig.lib.json"
     }
   ]
 }

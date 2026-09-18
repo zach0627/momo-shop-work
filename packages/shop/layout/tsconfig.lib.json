@@ -48,6 +48,9 @@
     },
     {
       "path": "../../shared/ui/tsconfig.lib.json"
+    },
+    {
+      "path": "../../catalog/data-access/tsconfig.lib.json"
     }
   ]
 }

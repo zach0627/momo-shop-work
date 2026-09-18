@@ -1,6 +1,8 @@
 import { useRef, type ReactNode } from 'react';
 
-import { ACTIVE_CATEGORY_ID, CATEGORIES } from './model/categories';
+import { useCategories } from '@momo/catalog-data-access';
+
+import { ACTIVE_CATEGORY_ID } from './model/layout-content';
 import { useInView } from './model/use-in-view';
 import { CategoryNav } from './ui/category-nav';
 import { Footer } from './ui/footer';
@@ -18,6 +20,8 @@ import { TopBar } from './ui/top-bar';
 export function AppLayout({ children }: { children: ReactNode }) {
   const mainHeaderRef = useRef<HTMLDivElement>(null);
   const mainHeaderInView = useInView(mainHeaderRef);
+  // The frame renders at once; the categories fill in when they arrive.
+  const { data: categories = [] } = useCategories();
 
   return (
     <div className="flex min-h-screen flex-col bg-surface text-ink">
@@ -26,7 +30,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <div ref={mainHeaderRef}>
           <MainHeader />
         </div>
-        <CategoryNav categories={CATEGORIES} activeId={ACTIVE_CATEGORY_ID} />
+        <CategoryNav categories={categories} activeId={ACTIVE_CATEGORY_ID} />
       </header>
 
       <main className="mx-auto w-full max-w-shop flex-1 px-4 py-8">

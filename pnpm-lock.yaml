@@ -313,6 +313,9 @@ importers:
 
   apps/shop:
     dependencies:
+      '@momo/catalog-data-access':
+        specifier: workspace:*
+        version: link:../../packages/catalog/data-access
       '@momo/goods-page':
         specifier: workspace:*
         version: link:../../packages/goods/page
@@ -384,6 +387,9 @@ importers:
 
   packages/shop/layout:
     dependencies:
+      '@momo/catalog-data-access':
+        specifier: workspace:*
+        version: link:../../catalog/data-access
       '@momo/shared-ui':
         specifier: workspace:*
         version: link:../../shared/ui

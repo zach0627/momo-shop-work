@@ -3,21 +3,30 @@ import { useId, useState } from 'react';
 import { AppLink } from '@momo/shared-ui';
 import { paths } from '@momo/shared-util';
 
-import type { Category, CategoryTone } from '../model/categories';
+/** All the navigation needs to know about a category. */
+interface NavCategory {
+  id: string;
+  name: string;
+}
 
 interface CategoryNavProps {
-  categories: Category[];
+  categories: NavCategory[];
   activeId: string;
 }
 
-// Written out in full so Tailwind can see every class name.
-const PILL_TONE: Record<CategoryTone, string> = {
-  sky: 'bg-category-sky',
-  lavender: 'bg-category-lavender',
-  rose: 'bg-category-rose',
-  mint: 'bg-category-mint',
-  peach: 'bg-category-peach',
-};
+// The live panel gives each row of pills its own tint. A category carries no
+// colour: the tint follows the row it lands on. Written out in full so
+// Tailwind can see every class name; `grid-cols-9` below is the same nine.
+const PILLS_PER_ROW = 9;
+const ROW_TINTS = [
+  'bg-category-sky',
+  'bg-category-lavender',
+  'bg-category-rose',
+  'bg-category-mint',
+  'bg-category-peach',
+];
+const tintOfRow = (index: number) =>
+  ROW_TINTS[Math.floor(index / PILLS_PER_ROW) % ROW_TINTS.length];
 
 /**
  * The row of categories under the header, and the "選擇分類" panel it expands
@@ -66,9 +75,13 @@ export function CategoryNav({ categories, activeId }: CategoryNavProps) {
           className="absolute top-full left-0 z-10 w-full rounded-b-panel bg-surface shadow-panel"
         >
           <ul className="grid grid-cols-9 gap-2.5 p-3">
-            {categories.map((category) => (
+            {categories.map((category, index) => (
               <li key={category.id}>
-                <Pill category={category} active={category.id === activeId} />
+                <Pill
+                  category={category}
+                  active={category.id === activeId}
+                  tint={tintOfRow(index)}
+                />
               </li>
             ))}
           </ul>
@@ -82,7 +95,7 @@ function RowItem({
   category,
   active,
 }: {
-  category: Category;
+  category: NavCategory;
   active: boolean;
 }) {
   const className = `inline-flex items-center border-b-3 px-1 text-ec-lg font-semibold whitespace-nowrap ${
@@ -104,14 +117,22 @@ function RowItem({
   );
 }
 
-function Pill({ category, active }: { category: Category; active: boolean }) {
+function Pill({
+  category,
+  active,
+  tint,
+}: {
+  category: NavCategory;
+  active: boolean;
+  tint: string;
+}) {
   return (
     <span
       aria-current={active ? 'page' : undefined}
       className={`block h-11 truncate rounded-pill px-4 py-3 text-center text-ec-base ${
         active
           ? 'border border-brand bg-surface text-brand'
-          : `${PILL_TONE[category.tone]} text-ink-strong`
+          : `${tint} text-ink-strong`
       }`}
     >
       {category.name}
