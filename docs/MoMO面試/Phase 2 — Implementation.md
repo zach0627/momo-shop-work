@@ -34,7 +34,7 @@ First Commit 至最後 Commit
 | ✅ | 2 | 10 libs + tags + boundary lint | `chore: add domain libs and module boundary rules` | — | ✗ |
 | ✅ | 3 | architecture.md + ADR ×6 + agent-workflow.md + CLAUDE.md + 邊界驗證工具 + OpenSpec | `docs: add architecture and ADRs` | — | ✗ |
 | ✅ | 4 ★ | Walking skeleton：兩條路由走得通（+ 兩層 design token） | `feat(shop): walking skeleton with routing and shell` | paths、AppLink | ✗ |
-| ⬜ | 5 ★ | **Layout**：TopBar(fixed→compact) + Header + 分類展開 + Footer（原 Step 7，提前） | 依內容拆分 | 分類展開、搜尋框、compact | ✗ |
+| ✅ | 5 ★ | **Layout**：TopBar(fixed→compact) + Header + 分類展開 + Footer（原 Step 7，提前） | 依內容拆分 | 分類展開、搜尋框、compact | ✗ |
 | ⬜ | 6 | 素材 + fixtures + catalog/data-access | `feat(catalog): mock repository, fixtures and query hooks` | #3 | ✗ |
 | ⬜ | 7 | shared util / ui | `feat(shared): price formatting and core ui components` | #1 #2 | ✗ |
 | ⬜ | 8 ★ | 首頁 config-driven + 6 blocks | `feat(home): config-driven section renderer and blocks` | #5 | ✗ |
@@ -122,22 +122,22 @@ First Commit 至最後 Commit
 **Review 重點**：`react-router` 是否只出現在 `apps/shop`；Tailwind token 有沒有生效。
 **Commit**：`feat(shop): walking skeleton with routing, providers and shell`
 
-### Step 5 ★ — Layout：TopBar / Header / 分類 / Footer
+### Step 5 ★ — Layout：TopBar / Header / 分類 / Footer ✅
 
 > **順序調整**：這一步原本排在 Step 7（資料層與共用元件之後）。layout 是每一頁的骨架，也是 Phase 1 最先描述的東西（「header scroll 保留區塊」「滑到下面要有 footer」），所以提前到 walking skeleton 之後。原 Step 5、6 順延為 Step 6、7；Step 8 之後不變。
 > lib 已由 `shell` 改名為 `layout`（`libs/layout/feature`、`@momo/layout-feature`、`scope:layout`、`AppLayout`）。
 
 **目標**：所有頁面共用、跨頁保留的外框。對照截圖 `01`–`04`、`15`、`16`；數值用從真站量到的 token。
-- [ ] 量測真站「選擇分類」展開面板的樣式（膠囊的底色、字色、圓角、間距 —— 目前還沒量），加進 token 與 `docs/design-tokens.md`。
-- [ ] 素材：先只搬 logo 與 footer 用到的圖到 `apps/shop/public/assets/`（其餘素材留給 Step 6）。資產路徑一律用**相對於文件 base** 的寫法（`assets/...`，靠 `index.html` 的 `<base href>` 解析），libs 不需要知道部署的子路徑。
-- [ ] **TDD**：`ui/category-nav` — 橫向分類列（17px / 600，「首頁」為作用中：品牌色 + 3px 底線）；點箭頭展開「選擇分類」面板列出全部分類；`aria-expanded` 正確；再點收合。（規格 `app-layout`「分類導覽可展開與收合」）
+- [x] 量測真站「選擇分類」展開面板的樣式（膠囊的底色、字色、圓角、間距 —— 目前還沒量），加進 token 與 `docs/design-tokens.md`。
+- [x] 素材：先只搬 logo 與 footer 用到的圖到 `apps/shop/public/assets/`（其餘素材留給 Step 6）。資產路徑一律用**相對於文件 base** 的寫法（`assets/...`，靠 `index.html` 的 `<base href>` 解析），libs 不需要知道部署的子路徑。
+- [x] **TDD**：`ui/category-nav` — 橫向分類列（17px / 600，「首頁」為作用中：品牌色 + 3px 底線）；點箭頭展開「選擇分類」面板列出全部分類；`aria-expanded` 正確；再點收合。（規格 `app-layout`「分類導覽可展開與收合」）
   - 分類清單先放在本 lib 私有的 `model/`（40 個）；Step 6 資料層完成後搬進 catalog fixtures，`AppLayout` 改讀 `useCategories`。`CategoryNav` 本身只吃 props，屆時不用改。
-- [ ] **TDD**：`ui/search-box` — 可輸入；送出時 `preventDefault`，不導頁。（規格「搜尋框為展示用」）
-- [ ] **TDD**：`AppLayout` 的 compact 行為 — 主 header 離開視窗 → TopBar 出現搜尋框；回到視窗 → 恢復。用替身 `IntersectionObserver` 驅動（jsdom 沒有內建）。（規格「頂部列在捲動時保留並轉為 compact」）
-- [ ] `ui/top-bar`：**`position: fixed`**（真站是 fixed 不是 sticky）、高 40px、背景 `surface-muted`、底線 1px `line-strong`、文字 13px；版面要為它預留 41px。除了「回首頁」以外的項目都是純文字（沒有對應頁面）。
-- [ ] `ui/main-header`：logo（連回首頁）+ 搜尋框 + 熱搜關鍵字列。右側三張活動小圖沒有素材 → 不做，記入 Known Gaps。
-- [ ] `ui/footer`：背景 `footer`、內容寬 1220px；防詐騙提醒框（3px `footer-accent-line`、圓角 8px）；六欄連結（標題 19px / 700 `footer-accent`、連結 13px 白字，皆為純文字）。
-- [ ] 以上全部為 lib 私有，`index.ts` 只匯出 `AppLayout`；移除本 lib 的 `passWithNoTests`。
+- [x] **TDD**：`ui/search-box` — 可輸入；送出時 `preventDefault`，不導頁。（規格「搜尋框為展示用」）
+- [x] **TDD**：`AppLayout` 的 compact 行為 — 主 header 離開視窗 → TopBar 出現搜尋框；回到視窗 → 恢復。用替身 `IntersectionObserver` 驅動（jsdom 沒有內建）。（規格「頂部列在捲動時保留並轉為 compact」）
+- [x] `ui/top-bar`：**`position: fixed`**（真站是 fixed 不是 sticky）、高 40px、背景 `surface-muted`、底線 1px `line-strong`、文字 13px；版面要為它預留 41px。除了「回首頁」以外的項目都是純文字（沒有對應頁面）。
+- [x] `ui/main-header`：logo（連回首頁）+ 搜尋框 + 熱搜關鍵字列。右側三張活動小圖沒有素材 → 不做，記入 Known Gaps。
+- [x] `ui/footer`：背景 `footer`、內容寬 1220px；防詐騙提醒框（3px `footer-accent-line`、圓角 8px）；六欄連結（標題 19px / 700 `footer-accent`、連結 13px 白字，皆為純文字）。
+- [x] 以上全部為 lib 私有，`index.ts` 只匯出 `AppLayout`；移除本 lib 的 `passWithNoTests`。
 
 **驗證**：`pnpm nx run-many -t lint test typecheck`（無快取）+ `pnpm nx build shop` + `pnpm verify:boundaries`；dev server 上實際捲動確認 TopBar 保留並轉 compact、分類面板可展開；**切到 `/goods/:id` 確認 TopBar 與 footer 仍在**；用 `getComputedStyle` 抽查數值與真站一致。
 **Review 重點**：與截圖 `01`–`04`、`15` 的差異；商品詳情頁是否保留同一組外框。
@@ -275,7 +275,8 @@ First Commit 至最後 Commit
 | — | **OpenSpec 複查與修正**：① 補測並改寫一條沒驗證過且寫錯的規格（深層引用：相對路徑由 lint 擋、套件名稱加內部路徑由型別檢查擋）；② `config.yaml` 補上專案脈絡與撰寫規則（先前說了要做卻沒做）；③ 已實作的 `module-boundaries` 移到主規格 `openspec/specs/`；④ 一個無法測試的 scenario 改為可比對的形式；⑤ 補缺漏：限時搶購卡片內容、首頁載入中 / 失敗狀態、推薦恰好一頁、分類清單（40 個）；⑥ 補做 Step 1 漏掉的 `engines.node`；⑦ 本頁 Step 1–3 逐項核對後打勾 | `0c28e6b` |
 | 4 | **Walking skeleton**：`/`、`/goods/:goodsId`、找不到頁面三條路由走得通，外面包著 layout；`paths`（URL 單一來源）與 `AppLink`（由 app 注入 router 的 Link）走 TDD；composition root（QueryClient + LinkProvider）；第一批跨專案依賴（7 條，0 違規）。**兩層 design token**：數值從真實網站量出，關閉 Tailwind 預設色盤。拆成 6 個 commit，**每一個都匯出到乾淨環境單獨驗證為綠** | `c589060` `240e2f1` `ab34cea` `ae1bd4d` `d6aca28` `3628bdd` |
 | — | **`shell` 改名為 `layout`**（lib、套件名、scope tag、元件、規格 capability）；`architecture.md` 補上 Layout 一節（layout route 的機制、跨頁保留哪些部分、如何加第二種 layout）。起因：Human 指出「看起來我們沒有設計 layout」—— layout 其實存在且有測試，但命名、文件與順序三個缺口讓它看不出來 | `ef285aa` |
-| — | **步驟重新編排**：Layout 由 Step 7 提前為 Step 5（它是每一頁的骨架）；原 Step 5、6 順延為 6、7；`tasks.md` 同步重新編號 | 見 git log |
+| — | **步驟重新編排**：Layout 由 Step 7 提前為 Step 5（它是每一頁的骨架）；原 Step 5、6 順延為 6、7；`tasks.md` 同步重新編號 | `4140d12` |
+| 5 | **Layout**：`fixed` 的 TopBar（捲動後轉 compact 顯示搜尋框）、主 header（logo + 展示用搜尋框 + 熱搜關鍵字）、可展開的分類列（40 個分類、五種色調）、footer（防詐騙提醒框 + 六欄 + QR code）。三份 spec 共 11 個測試（TDD）。分類面板的樣式從真站量出並進入兩層 token | 見 git log |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -334,4 +335,13 @@ First Commit 至最後 Commit
 - **沒量到的**：區塊標題（在跨來源 iframe 內讀不到，依截圖估 24px）、hover 狀態、限時搶購標題列的粉底。token 裡都標明是估計值。
 - 完整對照表：repo 的 `docs/design-tokens.md`。
 
-**下一步：Step 5 ★ — Layout（TopBar / Header / 分類 / Footer）** → 對應 `tasks.md` 第 5 組
+**Step 5 驗證結果**
+- 全部 11 個專案 `lint / test / typecheck`（無快取、循序）全綠；`nx build shop` 成功；`pnpm verify:boundaries` 7 條依賴、0 違規。
+- 瀏覽器實測：
+  - **捲動**：TopBar 維持在頂端（`fixed`、top 0、高 41px、背景 `#f2f2f2`、底線 `1px #ccc`、z-index 200），左側捷徑收起、換成搜尋框 —— 與 Phase 1 的「滾動時樣式」截圖一致。
+  - **商品詳情頁 `/goods/15642257`**：TopBar、主 header、分類列、footer 全部保留，只有中間的內容換掉。
+  - **分類面板**：展開後 40 個膠囊、9 欄 × 124px、間距 10px；膠囊 124×44、圓角 22px；五種半透明底色與真站量到的值相同；作用中的「首頁」為白底 + 品牌色框線。
+- 沒做的：主 header 右側三張活動小圖（沒有素材）。
+- 沒複核的：footer 與倒數數字幾個顏色的透明度（量的時候轉換函式把 alpha 丟掉了；複核時瀏覽器面板是隱藏的、虛擬化區塊沒掛載）。從截圖看是實色，做限時搶購時一併確認。
+
+**下一步：Step 6 — 素材 + fixtures + `catalog/data-access`**（分類清單會從 layout lib 搬進 catalog fixtures）→ 對應 `tasks.md` 第 6 組

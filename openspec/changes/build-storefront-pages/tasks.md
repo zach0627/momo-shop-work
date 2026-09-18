@@ -38,12 +38,12 @@
 
 > 原本排在共用元件之後。layout 是每一頁的骨架，所以提前到 walking skeleton 之後；原第 5、6 組順延為第 6、7 組。
 
-- [ ] 5.1 量測真實網站「選擇分類」展開面板的樣式（膠囊底色、字色、圓角、間距），加入兩層 token 並記錄到 `docs/design-tokens.md`；驗證：建置產物含新的 semantic utility
-- [ ] 5.2 搬移 layout 需要的素材（logo、footer 用圖）到 `apps/shop/public/assets/`，資產路徑採相對於文件 base 的寫法（`assets/...`）；驗證：dev server 上圖片在 `/` 與 `/goods/:id` 都載入成功
-- [ ] 5.3 TDD：`category-nav` —— 橫向分類列、「首頁」為作用中、展開 / 收合「選擇分類」面板；分類清單暫放本 lib 私有的 `model/`；驗證：spec 檢查 `aria-expanded` 的兩個狀態與面板列出全部分類（spec `app-layout`「分類導覽可展開與收合」），並移除本 lib 的 `passWithNoTests`
-- [ ] 5.4 TDD：`search-box` —— 可輸入、送出時不導頁；驗證：spec 確認 submit 事件被 `preventDefault`（spec `app-layout`「搜尋框為展示用」）
-- [ ] 5.5 TDD：`AppLayout` 的 compact 行為 —— 主 header 離開視窗時頂部列出現搜尋框、回到視窗時恢復；以替身 `IntersectionObserver` 驅動；驗證：spec 通過（spec `app-layout`「頂部列在捲動時保留並轉為 compact」）
-- [ ] 5.6 `top-bar`（`position: fixed`、高 40px，版面預留空間）、`main-header`（logo 連回首頁 + 搜尋框 + 熱搜關鍵字）、`footer`（防詐騙提醒框 + 六欄連結）；全部為 lib 私有，`index.ts` 只匯出 `AppLayout`；驗證：dev server 實際捲動確認頂部列保留並轉 compact；切到 `/goods/:id` 外框仍在；以 `getComputedStyle` 抽查數值與真站一致；與截圖 `01`–`04`、`15` 對照
+- [x] 5.1 量測真實網站「選擇分類」展開面板的樣式（膠囊底色、字色、圓角、間距），加入兩層 token 並記錄到 `docs/design-tokens.md`；驗證：建置產物含新的 semantic utility
+- [x] 5.2 搬移 layout 需要的素材（logo、footer 用圖）到 `apps/shop/public/assets/`，資產路徑採相對於文件 base 的寫法（`assets/...`）；驗證：dev server 上圖片在 `/` 與 `/goods/:id` 都載入成功
+- [x] 5.3 TDD：`category-nav` —— 橫向分類列、「首頁」為作用中、展開 / 收合「選擇分類」面板；分類清單暫放本 lib 私有的 `model/`；驗證：spec 檢查 `aria-expanded` 的兩個狀態與面板列出全部分類（spec `app-layout`「分類導覽可展開與收合」），並移除本 lib 的 `passWithNoTests`
+- [x] 5.4 TDD：`search-box` —— 可輸入、送出時不導頁；驗證：spec 確認 submit 事件被 `preventDefault`（spec `app-layout`「搜尋框為展示用」）
+- [x] 5.5 TDD：`AppLayout` 的 compact 行為 —— 主 header 離開視窗時頂部列出現搜尋框、回到視窗時恢復；以替身 `IntersectionObserver` 驅動；驗證：spec 通過（spec `app-layout`「頂部列在捲動時保留並轉為 compact」）
+- [x] 5.6 `top-bar`（`position: fixed`、高 40px，版面預留空間）、`main-header`（logo 連回首頁 + 搜尋框 + 熱搜關鍵字）、`footer`（防詐騙提醒框 + 六欄連結）；全部為 lib 私有，`index.ts` 只匯出 `AppLayout`；驗證：dev server 實際捲動確認頂部列保留並轉 compact；切到 `/goods/:id` 外框仍在；以 `getComputedStyle` 抽查數值與真站一致；與截圖 `01`–`04`、`15` 對照
 
 ## 6. 素材與商品資料（Step 6）
 
