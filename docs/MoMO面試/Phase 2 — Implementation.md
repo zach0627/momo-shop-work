@@ -246,4 +246,22 @@ First Commit 至最後 Commit
 - pnpm 12 預設擋 postinstall → `allowBuilds` 只明確核准 `nx`、`@swc/core`。
 - 環境備註：此機器上每次 `pnpm nx …` 約 20–60 秒、裝依賴約 3 分鐘；`NX_DAEMON=false` 可避免卡住。Step 2 起的時間預估要乘上這個係數。
 
-**下一步：Step 2 — 10 libs + tags + boundary rules**
+| — | 規劃筆記（本資料夾）複製進 repo `docs/MoMO面試/` | `b88ee0e` | 09-18 17:0x |
+| — | 17 張真站截圖進 `docs/pictures/`（依頁面順序重新命名）；repo 內 Phase 1 的圖片改為 GitHub 可渲染的標準語法；2 張登入狀態截圖的帳號姓名已在複本上遮蓋（vault 原圖未動） | `a42640b` | 09-18 17:1x |
+| 2 | 10 個 lib（`@nx/react:lib` ×9、`@nx/js:lib` ×1）+ tags；`depConstraints`（type 6 條 + scope 5 條）；`no-restricted-imports`（預設全禁，`apps/shop` 放行 router、`shared/ui` 放行 embla）；各 lib README 改寫為職責說明；移除用不到的 `.babelrc` 與範例碼 | 見 git log | 09-18 |
+
+**Step 2 驗證結果**
+- 基準：11 個專案 × `lint / test / typecheck` = 33 個 task 全綠（無快取）。
+- **負向驗證（規則真的會擋）**：放入 5 個故意違規的探針檔 → 5 個全部被 lint 擋下（feature→feature、ui→data-access、scope:goods→scope:home、lib 內 import `react-router`、`shared/ui` 以外 import `embla`）；2 個對照組（page→feature、`apps/shop` import router）正確通過。探針檔已全數移除。
+
+**Step 2 與原計畫的偏離**
+- 3 個 feature lib 的 placeholder container 延到 Step 8 才加（registry 真的需要時）；目前所有 lib 的 `index.ts` 都是 `export {};`。
+- 各 lib 的測試設定加了 `passWithNoTests: true`（空 lib 沒測試檔會被 Vitest 判失敗）。**某個 lib 加入第一個 spec 時，要把它的這行拿掉**，避免日後測試被誤刪卻沒人發現。
+- 踩到的坑：PowerShell 會把 `--tags=a,b` 的逗號當陣列 → tags 變成單一字串、boundary 規則靜默失效。已修正並逐一核對 10 個 lib 的 tags。
+
+**環境備註（重要，影響所有後續步驟的耗時）**
+- 專案在 **D: 槽 = 5400 轉傳統硬碟**（C: 才是 NVMe SSD），且 Defender 即時掃描開啟 → 每個 Nx / Vitest 指令光讀檔就 30 秒以上（實測一個 0.5 秒的測試總耗時 34 秒）。與程式碼無關。
+- 目前的因應：`NX_DAEMON=false` + `NX_ISOLATE_PLUGINS=false`（否則 plugin worker 會連線逾時）、`--parallel=1`（否則 Vitest worker 會逾時）。
+- 根治：把專案 clone 到 C: 槽。尚未執行，待決定。
+
+**下一步：Step 3 — 設計文件進 repo（`docs/architecture.md` + ADR ×5 + `agent-workflow.md` + 專案自己的 `CLAUDE.md`）**

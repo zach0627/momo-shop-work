@@ -5,6 +5,36 @@
   "references": [
     {
       "path": "./apps/shop"
+    },
+    {
+      "path": "./libs/shared/util"
+    },
+    {
+      "path": "./libs/shared/ui"
+    },
+    {
+      "path": "./libs/catalog/data-access"
+    },
+    {
+      "path": "./libs/home/data-access"
+    },
+    {
+      "path": "./libs/catalog/feature-recommendation"
+    },
+    {
+      "path": "./libs/home/feature-flash-sale"
+    },
+    {
+      "path": "./libs/home/feature-ranking"
+    },
+    {
+      "path": "./libs/home/page"
+    },
+    {
+      "path": "./libs/goods/page"
+    },
+    {
+      "path": "./libs/shell/feature"
     }
   ],
   "compilerOptions": {}
