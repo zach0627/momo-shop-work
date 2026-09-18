@@ -292,7 +292,7 @@ type HomeSection =
 | 猜你想搜 | `banner-grid`（caption = 關鍵字） | 猜你想搜 |
 | 限時搶購 | `flash-sale` → feature package | 限時搶購 |
 | 今日暢銷榜 | `ranking` → feature package | 今日暢銷榜 |
-| moPro 會員專屬價 | `product-rail`（日後有會員價邏輯再抽 feature） | momopro… |
+| moPro 會員專屬價 | `banner-carousel`（**Step 6 修正**：素材是整張做好的促銷磚，品牌、品名、價格都印在圖上，不是商品照 → 不是 `product-rail`） | momopro… |
 | 你可能會喜歡（3 列 + 看更多） | `recommendation` → feature package | 你可能會喜歡 |
 
 時間不夠時的砍法：**從 `home-layout.ts` 刪一行**即可下架區塊，不用改元件。
@@ -325,6 +325,7 @@ interface CatalogRepository {
 - `getFlashSale().endsAt` = `now() + N 小時`，不寫死在 fixture（否則倒數會過期）。
 - 首頁與詳情頁共用同一份 product fixture（single source of truth），所以每張商品卡都點得進詳情頁。
 - fixtures 用 `.ts` + `satisfies`，型別錯在編譯期就擋下；由 `tools/gen-fixtures.mjs` 決定性產生（同輸入同輸出，diff 乾淨）。
+- **Step 6 實作後的修正**：同一個商品 id 會出現在多個區塊的素材裡 → 一份商品表，集合只存 id；`Category` 只有 `id` 與 `name`（面板的色調是「第幾列」決定的，屬於 layout）；分類清單手寫（從真站讀來的，沒有素材可以產生）；`Product` 的 `images` 依內容去重；品牌刻意用虛構的。
 - 促銷資料暫放 catalog；促銷邏輯變多再抽 `promotion/data-access`（寫進 ADR）。
 
 ### 7. 素材搬遷（中文資料夾 → 英文 slug，避免 URL encode 問題）

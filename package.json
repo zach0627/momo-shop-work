@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "verify:boundaries": "node tools/verify-boundaries.mjs"
+    "gen:fixtures": "node tools/gen-fixtures.mjs",
+    "verify:boundaries": "node tools/verify-boundaries.mjs",
+    "verify:fixtures": "node tools/gen-fixtures.mjs --check"
   },
   "private": true,
   "packageManager": "pnpm@12.4.2",

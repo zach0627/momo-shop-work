@@ -50,11 +50,11 @@
 
 ## 6. 素材與商品資料（Step 6）
 
-- [ ] 6.1 將 `D:\repo\momo素材` 其餘的素材依 slug 對照搬到 `apps/shop/public/assets/`（只搬用得到的）；驗證：圖片路徑無中文、總大小記錄在 commit 訊息
-- [ ] 6.2 `tools/gen-fixtures.mjs` 由素材產生 `products.generated.ts`、`collections.ts`、`categories.ts`（40 個分類，**從 layout package 的私有清單搬過來**，`AppLayout` 改讀 `useCategories`）；驗證：連續執行兩次產出完全相同（spec `product-catalog`「資料是決定性的」「查詢分類清單」）
-- [ ] 6.3 TDD：`createMockCatalogRepository({ now, latencyMs })`；驗證：spec 涵蓋商品存在 / 不存在、未知集合回空清單、分頁 `nextOffset` 與最後一頁、`endsAt` 晚於注入的 `now`（spec `product-catalog`）
-- [ ] 6.4 `CatalogRepositoryProvider`、`useCatalogRepository`、6 個 query hooks、`query-keys.ts`、`testing.ts`（fake repository + wrapper）；於 app 的 providers 注入 mock；驗證：`nx test catalog-data-access` 通過
-- [ ] 6.5 `shop/layout` 改讀 `useCategories`：宣告 `"@momo/catalog-data-access": "workspace:*"` → `pnpm install` → `pnpm nx sync`，並確認 `pnpm-lock.yaml` 的 importer；刪除 package 私有的分類清單；驗證：`pnpm verify:boundaries` 出現 `shop-layout -> catalog-data-access` 且 0 違規，`app-layout` 的 spec 仍通過
+- [x] 6.1 以 `tools/import-assets.mjs` 將 `D:\repo\momo素材` 的全部素材依 slug 對照搬到 `apps/shop/public/assets/`（含巢狀的 `主要活動/今日大牌` → `home/main-events/today-brand`；9 個中文檔名改為 ASCII）；驗證：以內容雜湊對帳 —— 203 個來源檔案，202 個複製、1 個重複下載略過（與同資料夾的檔案逐位元組相同），每一份不同的內容在目的地都有相同的複本；圖片路徑無中文；共 7.8 MB
+- [x] 6.2 `tools/gen-fixtures.mjs` 由素材產生 `products.generated.ts` 與 `collections.generated.ts`（122 件商品、5 個集合；名稱、價格、說明由 id 的雜湊決定，不用亂數也不讀時鐘）；`categories.ts`（40 個分類）**改為手寫**：清單是從真站讀來的，沒有素材可以產生它；驗證：連續執行兩次產出逐位元組相同，`node tools/gen-fixtures.mjs --check` 通過（spec `product-catalog`「資料是決定性的」「查詢分類清單」）
+- [x] 6.3 TDD：`createMockCatalogRepository({ data, now, latencyMs, flashSaleHours })`；驗證：對空實作 17 個 spec 中 14 個因斷言失敗（其餘 3 個是「查不到」的情況，空實作剛好滿足）；實作後全過。涵蓋商品存在 / 不存在、集合順序、未知集合回空清單、分頁的中間頁 / 較短的最後一頁 / 恰好滿的最後一頁 / 超出範圍、延遲、`endsAt` 在兩個不同的注入時間點；另一組對真資料檢查規格寫明的數字（55 件推薦的兩個分頁、40 個分類、首頁每件商品都能以同名同價查到、限搶價低於原價）（spec `product-catalog`）
+- [x] 6.4 `CatalogRepositoryProvider`、`useCatalogRepository`、6 個 query hooks、`query-keys.ts`；次要入口 `@momo/catalog-data-access/testing`（fake repository + `CatalogTestProvider`，以 `exports` 的 `./testing` 公開）；於 app 的 providers 注入 mock（延遲 150 ms）；本 package 在自己的 `package.json` 宣告 `react` 與 `@tanstack/react-query`（`catalog:`）；驗證：`useRecommendations` 先對空實作紅燈；`nx test catalog-data-access` 26 個通過；測試用的入口不在 app 的 bundle 內
+- [x] 6.5 `shop/layout` 改讀 `useCategories`：宣告 workspace 依賴 → `pnpm install` → `pnpm nx sync`，lockfile 的 importer 已確認；刪除 package 私有的分類清單；`Category` 不帶顏色，`CategoryNav` 依「第幾列」決定色調（每列 9 個）；驗證：兩個新 spec 先紅燈；`pnpm verify:boundaries` 出現 `shop-layout -> catalog-data-access`，9 條依賴、0 違規；瀏覽器實測 40 個分類由 catalog 載入、五列的色調與透明度和 `design-tokens.md` 記錄的值相同
 
 ## 7. 共用元件（Step 7）
 

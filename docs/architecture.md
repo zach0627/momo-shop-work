@@ -242,10 +242,21 @@ interface CatalogRepository {
 }
 ```
 
-- `createMockCatalogRepository({ now, latencyMs })` 在 composition root 建立並以 Context 注入；hooks 透過 `useCatalogRepository()` 取得。測試注入小而可控的 fake repository，不依賴真 fixture。
+- `createMockCatalogRepository({ data, now, latencyMs })` 在 composition root 建立並以 Context 注入；hooks 透過 `useCatalogRepository()` 取得。「查不到」是一種答案而不是失敗：回 `null` 或 `[]`，不 throw。
 - `getFlashSale().endsAt` = `now() + N 小時`，不寫死在 fixture（否則倒數會過期）。
-- 商品 id 取自素材檔名；首頁與詳情頁共用同一份 fixture，所以每張商品卡都點得進詳情頁。
-- fixtures 由 `tools/gen-fixtures.mjs` **決定性**產生（同輸入同輸出、不用亂數），以 `.ts` + `satisfies` 在編譯期檢查型別。
+- **一份商品表，集合只存 id**：同一個商品 id 會出現在好幾個區塊的素材裡（例：同時在限時搶購、暢銷榜、你可能會喜歡）。所以「首頁與詳情頁的名稱與售價一致」是結構上保證的。
+- **`Category` 只有 `id` 與 `name`**：真站「選擇分類」面板的五種底色是「第幾列」決定的（每列 9 個），那是版面的事，由 `shop/layout` 依位置算出，不進資料層。
+- **測試的兩種資料來源**：邏輯測試注入小而可控的資料（repository 的 `data` 選項，或 UI 測試用的 fake repository），不依賴真 fixture 的內容與筆數；另有一組測試專門對真 fixture 檢查規格寫明的數字（55 件推薦、40 個分類）。
+- **`@momo/catalog-data-access/testing`**：`exports` 的第二個入口，提供 `createFakeCatalogRepository`（每個方法都回「沒有東西」，測試只覆寫它在意的）與 `CatalogTestProvider`。獨立成入口，測試工具才不會進到 app 的 bundle（build 後實際檢查過）。
+
+### 素材與 fixtures 的兩支工具
+
+| 工具                                                 | 做什麼                                                                                                                                  | 怎麼知道它做對了                                                                                                                                                                             |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `node tools/import-assets.mjs <素材根目錄>`          | 把素材複製到 `apps/shop/public/assets/`，中文資料夾與檔名對應到 ASCII slug。對照表就在腳本裡，是每個素材出處的紀錄                      | **每個來源檔案都必須有交代**（複製，或因為明確的理由略過），否則以 exit 1 結束。第一次盤點漏掉的巢狀資料夾就是這樣被抓到的。另以內容雜湊對帳過：203 個來源檔案，202 個複製、1 個重複下載略過 |
+| `node tools/gen-fixtures.mjs`（`pnpm gen:fixtures`） | 由素材產生商品資料：id 取自檔名，名稱、價格、說明由 id 的雜湊決定。不用亂數、不讀時鐘。同一張圖常在多個區塊各給一份，gallery 依內容去重 | `--check`（`pnpm verify:fixtures`）在磁碟上的檔案過期時失敗；連跑兩次逐位元組相同                                                                                                            |
+
+商品 id 是真的（來自檔名），**名稱、品牌與價格是編的，而且品牌刻意用虛構的** —— 產生出來的名稱旁邊那張照片並不是那個商品，不應該看起來像真的商品頁。分類清單是手寫的：它是從真站讀來的，沒有素材可以產生它。
 
 ## 8. 測試策略
 

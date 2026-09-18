@@ -2,7 +2,7 @@
 
 Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情頁。全程使用 Mock Data，不呼叫任何真實 API。
 
-> **狀態：進行中。** 目前完成 workspace、10 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
+> **狀態：進行中。** 目前完成 workspace、10 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）。首頁的業務區塊與商品詳情頁的內容尚未實作。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
 
 ## 先看這幾份
 
@@ -76,6 +76,7 @@ pnpm nx run-many -t lint test typecheck    # 全部專案
 pnpm nx build shop
 pnpm nx graph                              # 看依賴圖
 pnpm verify:boundaries                     # 確認依賴規則套用到每個專案、依賴圖 0 違規
+pnpm verify:fixtures                       # 商品 fixtures 與素材一致（過期時失敗）；重新產生用 pnpm gen:fixtures
 openspec validate build-storefront-pages --strict   # 驗證行為規格的格式
 ```
 

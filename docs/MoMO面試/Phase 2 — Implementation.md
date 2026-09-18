@@ -41,7 +41,7 @@ First Commit 至最後 Commit
 | ✅ | 3 | architecture.md + ADR ×6 + agent-workflow.md + CLAUDE.md + 邊界驗證工具 + OpenSpec | `docs: add architecture and ADRs` | — | ✗ |
 | ✅ | 4 ★ | Walking skeleton：兩條路由走得通（+ 兩層 design token） | `feat(shop): walking skeleton with routing and shell` | paths、AppLink | ✗ |
 | ✅ | 5 ★ | **Layout**：TopBar(fixed→compact) + Header + 分類展開 + Footer（原 Step 7，提前） | 依內容拆分 | 分類展開、搜尋框、compact | ✗ |
-| ⬜ | 6 | 素材 + fixtures + catalog/data-access | `feat(catalog): mock repository, fixtures and query hooks` | #3 | ✗ |
+| ✅ | 6 | 素材 + fixtures + catalog/data-access | `feat(catalog): mock repository, fixtures and query hooks` | #3 | ✗ |
 | ⬜ | 7 | shared util / ui | `feat(shared): price formatting and core ui components` | #1 #2 | ✗ |
 | ⬜ | 8 ★ | 首頁 config-driven + 6 blocks | `feat(home): config-driven section renderer and blocks` | #5 | ✗ |
 | ⬜ | 9 | 你可能會喜歡：3 列 + 看更多 | `feat(recommendation): paginated grid with load more` | #4 | ✗ |
@@ -154,26 +154,40 @@ First Commit 至最後 Commit
 **驗證**：`pnpm nx run-many -t lint test typecheck`（無快取）+ `pnpm nx build shop` + `pnpm verify:boundaries`；dev server 上實際捲動確認 TopBar 保留並轉 compact、分類面板可展開；**切到 `/goods/:id` 確認 TopBar 與 footer 仍在**；用 `getComputedStyle` 抽查數值與真站一致。
 **Review 重點**：與截圖 `01`–`04`、`15` 的差異；商品詳情頁是否保留同一組外框。
 **Commit**：依內容拆分（token、各元件、文件），每個 commit 單獨為綠。
-### Step 6 — 素材 + Catalog 資料層
+### Step 6 — 素材 + Catalog 資料層 ✅
 
 **目標**：所有商品資料的單一來源 + 可抽換的 repository。
-- [ ] 素材 `D:\repo\momo素材` → `apps/shop/public/assets/`（依 Phase 1 §7 的 slug 對照；只搬用得到的）。
-- [ ] `tools/gen-fixtures.mjs`：掃 `public/assets` → `products.generated.ts`（id 取自檔名、名稱 / 價格決定性產生、不用亂數）；`collections.ts`、`categories.ts`（40 個分類，第一項為「首頁」—— **從 layout lib 的私有清單搬過來**，`AppLayout` 改讀 `useCategories`）。
-- [ ] models：`Product`、`FlashSaleItem`、`Category`、`Page<T>`。
-- [ ] **TDD #3**：`createMockCatalogRepository({ now, latencyMs })`
-  - [ ] `getProduct`：存在 → 商品；不存在 → `null`
-  - [ ] `getCollection`：未知 key → `[]`
-  - [ ] `getRecommendations`：`nextOffset` 正確；最後一頁 → `null`
-  - [ ] `getFlashSale`：`endsAt` 跟著注入的 `now`
-- [ ] `CatalogRepositoryProvider` + `useCatalogRepository`；6 個 query hooks；`query-keys.ts`。
-  - [ ] `catalog/data-access` 會 import `react` 與 `@tanstack/react-query` → 在**它自己的** `package.json` 宣告，版本寫 `catalog:`（兩者都已在 catalog 裡）。
-- [ ] `testing.ts` 次要入口：`createFakeCatalogRepository` + 測試用 wrapper。以 `exports` 的 `"./testing"` 公開（`@momo/catalog-data-access/testing`），並確認 TypeScript 與 Vitest 都解析得到。
-- [ ] `app/providers.tsx` 注入 mock repository（composition root）。
-- [ ] `shop/layout` 宣告對 `@momo/catalog-data-access` 的依賴（`workspace:*` → `pnpm install` → `pnpm nx sync`），並確認 `pnpm-lock.yaml` 的 importer；`scope:shop` → `scope:catalog` 已在放行清單內。
+- [x] 素材 `D:\repo\momo素材` → `apps/shop/public/assets/`（依 Phase 1 §7 的 slug 對照；只搬用得到的）。
+  - ↳ 寫成工具 `tools/import-assets.mjs`，對照表就是素材出處的紀錄。**全部都搬**（共 7.8 MB，每個區塊都用得到），含第一次盤點漏掉的巢狀資料夾 `主要活動/今日大牌`。以內容雜湊對帳：203 個來源檔案，202 個複製、1 個重複下載略過。Step 5 手動搬的 logo 與 footer 圖也改由同一支工具產生，內容不變。
+- [x] `tools/gen-fixtures.mjs`：掃 `public/assets` → `products.generated.ts`（id 取自檔名、名稱 / 價格決定性產生、不用亂數）；`collections.ts`、`categories.ts`（40 個分類，第一項為「首頁」—— **從 layout lib 的私有清單搬過來**，`AppLayout` 改讀 `useCategories`）。
+  - ↳ 122 件商品、5 個集合；`--check` 在檔案過期時失敗（`pnpm verify:fixtures`）。
+  - ↳ **同一個商品 id 會出現在多個區塊的素材裡** → 一份商品表，集合只存 id（`collections.generated.ts`）。「首頁與詳情頁同名同價」因此是結構上保證的。
+  - ↳ **`categories.ts` 改為手寫**：分類是從真站讀來的，沒有素材可以產生它。
+  - ↳ **moPro 不產生商品**：那個資料夾是整張做好的促銷磚（品牌、品名、價格印在圖上），不是商品照 → Step 8 改用 `banner-carousel`。
+  - ↳ 同一張圖常在多個區塊各給一份 → gallery 依內容去重；品牌刻意用虛構的。
+- [x] models：`Product`、`FlashSaleItem`、`Category`、`Page<T>`。
+  - ↳ `Category` 只有 `id` 與 `name`：面板的五種底色是「第幾列」決定的，屬於 layout，不進 domain model。
+- [x] **TDD #3**：`createMockCatalogRepository({ now, latencyMs })`
+  - [x] `getProduct`：存在 → 商品；不存在 → `null`
+  - [x] `getCollection`：未知 key → `[]`
+  - [x] `getRecommendations`：`nextOffset` 正確；最後一頁 → `null`
+  - [x] `getFlashSale`：`endsAt` 跟著注入的 `now`
+  - ↳ 多一個 `data` 選項：邏輯測試注入小而可控的資料，不依賴真 fixture；另一組測試對真資料檢查規格寫明的數字（55 件、40 個分類、同名同價、限搶價低於原價）。
+  - ↳ 紅燈：對空實作 17 個 spec 中 14 個因斷言失敗；另外 3 個是「查不到」的情況，空實作剛好滿足，它們要等實作存在才有意義（防止查不到時 throw）。分頁另外補了「恰好滿的最後一頁」與「超出範圍」兩種邊界。
+- [x] `CatalogRepositoryProvider` + `useCatalogRepository`；6 個 query hooks；`query-keys.ts`。
+  - ↳ `useRecommendations` 回傳攤平的清單、`hasMore` 與隨時可呼叫的 `loadMore`，元件不需要知道分頁怎麼運作；先對空實作紅燈（3 個）。
+  - [x] `catalog/data-access` 會 import `react` 與 `@tanstack/react-query` → 在**它自己的** `package.json` 宣告，版本寫 `catalog:`（兩者都已在 catalog 裡）。
+- [x] `testing.ts` 次要入口：`createFakeCatalogRepository` + 測試用 wrapper。以 `exports` 的 `"./testing"` 公開（`@momo/catalog-data-access/testing`），並確認 TypeScript 與 Vitest 都解析得到。
+  - ↳ `shop/layout` 的 spec 從這個入口 import，型別檢查與測試都通過；build 後確認測試工具不在 app 的 bundle 內。
+- [x] `app/providers.tsx` 注入 mock repository（composition root）。
+  - ↳ 延遲 150 ms，讓載入狀態看得到。
+- [x] `shop/layout` 宣告對 `@momo/catalog-data-access` 的依賴（`workspace:*` → `pnpm install` → `pnpm nx sync`），並確認 `pnpm-lock.yaml` 的 importer；`scope:shop` → `scope:catalog` 已在放行清單內。
+  - ↳ `AppLayout` 改讀 `useCategories`，外框立刻渲染、分類到了再補上；layout 私有的 40 筆清單刪除。`CategoryNav` 依「第幾列」決定色調（每列 9 個）。兩個新 spec 先紅燈。
 
 **驗證**：`pnpm nx test catalog-data-access`、`pnpm nx lint catalog-data-access`
 **Review 重點**：`CatalogRepository` interface 是不是你心中「真 API 會長的樣子」；repo 體積（圖片總大小）。
 **Commit**：`feat(catalog): mock repository, generated fixtures and query hooks`
+  - ↳ 實際拆成 6 個 commit（素材 → models 與 fixtures → repository → hooks 與測試入口 → app 與 layout 接上 → 文件），每個單獨為綠。
 
 ### Step 7 — Shared util / ui
 
@@ -190,6 +204,8 @@ First Commit 至最後 Commit
 **Commit**：`feat(shared): price formatting and core ui components`
 
 ### Step 8 ★ — 首頁 config-driven
+
+> **Step 6 的發現**：moPro 的素材是整張做好的促銷磚，不是商品照 → `home-layout.ts` 裡它是 `banner-carousel`，不是 `product-rail`。`主要活動/today-brand/` 是 hero 右側「今日大牌」的圖。
 
 **目標**：13 個業務區塊由 `HomeSection[]` 驅動渲染。
 - [ ] `home/data-access`：`HomeSection` union、`Banner`、`Shortcut`；`home-layout.ts`（15 筆設定）；`HomeRepository` + Provider + `useHomeLayout`；app 注入。
@@ -294,7 +310,8 @@ First Commit 至最後 Commit
 | — | **全專案健檢**（Human 回報編輯器在 `tsconfig.app.json` 顯示 not found）：85 個 tsconfig 引用全部存在；直接驅動 tsserver（TS 6.0.3 與 5.9.3）取得編輯器層級的診斷 → 0 個，並以故意寫壞的 tsconfig 確認這個檢查抓得到 `TS6053 … not found`；歷史上每個 commit 的引用也都存在。磁碟上的狀態沒有問題，研判是編輯器留著改名當下的過期診斷。順帶發現並修正：本機外掛的狀態資料夾 `.omc/` 沒有被 ignore | `5142b29` |
 | — | **Layout 升為正式的一層**：`libs/layout/feature` → `libs/shop/layout`（`@momo/shop-layout`）；新增 `type:layout`（與 `page` 同層、可組合 feature、只有 app 能依賴）；`scope:layout` 改名為 `scope:shop`；ADR-0006 改寫，並記錄為什麼推翻原本「外框不能依賴 feature」那句話；主規格 `module-boundaries` 新增 3 個 scenario。起因：Human 質疑「layout 裡面卻有 feature，這是好的設計嗎？」 | `5966dcf` `d815c11` `6bb5b32` |
 | — | **layout 該放哪：查證與定案（ADR-0007）**。Human 連續追問：放 `apps/shop/src/layouts` 會不會比較好？Nx 以往怎麼放？是不是該叫 `feature-shell`？查證 Nx 文件、`nrwl/react-template`、`nrwl/nx-examples` 與 feature-shell 模式後，比較三種放法，**維持 `libs/shop/layout`，不搬程式**。`architecture.md` §3 註明 `page` 與 `layout` 是我們在 Nx 四種 type 之上自訂的延伸；README 的取捨表新增這一項 | `c87daa7` |
-| — | **`libs/` → `packages/`，並照 package 的規矩調整（ADR-0008）**。Human 指出每個 lib 都有 `package.json`，應該叫 packages，而且「不能只是改名」。對照 pnpm、Nx、Turborepo 的慣例後找到三個改名解決不了的問題並修正：① 拿掉 package 內部的 `src/lib/`；② 設計 token 的樣式改由 `@momo/shared-ui` 的 `exports` 公開，app 不再以相對路徑伸進去；③ 執行期依賴下放到各 package、版本由 pnpm catalog 統一，以 `@nx/dependency-checks` 強制，`verify-boundaries` 確認這條規則真的在運作。保留依 domain 分組（`packages/<scope>/<name>`） | `1587fbb` `8e18bb0` `aab099c` `e494945`（+ 文件與步驟的 commit） |
+| — | **`libs/` → `packages/`，並照 package 的規矩調整（ADR-0008）**。Human 指出每個 lib 都有 `package.json`，應該叫 packages，而且「不能只是改名」。對照 pnpm、Nx、Turborepo 的慣例後找到三個改名解決不了的問題並修正：① 拿掉 package 內部的 `src/lib/`；② 設計 token 的樣式改由 `@momo/shared-ui` 的 `exports` 公開，app 不再以相對路徑伸進去；③ 執行期依賴下放到各 package、版本由 pnpm catalog 統一，以 `@nx/dependency-checks` 強制，`verify-boundaries` 確認這條規則真的在運作。保留依 domain 分組（`packages/<scope>/<name>`） | `1587fbb` `8e18bb0` `aab099c` `e494945` `748d08b` |
+| 6 | **素材 + Catalog 資料層**：`tools/import-assets.mjs`（202 張圖、ASCII slug、以雜湊對帳）；`tools/gen-fixtures.mjs`（122 件商品、決定性、`--check`）；models 與 `CatalogRepository` interface；`createMockCatalogRepository`（注入 `data` / `now` / `latencyMs`）；Context 注入、6 個 query hooks、`query-keys`；次要入口 `@momo/catalog-data-access/testing`；app 的 composition root 注入 mock；`shop/layout` 改讀 `useCategories`。catalog 26 個測試、layout 13 個 | `cb3b680` `c2814e6` `ebb3b5f` `ec89864` `4d511e6`（+ 文件與步驟的 commit） |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -384,4 +401,11 @@ First Commit 至最後 Commit
 - **規則照預設值啟用時什麼都不檢查**：`@nx/dependency-checks` 對沒有 `build` target 的專案直接略過，10 個 package 全部沒被檢查而 lint 是綠的。啟用前先讀了規則的原始碼才發現。改用 `typecheck`，並讓 `verify-boundaries` 檢查這件事（自我測試：改回預設值 → 10 個問題）。
 - 其他：Nx 是靠 `package.json` 而不是資料夾名稱判斷專案類型，改名後 10 個 package 仍是 `lib`，`verify-boundaries` 的 scope 檢查沒有失效（改名前特別確認過）。
 
-**下一步：Step 6 — 素材 + fixtures + `catalog/data-access`**（分類清單會從 `shop/layout` 搬進 catalog fixtures）→ 對應 `tasks.md` 第 6 組
+**Step 6 驗證結果**
+- 全部 11 個專案 `lint / test / typecheck`（無快取、循序）全綠；`nx build shop` 成功；`pnpm verify:boundaries`：11 個專案、12 條規則、**9 條依賴**（新增 `shop-layout → catalog-data-access`、`shop → catalog-data-access`）、0 違規；`pnpm verify:fixtures` 通過；C: 複本的 `--frozen-lockfile` 安裝通過。
+- 素材：203 個來源檔案全部有交代（202 複製、1 個重複下載略過），每一份不同的內容在目的地都有逐位元組相同的複本。
+- 瀏覽器實測：分類列剛載入時 0 個、mock 延遲後 40 個（載入路徑真的有走到）；展開面板 40 個膠囊，第一個「首頁」為作用中（白底 + 品牌色框線）；五列的色調與透明度和 `design-tokens.md` 記錄的值相同（第三列 0.4、其餘 0.5）；沒有失敗的請求。
+- bundle：測試用的入口不在裡面；122 筆 mock 商品資料在裡面（主 bundle 約多 55 KB）—— 這是 mock 資料的成本，真的 API 不會有。
+- 過程中的錯誤：第一次盤點素材時只看了每個資料夾的第一層，漏掉 `主要活動/今日大牌`；匯入工具「每個檔案都要有交代否則 exit 1」的設計第一次執行就抓到，Human 也幾乎同時提醒要確認素材。另有一個測試自己的 bug（`beforeEach` 回傳了 mock，被 Vitest 當成清理函式執行）。
+
+**下一步：Step 7 — Shared util / ui**（`formatPrice`、`PriceTag`、`ProductCard`、`Carousel`、`SectionHeader`）→ 對應 `tasks.md` 第 7 組。新的外部套件（`embla-carousel-react`）要先加進 `pnpm-workspace.yaml` 的 catalog，並宣告在 `shared/ui` 自己的 `package.json`。
