@@ -225,7 +225,7 @@ momo-shop-work/
 │     ├─ ui/     countdown.tsx · flash-sale-header.tsx · stock-left.tsx · grab-badge.tsx   ← 私有
 │     └─ model/  get-remaining.ts（純函式）· use-countdown.ts · chunk.ts
 ├─ packages/home/feature-ranking/              type:feature  scope:home   今日暢銷榜
-│  └─ src/  ranking.tsx · ui/rank-badge.tsx                                 ← 私有
+│  └─ src/  ranking.tsx                                                      （原規劃的 ui/rank-badge 已移除：真站與截圖上都沒有名次）
 ├─ packages/home/page/                         type:page  scope:home
 │  └─ src/
 │     ├─ home-page.tsx                    useHomeLayout → <SectionRenderer sections />
@@ -291,8 +291,8 @@ type HomeSection =
 | 信用卡加碼優惠 | `banner-carousel` | 信用卡加碼優惠 |
 | 猜你想搜 | `banner-grid`（caption = 關鍵字） | 猜你想搜 |
 | 限時搶購 | `flash-sale` → feature package | 限時搶購 |
-| 今日暢銷榜 | `ranking` → feature package | 今日暢銷榜 |
-| moPro 會員專屬價 | `banner-carousel`（**Step 6 修正**：素材是整張做好的促銷磚，品牌、品名、價格都印在圖上，不是商品照 → 不是 `product-rail`） | momopro… |
+| 今日暢銷榜 | `ranking` → feature package（**對照真站後修正**：橫式商品卡、**沒有名次徽章**；它已經沒有自己的邏輯，Step 12 動工前要決定是否還需要獨立的 package） | 今日暢銷榜 |
+| moPro 會員專屬價 | `banner-carousel`（**Step 6 修正**：素材是整張做好的促銷磚，品牌、品名、價格都印在圖上 → 用圖磚呈現，不是 `product-rail`。**對照真站後補充**：真站上每張圖會連到商品頁；我們的素材沒有商品編號，所以不可點，列入 Known Gaps） | momopro… |
 | 你可能會喜歡（3 列 + 看更多） | `recommendation` → feature package | 你可能會喜歡 |
 
 時間不夠時的砍法：**從 `home-layout.ts` 刪一行**即可下架區塊，不用改元件。

@@ -137,7 +137,7 @@ UI → query hooks → useCatalogRepository() → CatalogRepository（interface�
 
 ### 10. 商品卡用 slots 而不是 variant
 
-**選擇**：`ProductCard` 提供 `topBadge`、`promoText`、`footer`、`priceLabel` 等 slot。限時搶購的「最後 N 組」與「搶」、暢銷榜的名次徽章，都由各自的 feature 填入。
+**選擇**：`ProductCard` 提供 `topBadge`、`promoText`、`footer`、`priceLabel` 等 slot。限時搶購的「最後 N 組」與「搶」由它的 feature 填入。卡片有直式（圖在上：降價好貨、限時搶購）與橫式（圖在左、335×174：momo 店取、今日暢銷榜）兩種版型，兩者都可以帶一行紅色的促銷文字 —— 這些是對照真實網站的 DOM 得到的。（原本還寫了「暢銷榜的名次徽章」，那是規劃時自己加的，真實網站與目標截圖上都沒有，已移除。）
 
 **為什麼**：三種卡片長得不一樣。用 `variant="flash-sale"` 會讓 `shared/ui` 知道業務概念；slot 讓裝飾留在它所屬的 feature。
 

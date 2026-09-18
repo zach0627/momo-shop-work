@@ -91,7 +91,7 @@
 
 ## 12. 今日暢銷榜（Step 12，可砍）
 
-- [ ] 12.1 `ranking` + 私有 `rank-badge`（透過 `ProductCard` 的 `topBadge` slot）；registry 換成真的元件；驗證：第一張卡片標示第 1 名（spec `home-page`「今日暢銷榜顯示名次」）
+- [ ] 12.1 今日暢銷榜：以橫式商品卡呈現 `getRanking()` 的商品（含一行促銷文字），**沒有名次徽章**（真實網站與截圖上都沒有；原規劃的 `rank-badge` 是自己加的）；registry 換成真的元件；驗證：順序與目錄回傳的相同、卡片沒有名次標示、點擊導向詳情頁（spec `home-page`「今日暢銷榜以橫式商品卡呈現」）。**動工前先決定**：它已經沒有自己的邏輯，是否還需要獨立的 `home/feature-ranking` package，或改為 `product-rail` 的一種版型
 
 ## 13. 交付（Step 13）
 

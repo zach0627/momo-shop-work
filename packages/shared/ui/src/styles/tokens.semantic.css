@@ -163,8 +163,9 @@
   /* "選擇分類": the one even size on the site, so it is named by role */
   --text-panel-title: 18px;
   --text-panel-title--line-height: 28px;
-  /* NOT measured: the section titles ("降價好貨" ...) are not in the readable
-     DOM (they sit in a cross-origin frame). Estimated from the screenshots. */
+  /* An estimate. On the live site a section title ("降價好貨" ...) is not text
+     but a 1220x70 background image, and that artwork was not supplied, so the
+     titles are rendered as text here. Sized from the screenshots. */
   --text-ec-title: 24px;
   --text-ec-title--line-height: 32px;
 

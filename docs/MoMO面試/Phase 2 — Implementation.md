@@ -47,7 +47,7 @@ First Commit 至最後 Commit
 | ⬜ | 9 | 你可能會喜歡：3 列 + 看更多 | `feat(recommendation): paginated grid with load more` | #4 | ✗ |
 | ⬜ | 10 ★ | 商品詳情頁（純展示） | `feat(goods): display-only goods detail page` | #8 | ✗ |
 | ⬜ | 11 | 限時搶購：倒數 + 2 列輪播 | `feat(flash-sale): countdown and two-row carousel` | #7 | ✓ |
-| ⬜ | 12 | 今日暢銷榜 | `feat(ranking): best sellers with rank badge` | — | ✓ |
+| ⬜ | 12 | 今日暢銷榜（橫式商品卡，沒有名次） | `feat(ranking): best sellers as horizontal cards` | — | ✓ |
 | ⬜ | 13 ★ | README + CI | `docs: readme with tradeoffs and roadmap` / `ci: nx affected` | — | README ✗ / CI ✓ |
 | ⬜ | P2 | Playwright / SectionBoundary / Skeleton / 部署 | 各自一個 commit | — | ✓ |
 
@@ -191,6 +191,12 @@ First Commit 至最後 Commit
 
 ### Step 7 — Shared util / ui
 
+> **對照真站得到的事實（2026-09-19，桌機版 DOM）**，`ProductCard` 要照這個做：
+> - 商品卡有**兩種版型**：直式（圖在上）—— 降價好貨 131×238、圖 128×128；限時搶購 230×386、圖 208×208。橫式（圖在左）—— momo 店取與今日暢銷榜都是 335×174、圖 140×140。
+> - 兩種版型都可以帶一行**紅色促銷文字**（橫式 13px `#dd2222`；限時搶購 15px / 700）。
+> - 價格：數字 21px / 700（限時搶購 23px）、前面的 `$` 13px；降價好貨用品牌色 `#d62872`，店取與暢銷榜用 `#db2777`，限時搶購用 `#dd2222`。原價 13px 劃線灰色。名稱 15px `#404040`。這些和現有的 token 一致。
+> - 區塊標題在真站上是一張 1220×70 的圖，素材裡沒有 → `SectionHeader` 用文字，字級是估計值。
+
 **目標**：通過 Rule of Two 的共用元件，全部不認識 domain model。
 - [ ] 安裝 `embla-carousel-react`。
 - [ ] **TDD #1**：`formatPrice`（`49900 → "49,900"`、`0`）。
@@ -262,10 +268,12 @@ First Commit 至最後 Commit
 
 ### Step 12 — 今日暢銷榜　（可砍）
 
-- [ ] `ranking.tsx` + 私有 `ui/rank-badge`（透過 `ProductCard` 的 `topBadge` slot）；registry 換成真的元件。
+- [ ] `ranking.tsx`：以橫式商品卡呈現 `getRanking()` 的商品（含促銷文字）；registry 換成真的元件。
+  - ↳ **原本寫的 `ui/rank-badge` 已移除**：真站與目標截圖上都沒有名次，那是規劃時自己加的。
+  - ↳ **動工前先決定**：它已經沒有自己的邏輯，是否還需要獨立的 `home/feature-ranking` package，或改為 `product-rail` 的一種版型（`architecture.md` §5：沒有邏輯的區塊不拆）。
 
 **驗證**：`pnpm nx test home-feature-ranking`、dev server
-**Commit**：`feat(ranking): best sellers with rank badge`
+**Commit**：`feat(ranking): best sellers as horizontal cards`
 
 ### Step 13 ★ — README + CI
 
@@ -311,7 +319,7 @@ First Commit 至最後 Commit
 | — | **Layout 升為正式的一層**：`libs/layout/feature` → `libs/shop/layout`（`@momo/shop-layout`）；新增 `type:layout`（與 `page` 同層、可組合 feature、只有 app 能依賴）；`scope:layout` 改名為 `scope:shop`；ADR-0006 改寫，並記錄為什麼推翻原本「外框不能依賴 feature」那句話；主規格 `module-boundaries` 新增 3 個 scenario。起因：Human 質疑「layout 裡面卻有 feature，這是好的設計嗎？」 | `5966dcf` `d815c11` `6bb5b32` |
 | — | **layout 該放哪：查證與定案（ADR-0007）**。Human 連續追問：放 `apps/shop/src/layouts` 會不會比較好？Nx 以往怎麼放？是不是該叫 `feature-shell`？查證 Nx 文件、`nrwl/react-template`、`nrwl/nx-examples` 與 feature-shell 模式後，比較三種放法，**維持 `libs/shop/layout`，不搬程式**。`architecture.md` §3 註明 `page` 與 `layout` 是我們在 Nx 四種 type 之上自訂的延伸；README 的取捨表新增這一項 | `c87daa7` |
 | — | **`libs/` → `packages/`，並照 package 的規矩調整（ADR-0008）**。Human 指出每個 lib 都有 `package.json`，應該叫 packages，而且「不能只是改名」。對照 pnpm、Nx、Turborepo 的慣例後找到三個改名解決不了的問題並修正：① 拿掉 package 內部的 `src/lib/`；② 設計 token 的樣式改由 `@momo/shared-ui` 的 `exports` 公開，app 不再以相對路徑伸進去；③ 執行期依賴下放到各 package、版本由 pnpm catalog 統一，以 `@nx/dependency-checks` 強制，`verify-boundaries` 確認這條規則真的在運作。保留依 domain 分組（`packages/<scope>/<name>`） | `1587fbb` `8e18bb0` `aab099c` `e494945` `748d08b` |
-| 6 | **素材 + Catalog 資料層**：`tools/import-assets.mjs`（202 張圖、ASCII slug、以雜湊對帳）；`tools/gen-fixtures.mjs`（122 件商品、決定性、`--check`）；models 與 `CatalogRepository` interface；`createMockCatalogRepository`（注入 `data` / `now` / `latencyMs`）；Context 注入、6 個 query hooks、`query-keys`；次要入口 `@momo/catalog-data-access/testing`；app 的 composition root 注入 mock；`shop/layout` 改讀 `useCategories`。catalog 26 個測試、layout 13 個 | `cb3b680` `c2814e6` `ebb3b5f` `ec89864` `4d511e6`（+ 文件與步驟的 commit） |
+| 6 | **素材 + Catalog 資料層**：`tools/import-assets.mjs`（202 張圖、ASCII slug、以雜湊對帳）；`tools/gen-fixtures.mjs`（122 件商品、決定性、`--check`）；models 與 `CatalogRepository` interface；`createMockCatalogRepository`（注入 `data` / `now` / `latencyMs`）；Context 注入、6 個 query hooks、`query-keys`；次要入口 `@momo/catalog-data-access/testing`；app 的 composition root 注入 mock；`shop/layout` 改讀 `useCategories`。catalog 26 個測試、layout 13 個 | `cb3b680` `c2814e6` `ebb3b5f` `ec89864` `4d511e6` `52b64a0` |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -407,5 +415,11 @@ First Commit 至最後 Commit
 - 瀏覽器實測：分類列剛載入時 0 個、mock 延遲後 40 個（載入路徑真的有走到）；展開面板 40 個膠囊，第一個「首頁」為作用中（白底 + 品牌色框線）；五列的色調與透明度和 `design-tokens.md` 記錄的值相同（第三列 0.4、其餘 0.5）；沒有失敗的請求。
 - bundle：測試用的入口不在裡面；122 筆 mock 商品資料在裡面（主 bundle 約多 55 KB）—— 這是 mock 資料的成本，真的 API 不會有。
 - 過程中的錯誤：第一次盤點素材時只看了每個資料夾的第一層，漏掉 `主要活動/今日大牌`；匯入工具「每個檔案都要有交代否則 exit 1」的設計第一次執行就抓到，Human 也幾乎同時提醒要確認素材。另有一個測試自己的 bug（`beforeEach` 回傳了 mock，被 Vitest 當成清理函式執行）。
+
+**Step 6 之後：對照真實網站（Human 要求）**
+- 做法：以桌機尺寸（1440×900）載入真站 —— 面板原本只有 534px 寬，拿到的是手機版 —— 由上往下捲動讓每個區塊掛載，再用圖片網址裡的區塊代碼（素材檔名也帶同樣的代碼，例：moPro = `bt_7_703_02`）硬對出每個區塊。
+- **核對無誤**：分類面板 40 個、9/9/9/9/4、一列一種色調且色值相同；區塊的相對順序；降價好貨 26 件（和素材數量相同）；momo 店取前三件商品的編號和素材完全相同；猜你想搜是「圖 + 關鍵字」；限時搶購卡片的欄位（促銷文字、限搶價、劃線原價、最後 N 組）；三種價格顏色。
+- **錯的三項**（都已修正）：① moPro 在真站上每張圖都連到商品頁 ——「用圖磚呈現」對，「不是商品」錯；素材沒有商品編號所以維持不可點，列入 Known Gaps。② **今日暢銷榜沒有名次徽章**，那是自己加的，還被寫成一條行為規格。③ 區塊標題量不到不是因為「在跨來源 iframe 裡」，而是它是一張 1220×70 的背景圖。
+- 新得知：商品卡有直式與橫式兩種版型（寫進 Step 7 開頭）；真站另有 3 個區塊與 2 個廣告 iframe 不在素材與截圖裡（列入 Known Gaps）。
 
 **下一步：Step 7 — Shared util / ui**（`formatPrice`、`PriceTag`、`ProductCard`、`Carousel`、`SectionHeader`）→ 對應 `tasks.md` 第 7 組。新的外部套件（`embla-carousel-react`）要先加進 `pnpm-workspace.yaml` 的 catalog，並宣告在 `shared/ui` 自己的 `package.json`。
