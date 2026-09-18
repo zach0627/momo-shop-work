@@ -8,7 +8,7 @@
 
 結論分兩層：
 
-- `libs/` 資料夾變大不是問題，它就是 `src/`。成長方式應該是**新增 scope**，而不是養大既有的 lib（拆分準則見 `architecture.md` §5）。
+- `packages/` 資料夾變大不是問題，它就是 `src/`。成長方式應該是**新增 scope**，而不是養大既有的 package（拆分準則見 `architecture.md` §5）。
 - 真正會腐化的是 **scope 的放行清單**。5 個 scope 時沒事；到 12 個 scope 時，最常見的劣化是有人遇到 lint 錯誤就「在放行清單加一個 scope」，幾年後每個 domain 都能依賴每個 domain，規則名存實亡。
 
 ## 決策
@@ -64,7 +64,7 @@ graph TD
 
 ### 修訂：外框從 `type:feature` 改為 `type:layout`
 
-這份 ADR 原本寫的是「外框只能依賴對方的 `data-access`，不能依賴 feature」。那句話不是獨立的設計目標，而是外框當時被標成 `type:feature`、受 `feature ✗ feature` 約束的**結果**。它對摘要資料成立，但對互動元件只留下兩條路：把購物車或搜尋的邏輯寫進外框 lib（外框變肥，且擁有不屬於它的邏輯），或是破壞規則。
+這份 ADR 原本寫的是「外框只能依賴對方的 `data-access`，不能依賴 feature」。那句話不是獨立的設計目標，而是外框當時被標成 `type:feature`、受 `feature ✗ feature` 約束的**結果**。它對摘要資料成立，但對互動元件只留下兩條路：把購物車或搜尋的邏輯寫進外框 package（外框變肥，且擁有不屬於它的邏輯），或是破壞規則。
 
 外框實際所在的層級與 `page` 相同 —— 只有 app 的 router 會 import 它，它與 page 由路由巢狀組合、彼此不 import。因此新增 `type:layout` 一層，權限與 `page` 相同（可組合 feature），並把 scope 從 `layout` 改名為 `shop`：`layout` 描述的是「哪一種專案」，屬於 `type:`，不是一個 domain。
 

@@ -28,10 +28,16 @@ First Commit 至最後 Commit
 
 ### 總覽
 
+> **路徑與用詞（2026-09-19 起）**：`libs/` 已改為 `packages/`，package 內部也沒有 `src/lib/` 這一層了（ADR-0008）。下面已完成的步驟保留當時的寫法，以「↳」註記差異；**還沒做的步驟一律照新的規範**：
+> - 新的 package 放在 `packages/<scope>/<name>`；generator 產生 `src/lib/` 的話攤平成 `src/`。
+> - `src/` import 了外部套件 → 在**該 package** 的 `package.json` 宣告，版本寫 `catalog:`；新的套件先加進 `pnpm-workspace.yaml` 的 `catalog`。不要加到根目錄。
+> - 要從別的 package 拿 TypeScript 以外的東西（樣式、測試工具）→ 加到對方的 `exports`，不用相對路徑。
+> - 每一步的驗證都多跑 `pnpm verify:boundaries`（它會確認依賴宣告的檢查真的有在運作）。
+
 | 狀態 | Step | 產出 | Commit | TDD | 可砍 |
 |---|---|---|---|---|---|
 | ✅ | 1 | Nx workspace + `shop` app 可 build | `chore: scaffold nx workspace` | — | ✗ |
-| ✅ | 2 | 10 libs + tags + boundary lint | `chore: add domain libs and module boundary rules` | — | ✗ |
+| ✅ | 2 | 10 個 package（當時叫 libs）+ tags + boundary lint | `chore: add domain libs and module boundary rules` | — | ✗ |
 | ✅ | 3 | architecture.md + ADR ×6 + agent-workflow.md + CLAUDE.md + 邊界驗證工具 + OpenSpec | `docs: add architecture and ADRs` | — | ✗ |
 | ✅ | 4 ★ | Walking skeleton：兩條路由走得通（+ 兩層 design token） | `feat(shop): walking skeleton with routing and shell` | paths、AppLink | ✗ |
 | ✅ | 5 ★ | **Layout**：TopBar(fixed→compact) + Header + 分類展開 + Footer（原 Step 7，提前） | 依內容拆分 | 分類展開、搜尋框、compact | ✗ |
@@ -71,6 +77,7 @@ First Commit 至最後 Commit
 - [x] 用 `@nx/react:lib` 產生 10 個 lib（路徑、import alias、tags 依 Phase 1 §3 / §4）：
   `shared/ui` `shared/util` `catalog/data-access` `catalog/feature-recommendation` `home/data-access` `home/feature-flash-sale` `home/feature-ranking` `home/page` `goods/page` `shop/layout`
   - ↳ `shared/util` 是純函式，改用 `@nx/js:lib`；其餘 9 個用 `@nx/react:lib`。10 個 lib 的 tags 逐一核對過。
+  - ↳ 這 10 個當時建立在 `libs/` 底下、程式碼在 `src/lib/`；之後整個搬到 `packages/` 並拿掉 `src/lib/`（ADR-0008）。
   - ↳ 最後一個 lib 建立時叫 `shell/feature`，之後兩度改名，現為 `shop/layout`（`type:layout`、`scope:shop`）。原因見完成紀錄。
 - [x] `apps/shop` 標 `type:app`。
 - [x] `eslint.config.mjs`：`@nx/enforce-module-boundaries` 的 `depConstraints`（type 6 條 + scope 5 條）。
@@ -113,6 +120,7 @@ First Commit 至最後 Commit
   - ↳ 6 個測試。紅燈時發現「path 符合 pattern」的測試在兩邊都是空字串時會通過 → 補上 pattern 必須以 `/` 開頭的斷言。
 - [x] **TDD**：`shared/ui/link` — `AppLink` 預設渲染 `<a href>`；有 `LinkProvider` 時改用注入的元件。
 - [x] `shared/ui/styles/theme.css`：`@theme` tokens（品牌粉、價格紅、容器寬 1220px）；`apps/shop/src/styles.css` import + `@source` 掃 libs。
+  - ↳ 當時 `styles.css` 以相對路徑 import 那份 theme；之後改為 `@import '@momo/shared-ui/theme.css'`，由 `@momo/shared-ui` 的 `exports` 公開（ADR-0008）。
   - ↳ **大幅超出原計畫**：改為 Primitive / Semantic 兩層 token，數值從真實網站的計算樣式量出（見下方完成紀錄）。
 - [x] `apps/shop`：`providers.tsx`（QueryClient + LinkProvider）、`router.tsx`（lazy routes、路徑取自 `paths`）、`router-link.tsx`、3 個 route 檔。
   - ↳ 路由測試 4 個 + App smoke 1 個，對應 spec `app-layout`「每個頁面都有共用外框」「Logo 連回首頁」。
@@ -158,7 +166,8 @@ First Commit 至最後 Commit
   - [ ] `getRecommendations`：`nextOffset` 正確；最後一頁 → `null`
   - [ ] `getFlashSale`：`endsAt` 跟著注入的 `now`
 - [ ] `CatalogRepositoryProvider` + `useCatalogRepository`；6 個 query hooks；`query-keys.ts`。
-- [ ] `testing.ts` 次要入口：`createFakeCatalogRepository` + 測試用 wrapper。
+  - [ ] `catalog/data-access` 會 import `react` 與 `@tanstack/react-query` → 在**它自己的** `package.json` 宣告，版本寫 `catalog:`（兩者都已在 catalog 裡）。
+- [ ] `testing.ts` 次要入口：`createFakeCatalogRepository` + 測試用 wrapper。以 `exports` 的 `"./testing"` 公開（`@momo/catalog-data-access/testing`），並確認 TypeScript 與 Vitest 都解析得到。
 - [ ] `app/providers.tsx` 注入 mock repository（composition root）。
 - [ ] `shop/layout` 宣告對 `@momo/catalog-data-access` 的依賴（`workspace:*` → `pnpm install` → `pnpm nx sync`），並確認 `pnpm-lock.yaml` 的 importer；`scope:shop` → `scope:catalog` 已在放行清單內。
 
@@ -188,7 +197,7 @@ First Commit 至最後 Commit
 - [ ] **TDD #5**：`SectionRenderer`
   - [ ] 依 `type` 渲染對應元件
   - [ ] 未知 `type` → 不渲染、不 throw、呼叫 `reportError`
-- [ ] `registry.ts`：mapped type（漏寫 renderer → 編譯錯誤）；3 個 feature lib 各建立一個 placeholder container（從 Step 2 移過來的項目），registry 先指向它們。
+- [ ] `registry.ts`：mapped type（漏寫 renderer → 編譯錯誤）；3 個 feature package 各建立一個 placeholder container（從 Step 2 移過來的項目），registry 先指向它們。
 - [ ] 6 個私有 blocks：`hero`、`banner-carousel`、`banner-grid`、`shortcut-bar`、`notice`、`product-rail`（商品卡連到 `paths.goods(id)`）。
 - [ ] `HomePage`：`useHomeLayout` → loading / error / `<SectionRenderer>`。
 
@@ -284,7 +293,8 @@ First Commit 至最後 Commit
 | 5 | **Layout**：`fixed` 的 TopBar（捲動後轉 compact 顯示搜尋框）、主 header（logo + 展示用搜尋框 + 熱搜關鍵字）、可展開的分類列（40 個分類、五種色調）、footer（防詐騙提醒框 + 六欄 + QR code）。三份 spec 共 11 個測試（TDD）。分類面板的樣式從真站量出並進入兩層 token。拆成 5 個 commit，中間的 3 個都匯出到乾淨環境單獨驗證為綠 | `8063454` `fc73d14` `0d2a0ef` `4678d8e` `3e8caf5` |
 | — | **全專案健檢**（Human 回報編輯器在 `tsconfig.app.json` 顯示 not found）：85 個 tsconfig 引用全部存在；直接驅動 tsserver（TS 6.0.3 與 5.9.3）取得編輯器層級的診斷 → 0 個，並以故意寫壞的 tsconfig 確認這個檢查抓得到 `TS6053 … not found`；歷史上每個 commit 的引用也都存在。磁碟上的狀態沒有問題，研判是編輯器留著改名當下的過期診斷。順帶發現並修正：本機外掛的狀態資料夾 `.omc/` 沒有被 ignore | `5142b29` |
 | — | **Layout 升為正式的一層**：`libs/layout/feature` → `libs/shop/layout`（`@momo/shop-layout`）；新增 `type:layout`（與 `page` 同層、可組合 feature、只有 app 能依賴）；`scope:layout` 改名為 `scope:shop`；ADR-0006 改寫，並記錄為什麼推翻原本「外框不能依賴 feature」那句話；主規格 `module-boundaries` 新增 3 個 scenario。起因：Human 質疑「layout 裡面卻有 feature，這是好的設計嗎？」 | `5966dcf` `d815c11` `6bb5b32` |
-| — | **layout 該放哪：查證與定案（ADR-0007）**。Human 連續追問：放 `apps/shop/src/layouts` 會不會比較好？Nx 以往怎麼放？是不是該叫 `feature-shell`？查證 Nx 文件、`nrwl/react-template`、`nrwl/nx-examples` 與 feature-shell 模式後，比較三種放法，**維持 `libs/shop/layout`，不搬程式**。`architecture.md` §3 註明 `page` 與 `layout` 是我們在 Nx 四種 type 之上自訂的延伸；README 的取捨表新增這一項 | 見 git log |
+| — | **layout 該放哪：查證與定案（ADR-0007）**。Human 連續追問：放 `apps/shop/src/layouts` 會不會比較好？Nx 以往怎麼放？是不是該叫 `feature-shell`？查證 Nx 文件、`nrwl/react-template`、`nrwl/nx-examples` 與 feature-shell 模式後，比較三種放法，**維持 `libs/shop/layout`，不搬程式**。`architecture.md` §3 註明 `page` 與 `layout` 是我們在 Nx 四種 type 之上自訂的延伸；README 的取捨表新增這一項 | `c87daa7` |
+| — | **`libs/` → `packages/`，並照 package 的規矩調整（ADR-0008）**。Human 指出每個 lib 都有 `package.json`，應該叫 packages，而且「不能只是改名」。對照 pnpm、Nx、Turborepo 的慣例後找到三個改名解決不了的問題並修正：① 拿掉 package 內部的 `src/lib/`；② 設計 token 的樣式改由 `@momo/shared-ui` 的 `exports` 公開，app 不再以相對路徑伸進去；③ 執行期依賴下放到各 package、版本由 pnpm catalog 統一，以 `@nx/dependency-checks` 強制，`verify-boundaries` 確認這條規則真的在運作。保留依 domain 分組（`packages/<scope>/<name>`） | `1587fbb` `8e18bb0` `aab099c` `e494945`（+ 文件與步驟的 commit） |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -363,5 +373,15 @@ First Commit 至最後 Commit
 - 查證到的事實：Nx 官方的兩個範例都把 layout **外框**放在 app，只把可重用的**零件**（header）抽成 lib；`feature-shell` 是「擁有頂層路由」的 lib，為的是同一個應用出多個平台版本，和我們的情境不同，而且會破壞「router 只存在於 app」（ADR-0001）。
 - 結論：維持 `libs/shop/layout`。理由是 app 是唯一不受邊界規則約束的專案，所以只放接線；`page` 與 `layout` 同屬「路由層級的組合」這一層，都在 lib。與另一個方案的實質差距只有約 12 行排版 JSX 與一條規則。
 - Agent 的失誤：同一個決定換了三次建議，每一輪都是先有結論再找理由，被要求查證才去讀文件與範例；引用 `nx-examples` 時把「header 零件」與「layout 外框」混為一談（Human 糾正用詞時才發現）；說錯「拆掉 `type:layout` 就全部是 Nx 標準 type」（`type:page` 本來就是自訂的）。已照實寫進 `docs/agent-workflow.md`。
+
+**`libs/` → `packages/`：驗證結果與過程中的錯誤**
+- 拆成 5 個 commit（搬移 → 攤平 `src/lib/` → 樣式走 `exports` → 依賴宣告 → 文件與步驟）。前四個在 commit 前都跑過 11 個專案的 `lint / test / typecheck`（無快取）、`verify:boundaries` 與 `build`；**每一步的 JS 與 CSS 產物雜湊都與改動前相同**，行為沒有變。測試數量不變（6 + 2 + 11 + 5）。C: 複本的 `--frozen-lockfile` 安裝通過。
+- 只安裝了一份 `react@19.3.0`，每個宣告它的 package 都連到同一個實體。
+- 樣式入口：沒有宣告 export 時 build 失敗（`"./theme.css" is not exported`）；未公開的路徑仍然失敗。
+- 依賴宣告的 5 個探針：沒宣告 react（擋）、沒宣告 workspace package（擋）、宣告了卻沒用（擋）、空的 package 開始 import react（擋）、只寫 JSX 的 package 拿掉 react（**通過 —— 工具的盲點，已照實寫進 ADR**）。
+- Agent 一開始的建議是「保留 `libs/`、補一段文件就好」。照那樣做的話，上面三個真問題會繼續存在。
+- **探針連續兩輪給出假的「被擋下」**：第一輪是 pnpm 發現 `package.json` 與 lockfile 不一致而拒絕執行，ESLint 根本沒跑；第二輪是 nx 執行檔的路徑寫錯。探針腳本只看 exit code，兩輪都印出整排 OK。改為「輸出裡必須出現那條規則的名稱才算被擋」之後，第三輪才是真的。
+- **規則照預設值啟用時什麼都不檢查**：`@nx/dependency-checks` 對沒有 `build` target 的專案直接略過，10 個 package 全部沒被檢查而 lint 是綠的。啟用前先讀了規則的原始碼才發現。改用 `typecheck`，並讓 `verify-boundaries` 檢查這件事（自我測試：改回預設值 → 10 個問題）。
+- 其他：Nx 是靠 `package.json` 而不是資料夾名稱判斷專案類型，改名後 10 個 package 仍是 `lib`，`verify-boundaries` 的 scope 檢查沒有失效（改名前特別確認過）。
 
 **下一步：Step 6 — 素材 + fixtures + `catalog/data-access`**（分類清單會從 `shop/layout` 搬進 catalog fixtures）→ 對應 `tasks.md` 第 6 組

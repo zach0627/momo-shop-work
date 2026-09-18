@@ -8,7 +8,7 @@
 
 ## 決策
 
-採用 (c)。每個 data-access lib 定義一個 repository interface，提供 mock 實作，並透過 React Context 注入。用哪個實作由 composition root（`apps/shop` 的 providers）決定。
+採用 (c)。每個 data-access package 定義一個 repository interface，提供 mock 實作，並透過 React Context 注入。用哪個實作由 composition root（`apps/shop` 的 providers）決定。
 
 ```
 UI → query hooks → useCatalogRepository() → CatalogRepository (interface)
@@ -26,7 +26,7 @@ UI → query hooks → useCatalogRepository() → CatalogRepository (interface)
 
 ## 代價
 
-- 每個 data-access lib 多一個 interface、一個 Context、一個測試用的 helper。
+- 每個 data-access package 多一個 interface、一個 Context、一個測試用的 helper。
 - Repository 這層不會驗證 HTTP 細節（status code、headers、序列化）。
 
 ## 演進觸發條件

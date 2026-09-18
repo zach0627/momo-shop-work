@@ -88,7 +88,7 @@ const RESTRICTED_PACKAGES = {
       'react-router-dom/*',
     ],
     message:
-      'Only apps/shop may import the router. Libs take route params as props and link through AppLink from @momo/shared-ui.',
+      'Only apps/shop may import the router. Packages take route params as props and link through AppLink from @momo/shared-ui.',
   },
   'embla-carousel-react': {
     group: ['embla-carousel', 'embla-carousel/*', 'embla-carousel-*'],

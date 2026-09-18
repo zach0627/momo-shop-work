@@ -23,7 +23,7 @@
 
 ## 演進觸發條件與路徑
 
-1. 出現購物車或會員 → 在**該 domain 的 data-access lib**（例：`cart/data-access`）引入輕量 store。
+1. 出現購物車或會員 → 在**該 domain 的 data-access package**（例：`cart/data-access`）引入輕量 store。
 2. 購物車 × 優惠券 × 結帳這類跨 domain、有複雜狀態轉移的流程 → 改用 **Redux Toolkit**（可預測的狀態轉移、時間旅行除錯、middleware）。
 
 讓抽換不痛的前提：**state 一律包在 data-access 的 hooks 後面**。feature 只呼叫 `useCart()`，不知道後面是 Zustand 還是 RTK，所以換實作時 feature 不用改。

@@ -6,7 +6,7 @@ import { LinkProvider } from '@momo/shared-ui';
 import { RouterLink } from './router-link';
 
 /**
- * Composition root. Everything a lib needs but must not choose for itself is
+ * Composition root. Everything a package needs but must not choose for itself is
  * decided here: how links navigate now, which repository implementation
  * (mock or HTTP) the data hooks talk to once the data layer lands.
  */

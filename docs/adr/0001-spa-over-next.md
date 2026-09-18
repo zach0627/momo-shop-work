@@ -26,7 +26,7 @@
 
 遷移成本被刻意壓低，靠的是三條已經由 lint 強制的規則：
 
-1. `react-router` 只准出現在 `apps/shop`。libs 拿到的是 props（例：`goodsId`），不是 `useParams`。
+1. `react-router` 只准出現在 `apps/shop`。packages 拿到的是 props（例：`goodsId`），不是 `useParams`。
 2. 連結透過 `@momo/shared-ui` 的 `AppLink`；實際的 Link 元件由 app 注入。換成 `next/link` 只改一處。
 3. 資料走 TanStack Query，它本身支援 SSR hydration。
 

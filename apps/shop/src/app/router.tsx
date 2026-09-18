@@ -13,7 +13,7 @@ function LayoutRoute() {
 
 /**
  * The route table. Paths come from ROUTE_PATTERNS so they cannot drift from
- * the links libs build with `paths`. Each page is a lazy chunk.
+ * the links packages build with `paths`. Each page is a lazy chunk.
  *
  * apps/shop is the only project allowed to import the router (enforced by
  * lint), which keeps a move to another router or to SSR a one-project change.

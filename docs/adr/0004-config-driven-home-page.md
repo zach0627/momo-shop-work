@@ -11,7 +11,7 @@ momo 首頁由上到下有 13 個業務區塊。從素材檔名（`bt_7_701_01_e
 首頁由一份資料 `HomeSection[]`（discriminated union）驅動。`SectionRenderer` 透過一張型別化的 registry 把 `type` 對到元件。
 
 - 沒有邏輯的純版面區塊，收斂成 6 種通用 block（hero、banner-carousel、banner-grid、shortcut-bar、notice、product-rail），留在 `home/page`。
-- 有自己邏輯 / 資料 / 重用性的區塊（限時搶購、暢銷榜、你可能會喜歡）是獨立的 feature lib，registry 只是把它們掛上去。
+- 有自己邏輯 / 資料 / 重用性的區塊（限時搶購、暢銷榜、你可能會喜歡）是獨立的 feature package，registry 只是把它們掛上去。
 
 ## 理由
 

@@ -15,9 +15,9 @@
 
 ### 目前的狀態
 
-- Nx 23 workspace（pnpm workspaces + TypeScript project references）、1 個 app + 10 個 lib，皆已建立但內容為空殼。
+- Nx 23 workspace（pnpm workspaces + TypeScript project references）、1 個 app + 10 個 package，皆已建立但內容為空殼。
 - 依賴規則已由 lint 強制，並經負向驗證（5 個違規探針全部被擋）與 `pnpm verify:boundaries` 確認套用到每個專案。這些已實作的約束寫在主規格 `openspec/specs/module-boundaries/`，本 change 在它的約束下實作、不修改它。
-- 專案之間目前沒有任何依賴（libs 都是空的）。本 change 的第一步會產生第一批跨專案 import。
+- 專案之間目前沒有任何依賴（packages 都是空的）。本 change 的第一步會產生第一批跨專案 import。
 - 目標畫面的截圖在 `docs/pictures/`，依頁面由上到下編號。
 
 ### 限制
@@ -52,13 +52,13 @@
 
 **放棄的方案**：Next.js —— 正式環境的電商幾乎一定是 SSR，這點在 ADR-0001 照實記錄為代價。
 
-**保留遷移路徑的方式**：router 只准出現在 `apps/shop`（lint 強制）；libs 以 props 接收路由參數；連結透過 `AppLink`，實際的 Link 元件由 app 注入。遷移時優先考慮 React Router framework mode（同一套 router）。→ `docs/adr/0001-spa-over-next.md`
+**保留遷移路徑的方式**：router 只准出現在 `apps/shop`（lint 強制）；packages 以 props 接收路由參數；連結透過 `AppLink`，實際的 Link 元件由 app 注入。遷移時優先考慮 React Router framework mode（同一套 router）。→ `docs/adr/0001-spa-over-next.md`
 
-### 2. Nx 單一 app + 依 domain 切分的 libs
+### 2. Nx 單一 app + 依 domain 切分的 packages
 
-**選擇**：一個薄殼 app，程式碼放在 10 個 lib，每個 lib 帶 `type:`（層級）與 `scope:`（domain）兩個標籤，依賴規則由 `@nx/enforce-module-boundaries` 強制。
+**選擇**：一個薄殼 app，程式碼放在 10 個 package，每個 package 帶 `type:`（層級）與 `scope:`（domain）兩個標籤，依賴規則由 `@nx/enforce-module-boundaries` 強制。
 
-**為什麼**：邊界由工具強制；`nx affected` 與快取以 lib 為單位；日後把某個 domain 抽成獨立 app 的成本低。
+**為什麼**：邊界由工具強制；`nx affected` 與快取以 package 為單位；日後把某個 domain 抽成獨立 app 的成本低。
 
 **放棄的方案**：
 
@@ -88,7 +88,7 @@
 **選擇**：`HomeSection` 是 discriminated union；`SectionRenderer` 透過型別化的 registry 對應 `type → Component`。
 
 - 沒有邏輯的區塊收斂成 6 種通用 block，留在 `home/page`。
-- 有自己邏輯 / 資料 / 重用性的 3 個區塊是獨立的 feature lib。
+- 有自己邏輯 / 資料 / 重用性的 3 個區塊是獨立的 feature package。
 - registry 以 mapped type 定義：union 新增型別卻沒寫 renderer → **編譯期報錯**。
 - 執行期遇到未知型別 → 不渲染、回報錯誤事件（對應 spec `home-page` 的「未知的區塊型別不影響頁面」）。
 
@@ -98,7 +98,7 @@
 
 ### 6. Repository interface + Context 注入，而非 MSW
 
-**選擇**：每個 data-access lib 定義 repository interface 與 mock 實作，以 React Context 注入；用哪個實作由 `apps/shop` 的 providers 決定。
+**選擇**：每個 data-access package 定義 repository interface 與 mock 實作，以 React Context 注入；用哪個實作由 `apps/shop` 的 providers 決定。
 
 ```
 UI → query hooks → useCatalogRepository() → CatalogRepository（interface）
@@ -123,11 +123,11 @@ UI → query hooks → useCatalogRepository() → CatalogRepository（interface�
 
 ### 8. 共用門檻：Rule of Two
 
-**選擇**：被 ≥2 個專案使用的東西才能進 `shared/*`；其餘放在該 lib 的 `ui/`（展示）或 `model/`（邏輯），不從 `index.ts` 匯出。升級路徑：lib 私有 → 同 domain 共用（`libs/<scope>/ui`）→ 跨 domain 才進 `shared/ui`。
+**選擇**：被 ≥2 個專案使用的東西才能進 `shared/*`；其餘放在該 package 的 `ui/`（展示）或 `model/`（邏輯），不從 `index.ts` 匯出。升級路徑：package 私有 → 同 domain 共用（`packages/<scope>/ui`）→ 跨 domain 才進 `shared/ui`。
 
-**為什麼**：`shared/ui` 是全專案都依賴的 lib，長大後任何修改都讓 `nx affected` 等於全部。設計討論時 Human 指出原案把只有一個使用者的「看更多」按鈕與倒數計時放進 shared，修正後 `shared/ui` 從 10 個元件瘦身到 6 個。
+**為什麼**：`shared/ui` 是全專案都依賴的 package，長大後任何修改都讓 `nx affected` 等於全部。設計討論時 Human 指出原案把只有一個使用者的「看更多」按鈕與倒數計時放進 shared，修正後 `shared/ui` 從 10 個元件瘦身到 6 個。
 
-**「私有」由誰保證**（實際驗證過，不是假設）：每個 lib 的 `package.json` 的 `exports` 只公開 `.`（即 `src/index.ts`）。以「套件名稱 + 內部路徑」引用會在型別檢查失敗（TS2307）；以相對路徑跨專案引用會被 lint 擋下。兩道關卡來自不同工具，所以驗證關卡必須同時跑 `lint` 與 `typecheck`。
+**「私有」由誰保證**（實際驗證過，不是假設）：每個 package 的 `package.json` 的 `exports` 只公開 `.`（即 `src/index.ts`）。以「套件名稱 + 內部路徑」引用會在型別檢查失敗（TS2307）；以相對路徑跨專案引用會被 lint 擋下。兩道關卡來自不同工具，所以驗證關卡必須同時跑 `lint` 與 `typecheck`。
 
 ### 9. `shared/ui` 不認識 domain model
 
@@ -164,17 +164,17 @@ UI → query hooks → useCatalogRepository() → CatalogRepository（interface�
 
 ## Risks / Trade-offs
 
-- **[結構以目前規模偏重：10 個 lib 約 80 個設定檔]** → 在 README 的 Tradeoffs 照實說明，並寫下「如果是真實的 2 頁專案我不會從這裡開始」。
+- **[結構以目前規模偏重：10 個 package 約 80 個設定檔]** → 在 README 的 Tradeoffs 照實說明，並寫下「如果是真實的 2 頁專案我不會從這裡開始」。
 - **[`catalog/data-access` 最可能先變肥：目前同時放商品、分類、限時搶購、暢銷榜、推薦]** → 觸發條件：出現第 2 種促銷型別或促銷有自己的後端 → 抽 `promotion/data-access`。見 `docs/architecture.md` §5。
 - **[`shared/ui` 長大後 `nx affected` 失去意義]** → 觸發條件：元件超過約 15 個 → 依元件家族拆分。
 - **[scope 放行清單隨時間腐化，最後誰都能依賴誰]** → 新增任何放行前必須先修改 ADR-0006；`CLAUDE.md` 明令 agent 不得為了讓 lint 通過而修改規則。
-- **[標籤寫壞的 lib 會靜默地不受任何規則約束，lint 仍是綠的]** → 建立 lib 時真的發生過。`pnpm verify:boundaries` 檢查標籤格式，並已驗證會在標籤壞掉時報紅。
+- **[標籤寫壞的 package 會靜默地不受任何規則約束，lint 仍是綠的]** → 建立 package 時真的發生過。`pnpm verify:boundaries` 檢查標籤格式，並已驗證會在標籤壞掉時報紅。
 - **[跨專案 import 需要三個動作才會成立：宣告 `workspace:*` 依賴、`pnpm install`、`nx sync`；漏掉任何一個，型別檢查或 Nx 的同步檢查會失敗]** → pnpm 的嚴格 `node_modules` 不會讓未宣告的 workspace 套件被解析到，這其實是好事（依賴必須明說）。做法寫成 `tasks.md` 的 4.0，並列入 `CLAUDE.md`。
 - **[Tailwind 的任意值語法 `text-[#d62872]` 仍能繞過 token]** → 目前靠 review 與 `CLAUDE.md` 的規則；要工具化可加一條 lint 規則禁止 className 出現 `[#`。
 - **[通用 block 的 props 會隨需求膨脹]** → 某個區塊的特例超過 2–3 個時，把它升級成自己的 feature，而不是繼續加 props。
 - **[純版面區塊沒有單元測試]** → 刻意的取捨：這些區塊沒有邏輯，測試只會驗證 JSX 長什麼樣。視覺正確性交給截圖對照與（P2）Playwright smoke test。
 - **[Repository 層不驗證 HTTP 細節]** → 有真實 API 契約後再引入 MSW 做 contract test，接在 HTTP 實作後面，與本設計不衝突。
-- **[空的 lib 設了 `passWithNoTests`，日後測試被誤刪不會被發現]** → 每個 lib 加入第一個 spec 時移除這一行，列入 `tasks.md`。
+- **[空的 package 設了 `passWithNoTests`，日後測試被誤刪不會被發現]** → 每個 package 加入第一個 spec 時移除這一行，列入 `tasks.md`。
 
 ## Migration Plan
 

@@ -72,7 +72,7 @@ export const FOOTER_COLUMNS: { heading: string; items: string[] }[] = [
 
 export const APP_COLUMN_HEADING = '行動購物APP';
 
-// Relative to the document base (<base href> in index.html), so the libs do
+// Relative to the document base (<base href> in index.html), so the packages do
 // not need to know under which sub-path the app is deployed.
 export const LOGO_SRC = 'assets/brand/momo-logo.png';
 export const APP_QR_SRC = 'assets/footer/app-qr.jpg';

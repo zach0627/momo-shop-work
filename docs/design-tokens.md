@@ -1,6 +1,6 @@
 # 設計 Token
 
-顏色、字級、圓角、陰影都不寫死在元件裡，而是走兩層 token。來源檔在 [`libs/shared/ui/src/styles/`](../libs/shared/ui/src/styles)。
+顏色、字級、圓角、陰影都不寫死在元件裡，而是走兩層 token。來源檔在 [`packages/shared/ui/src/styles/`](../packages/shared/ui/src/styles)。
 
 ## 兩層結構
 

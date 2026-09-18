@@ -16,10 +16,10 @@ context: |
 
   ## 為什麼這樣設置
   - 用 2 個頁面的實作，展示一套在 30 個頁面、5 個團隊時仍能運作的結構。
-    以目前規模這個結構是偏重的（10 個 lib 約 80 個設定檔）；這是刻意的選擇，
+    以目前規模這個結構是偏重的（10 個 package 約 80 個設定檔）；這是刻意的選擇，
     代價照實寫在 README 的 Tradeoffs 與 docs/adr/0002。
   - Nx 23 + pnpm workspaces + TypeScript project references。1 個薄殼 app + 依
-    domain 與職責切分的 libs。選 Nx 是因為依賴方向可以由 lint 強制，而不是靠 review。
+    domain 與職責切分的 packages。選 Nx 是因為依賴方向可以由 lint 強制，而不是靠 review。
   - SPA（React 19 + Vite）而非 Next：mock-only 沒有 SEO 需求、可靜態部署。
     遷移路徑靠「router 只存在於 app」保留（docs/adr/0001）。
   - 不安裝全域 store：兩個頁面都是展示用，盤點後全域 client state 為 0（docs/adr/0003）。
@@ -30,8 +30,8 @@ context: |
   ## 不能破的規則（細節見 openspec/specs/module-boundaries 與 CLAUDE.md）
   - 依賴方向：app → layout / page → feature → ui / data-access → util。feature ✗ feature，
     data-access ✗ data-access；只有 layout 與 page 可以組合多個 feature，兩者同層、互不依賴。
-  - react-router 只准出現在 apps/shop；embla 只准出現在 libs/shared/ui。
-  - Rule of Two：被 ≥2 個專案使用的東西才能進 shared/*；其餘留在該 lib 私有的
+  - react-router 只准出現在 apps/shop；embla 只准出現在 packages/shared/ui。
+  - Rule of Two：被 ≥2 個專案使用的東西才能進 shared/*；其餘留在該 package 私有的
     ui/ 或 model/，不從 index.ts 匯出。
   - shared/ui 不認識 domain model，只宣告自己需要的最小形狀。
   - 不可為了讓 lint 通過而修改 depConstraints；新增 scope 放行前先改 docs/adr/0006。
@@ -57,13 +57,13 @@ rules:
   tasks:
     - 一個任務群組對應一個 commit；每個任務都要寫明怎麼驗證完成。
     - 有邏輯的任務先寫測試並確認因正確的理由失敗，再實作。
-    - 任務若讓某個 lib 出現第一個 spec，要同時移除該 lib 的 passWithNoTests。
+    - 任務若讓某個 package 出現第一個 spec，要同時移除該 package 的 passWithNoTests。
 
 operations:
   apply:
     guidance:
       - 驗證關卡使用 --skip-nx-cache 與 --parallel=1；貼出實際輸出，失敗照實說，讀錯誤訊息分辨是程式碼還是環境的問題。
-      - 一個 lib 要 import 另一個 lib 時，先在自己的 package.json 宣告 workspace:* 依賴並執行 nx sync，再跑 pnpm verify:boundaries。
+      - 一個 package 要 import 另一個 package 時，先在自己的 package.json 宣告 workspace:* 依賴並執行 nx sync，再跑 pnpm verify:boundaries。
       - 完成一個任務立刻把 tasks.md 的 - [ ] 改成 - [x]；偏離計畫的地方記在 docs/agent-workflow.md。
   archive:
     guidance:

@@ -48,7 +48,7 @@ layout 與 page 是同一層的兩種角色：layout 是跨頁保留的外框，
 
 ### Requirement: Domain 之間的依賴受限
 
-每個 lib SHALL 屬於恰好一個 domain（scope）。一個 domain MUST 只能依賴 `docs/architecture.md` §3 的 scope 表所列的 domain。lint 設定中的 scope 規則 MUST 與該表一致。
+每個 package SHALL 屬於恰好一個 domain（scope）。一個 domain MUST 只能依賴 `docs/architecture.md` §3 的 scope 表所列的 domain。lint 設定中的 scope 規則 MUST 與該表一致。
 
 新增 domain 之間的放行屬於設計決定，治理方式見 `docs/adr/0006-domain-dependency-map.md`。
 
@@ -66,9 +66,9 @@ layout 與 page 是同一層的兩種角色：layout 是跨頁保留的外框，
 
 路由套件 SHALL 只能在 app 專案中被 import；輪播套件 SHALL 只能在共用 ui 專案中被 import。其他專案 import 它們時 MUST 被 lint 擋下，且錯誤訊息 MUST 說明正確的做法。
 
-#### Scenario: lib 直接使用路由套件
+#### Scenario: package 直接使用路由套件
 
-- **WHEN** 任何 lib import 路由套件
+- **WHEN** 任何 package import 路由套件
 - **THEN** lint 失敗，錯誤指出應以 props 接收路由參數、以共用的連結元件導頁
 
 #### Scenario: 共用 ui 以外的專案使用輪播套件
@@ -81,9 +81,9 @@ layout 與 page 是同一層的兩種角色：layout 是跨頁保留的外框，
 - **WHEN** app 專案 import 路由套件
 - **THEN** lint 通過
 
-### Requirement: 只能透過公開入口使用一個 lib
+### Requirement: 只能透過公開入口使用一個 package
 
-一個 lib 對外 SHALL 只提供其公開入口匯出的內容。其他專案 MUST NOT 引用 lib 內部的檔案，不論是透過相對路徑或是套件名稱加上內部路徑。
+一個 package 對外 SHALL 只提供其公開入口匯出的內容。其他專案 MUST NOT 引用 package 內部的檔案，不論是透過相對路徑或是套件名稱加上內部路徑。
 
 #### Scenario: 以相對路徑引用另一個專案的檔案
 
@@ -92,12 +92,50 @@ layout 與 page 是同一層的兩種角色：layout 是跨頁保留的外框，
 
 #### Scenario: 以套件名稱加內部路徑引用
 
-- **WHEN** 一個專案以「套件名稱 + 內部路徑」import 另一個 lib 未公開的檔案
-- **THEN** 型別檢查失敗，回報找不到該模組（lib 只公開它的入口）
+- **WHEN** 一個專案以「套件名稱 + 內部路徑」import 另一個 package 未公開的檔案
+- **THEN** 型別檢查失敗，回報找不到該模組（package 只公開它的入口）
 
-### Requirement: 共用 lib 只收被多處使用的程式碼
+#### Scenario: 樣式經由公開入口引用
 
-元件或函式 SHALL 在被兩個以上的專案使用時，才能放進共用 lib。只有一個使用者的，MUST 留在該專案內且不從公開入口匯出。
+- **WHEN** app 的樣式以套件名稱引用共用 ui 公開的樣式入口
+- **THEN** 建置成功
+
+#### Scenario: 引用未公開的樣式檔
+
+- **WHEN** 一個專案的樣式以套件名稱加內部路徑，引用另一個 package 未公開的樣式檔
+- **THEN** 建置失敗，錯誤指出該路徑沒有被公開
+
+### Requirement: package 宣告自己使用的依賴
+
+每個專案 SHALL 在自己的清單中宣告其原始碼 import 的所有外部套件與 workspace package，MUST NOT 依賴根目錄替它提供。宣告了卻沒有使用的依賴 MUST 同樣被回報。同一個外部套件在整個 workspace MUST 只有一個版本。
+
+測試檔與工具設定檔不在此限：測試與建置工具由根目錄統一提供。
+
+已知的限制：檢查只認得明寫的 import。只寫 JSX 而沒有明寫 import react 的 package，需要在自己的設定中對 react 放行；放行之後，它漏宣告 react 時不會被發現。
+
+#### Scenario: 使用了卻沒有宣告
+
+- **WHEN** 一個 package 的原始碼 import 一個外部套件，而它的清單沒有宣告該套件
+- **THEN** lint 失敗，錯誤指出缺少哪個套件
+
+#### Scenario: 沒有宣告 workspace package
+
+- **WHEN** 一個專案 import 另一個 workspace package，而它的清單沒有宣告該 package
+- **THEN** lint 失敗，錯誤指出缺少哪個 package
+
+#### Scenario: 宣告了卻沒有使用
+
+- **WHEN** 一個 package 的清單宣告了一個它的原始碼沒有 import 的套件
+- **THEN** lint 失敗，錯誤指出哪個套件沒有被使用
+
+#### Scenario: 整個 workspace 只有一個版本
+
+- **WHEN** 檢視安裝結果中 react 的實體數量
+- **THEN** 只有一份，且每個宣告它的專案都連結到同一份
+
+### Requirement: 共用 package 只收被多處使用的程式碼
+
+元件或函式 SHALL 在被兩個以上的專案使用時，才能放進共用 package。只有一個使用者的，MUST 留在該專案內且不從公開入口匯出。
 
 這一條由 review 把關而非工具強制；公開入口的限制（上一條）讓「偷用別人的私有元件」不可能發生，所以需要共用時只能走升級這條路。
 
@@ -117,14 +155,19 @@ layout 與 page 是同一層的兩種角色：layout 是跨頁保留的外框，
 
 ### Requirement: 約束本身被自動驗證
 
-系統 SHALL 提供一個可重複執行的檢查，確認：每個專案的標籤格式正確且不會被發佈、每個專案實際套用的 lint 設定都啟用了依賴規則、框架放行只發生在指定的專案、以及專案依賴圖的每一條依賴都符合規則。任何一項不符時 MUST 以非零狀態結束並指出是哪個專案。
+系統 SHALL 提供一個可重複執行的檢查，確認：每個專案的標籤格式正確且不會被發佈、每個專案實際套用的 lint 設定都啟用了依賴規則、框架放行只發生在指定的專案、依賴宣告的檢查對每個專案都真的在運作、以及專案依賴圖的每一條依賴都符合規則。任何一項不符時 MUST 以非零狀態結束並指出是哪個專案。
 
-標籤寫壞的 lib 會靜默地不受任何規則約束，而 lint 依然通過 —— 這是這項檢查存在的原因。
+標籤寫壞的 package 會靜默地不受任何規則約束，而 lint 依然通過 —— 這是這項檢查存在的原因。
 
 #### Scenario: 標籤寫壞
 
-- **WHEN** 某個 lib 的標籤格式錯誤（例如兩個標籤被合併成一個字串）
-- **THEN** 檢查以非零狀態結束，並指出該 lib 與錯誤內容
+- **WHEN** 某個 package 的標籤格式錯誤（例如兩個標籤被合併成一個字串）
+- **THEN** 檢查以非零狀態結束，並指出該 package 與錯誤內容
+
+#### Scenario: 依賴宣告的檢查開著卻沒有作用
+
+- **WHEN** 依賴宣告的檢查被設定成比對某個專案所沒有的工作目標
+- **THEN** 檢查以非零狀態結束，並指出該專案的依賴宣告沒有被檢查
 
 #### Scenario: 全部符合
 

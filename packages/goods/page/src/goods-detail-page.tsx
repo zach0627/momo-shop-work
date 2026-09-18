@@ -1,5 +1,5 @@
 export interface GoodsDetailPageProps {
-  /** Comes from the route. Reading the URL is the app's job, not this lib's. */
+  /** Comes from the route. Reading the URL is the app's job, not this package's. */
   goodsId: string;
 }
 

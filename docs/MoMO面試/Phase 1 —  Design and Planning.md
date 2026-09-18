@@ -76,9 +76,10 @@ D:\repo\momo素材
 > 版本：**v2**（2026-09-18，經自我審查後定案）｜實作 repo：`D:\repo\momo-shop-work`
 > 本段會同步成 repo 的 `docs/architecture.md` 與 `docs/adr/*`，給面試官看。
 
-> [!note] v2 之後的兩次修訂（2026-09-18，都是 Human 質疑後才改的，下文已一併更新）
+> [!note] v2 之後的三次修訂（2026-09-18 ~ 19，都是 Human 質疑後才改的，下文已一併更新）
 > 1. 全站外框的 lib 由 `shell` 改名為 `layout`：「shell library」在 Nx 社群另有所指，而這個 lib 就是一般所說的 layout。
-> 2. `libs/layout/feature` → **`libs/shop/layout`**，並新增 **`type:layout`** 一層。路徑的寫法是 `libs/<誰的>/<哪一種>`，「layout」是種類而不是擁有者；而且外框與 `page` 同層（只有 router 會 import 它、它包住 page），標成 `feature` 會讓它無法組合別的 domain 的 feature。
+> 2. `layout/feature` → **`shop/layout`**，並新增 **`type:layout`** 一層。路徑的寫法是 `<誰的>/<哪一種>`，「layout」是種類而不是擁有者；而且外框與 `page` 同層（只有 router 會 import 它、它包住 page），標成 `feature` 會讓它無法組合別的 domain 的 feature。是否該改放 `apps/shop/src/layouts` 或改用 Nx 的 `feature-shell`，查證後維持原位置（ADR-0007）。
+> 3. **`libs/` → `packages/`**，而且不只是改名（ADR-0008）：每個專案本來就是 pnpm workspace package，所以照 package 的規矩來 —— 保留依 domain 分組、拿掉 package 內部的 `src/lib/`、樣式也只能透過 `exports` 取得、`src/` import 什麼就在自己的 `package.json` 宣告什麼（版本由 pnpm catalog 統一，`@nx/dependency-checks` 強制）。
 
 > [!note] v1 → v2 自我審查修正了什麼
 > 1. `shared/ui` 不認識 domain model：`ProductCard` 只宣告最小形狀 `ProductCardItem`，`Product` 靠 structural typing 傳入（v1 照寫會變成 ui → data-access 違規依賴）。
@@ -88,7 +89,7 @@ D:\repo\momo素材
 > 5. 限時搶購 `endsAt` 不寫死在 fixture：mock repository 注入 `now()`。
 > 6. 交付順序改 **walking skeleton 先行**；goods detail 排在 flash-sale / ranking 之前（前者不可砍、後者可砍）。
 > 7. design tokens 從 app 移到 `shared/ui/styles/theme.css`（token 屬於 design system）。
-> 8. 用字：13 個業務區塊 = 15 筆 section 設定；Rule of Two 計數單位是 project（lib 或 app）。
+> 8. 用字：13 個業務區塊 = 15 筆 section 設定；Rule of Two 計數單位是 project（package 或 app）。
 
 ### 0. 範圍（Scope）— 先講不做什麼
 
@@ -102,11 +103,11 @@ D:\repo\momo素材
 ### 1. 設計原則（所有決策都回到這 5 條）
 
 1. **依賴方向單向且由 lint 強制**：`app → layout / page → feature → ui / data-access → util`，不是靠自律。
-2. **切 lib 的準則**：「有自己的邏輯 / 自己的資料 / 首頁以外會被重用」才獨立成 feature lib；純 CMS 圖片區塊不拆（避免空殼 lib）。
-   - **Rule of Two（共用門檻）**：元件 / 函式**被 ≥2 個 project（lib 或 app）使用**才能進 `shared/ui`、`shared/util`。只有自己用的，一律放該 lib 自己的 `ui/`（展示）或 `model/`（邏輯、hooks），且**不從 `index.ts` 匯出**（= lib 私有）。
-   - **升級路徑**：feature 私有 → 出現第 2 個使用者 → 只在同 domain 共用升到 `libs/<scope>/ui`，跨 domain 才升到 `shared/ui`。
+2. **切 package 的準則**：「有自己的邏輯 / 自己的資料 / 首頁以外會被重用」才獨立成 feature package；純 CMS 圖片區塊不拆（避免空殼 package）。
+   - **Rule of Two（共用門檻）**：元件 / 函式**被 ≥2 個 project（package 或 app）使用**才能進 `shared/ui`、`shared/util`。只有自己用的，一律放該 package 自己的 `ui/`（展示）或 `model/`（邏輯、hooks），且**不從 `index.ts` 匯出**（= package 私有）。
+   - **升級路徑**：feature 私有 → 出現第 2 個使用者 → 只在同 domain 共用升到 `packages/<scope>/ui`，跨 domain 才升到 `shared/ui`。
    - **由工具強制**：Nx boundary rule 禁止 deep import（只能走 `index.ts`）+ 禁止 feature ✗ feature，想偷用別人的私有元件會直接 lint error。
-   - feature / page lib 內部統一結構：`<name>.tsx`（container：抓資料 + 組合）｜`ui/`（私有展示）｜`model/`（私有邏輯）｜`index.ts` 只匯出 container。
+   - feature / page package 內部統一結構：`<name>.tsx`（container：抓資料 + 組合）｜`ui/`（私有展示）｜`model/`（私有邏輯）｜`index.ts` 只匯出 container。
 3. **首頁是資料驅動（config-driven）**：區塊順序與內容來自 `HomeSection[]`，不是寫死在 JSX。
 4. **框架耦合集中在一處**（皆以 `no-restricted-imports` 強制）：`react-router` 只准出現在 `apps/shop`；`embla-carousel-react` 只准出現在 `shared/ui`。換 Next / 換輪播套件只改一處。
 5. **資料走 Repository 接縫 + Context 注入**：UI 只認 hooks，hooks 只認 repository interface；用哪個實作由 composition root（`app/providers.tsx`）決定。mock → 真 API 只改那一行。
@@ -159,7 +160,7 @@ graph TD
 - `scope:` 規則：`home → home, catalog, shared`｜`goods → goods, catalog, shared`｜`shop → shop, catalog, shared`｜`catalog → catalog, shared`｜`shared → shared`
 - Import alias：`@momo/shared-ui`｜`@momo/shared-util`｜`@momo/catalog-data-access`｜`@momo/catalog-feature-recommendation`｜`@momo/home-data-access`｜`@momo/home-feature-flash-sale`｜`@momo/home-feature-ranking`｜`@momo/home-page`｜`@momo/goods-page`｜`@momo/shop-layout`
 
-### 4. 檔案架構（1 app + 10 libs）
+### 4. 檔案架構（1 app + 10 packages）
 
 > `home/data-access` 與 `catalog/data-access` 分開的原因：首頁版位（CMS）與商品目錄（Catalog）在真實電商是兩個不同的後端來源，混在一起之後最難拆。兩者只靠 `collection` 字串 key 鬆耦合，互不 import。
 
@@ -169,7 +170,7 @@ momo-shop-work/
 │  ├─ public/assets/                       素材（資料夾改英文 slug，見 §7）
 │  └─ src/
 │     ├─ main.tsx
-│     ├─ styles.css                        @import tailwind + shared/ui theme.css；@source 掃 libs
+│     ├─ styles.css                        @import tailwind + shared/ui theme.css；@source 掃 packages
 │     └─ app/
 │        ├─ app.tsx
 │        ├─ providers.tsx                  ★ composition root：QueryClient(+onError→telemetry)
@@ -178,68 +179,66 @@ momo-shop-work/
 │        ├─ router-link.tsx                RR <Link> → shared/ui LinkProvider 的 adapter
 │        └─ routes/  home.route.tsx · goods.route.tsx(useParams → props) · not-found.route.tsx
 │
-├─ libs/shared/ui/                         type:ui  scope:shared   ★ 只收「≥2 個 project 在用」的元件
+├─ packages/shared/ui/                         type:ui  scope:shared   ★ 只收「≥2 個 project 在用」的元件
 │  └─ src/
 │     ├─ styles/theme.css                  @theme design tokens（品牌粉、價格紅、容器寬、圓角）
-│     └─ lib/
-│        ├─ link/            LinkProvider + AppLink（預設 <a>）      使用者：ProductCard / layout / home blocks
-│        ├─ product-card/    ProductCardItem 型別 + 基底卡片 + slots（topBadge / promoText / footer / priceLabel）
-│        │                                                           使用者：home product-rail / flash-sale / ranking / recommendation
-│        ├─ price-tag/       售價 + 劃線原價                          使用者：ProductCard / goods-info
-│        ├─ carousel/        ★ 唯一 import embla（prev / next / dots / perView）
-│        │                                                           使用者：home hero·banner-carousel·product-rail / flash-sale
-│        ├─ section-header/                                          使用者：home blocks / ranking / recommendation
-│        └─ skeleton/        (P1)                                    使用者：home / recommendation / goods
+│     ├─ link/            LinkProvider + AppLink（預設 <a>）      使用者：ProductCard / layout / home blocks
+│     ├─ product-card/    ProductCardItem 型別 + 基底卡片 + slots（topBadge / promoText / footer / priceLabel）
+│     │                                                           使用者：home product-rail / flash-sale / ranking / recommendation
+│     ├─ price-tag/       售價 + 劃線原價                          使用者：ProductCard / goods-info
+│     ├─ carousel/        ★ 唯一 import embla（prev / next / dots / perView）
+│     │                                                           使用者：home hero·banner-carousel·product-rail / flash-sale
+│     ├─ section-header/                                          使用者：home blocks / ranking / recommendation
+│     └─ skeleton/        (P1)                                    使用者：home / recommendation / goods
 │
-├─ libs/shared/util/                       type:util  scope:shared   ★ 同樣套 Rule of Two
-│  └─ src/lib/
+├─ packages/shared/util/                       type:util  scope:shared   ★ 同樣套 Rule of Two
+│  └─ src/
 │     ├─ format-price.ts     使用者：PriceTag / goods-info
 │     ├─ paths.ts            URL 單一來源：paths.home()、paths.goods(id)、pattern 給 router      使用者：app router / 4 個商品區塊
 │     └─ telemetry.ts        reportError / track，sink 可替換（預設 console）                    使用者：home SectionRenderer / app providers
 │
-├─ libs/catalog/data-access/               type:data-access  scope:catalog
+├─ packages/catalog/data-access/               type:data-access  scope:catalog
 │  └─ src/
 │     ├─ index.ts
-│     ├─ testing.ts                        次要入口：createFakeCatalogRepository + 測試用 Provider wrapper
-│     └─ lib/
-│        ├─ models/          product.ts · flash-sale.ts · category.ts · page.ts（Page<T>{ items, nextOffset }）
-│        ├─ repository/      catalog-repository.ts（interface）
-│        │                   mock-catalog-repository.ts（createMockCatalogRepository({ now, latencyMs })）
-│        │                   catalog-repository-context.tsx（Provider + useCatalogRepository）
-│        ├─ fixtures/        products.generated.ts · collections.ts · categories.ts
-│        ├─ hooks/           use-product · use-product-collection · use-recommendations（infinite）
-│        │                   use-flash-sale · use-ranking · use-categories
-│        └─ query-keys.ts
-├─ libs/catalog/feature-recommendation/    type:feature  scope:catalog   你可能會喜歡（詳情頁日後可重用 → 放 catalog 不放 home）
-│  └─ src/lib/
+│     ├─ testing.ts                        次要入口（`exports` 的 `./testing`）：createFakeCatalogRepository + 測試用 Provider wrapper
+│     ├─ models/          product.ts · flash-sale.ts · category.ts · page.ts（Page<T>{ items, nextOffset }）
+│     ├─ repository/      catalog-repository.ts（interface）
+│     │                   mock-catalog-repository.ts（createMockCatalogRepository({ now, latencyMs })）
+│     │                   catalog-repository-context.tsx（Provider + useCatalogRepository）
+│     ├─ fixtures/        products.generated.ts · collections.ts · categories.ts
+│     ├─ hooks/           use-product · use-product-collection · use-recommendations（infinite）
+│     │                   use-flash-sale · use-ranking · use-categories
+│     └─ query-keys.ts
+├─ packages/catalog/feature-recommendation/    type:feature  scope:catalog   你可能會喜歡（詳情頁日後可重用 → 放 catalog 不放 home）
+│  └─ src/
 │     ├─ recommendation.tsx               container：useRecommendations + 組合
 │     ├─ ui/     recommendation-grid.tsx · load-more-button.tsx              ← 私有
 │     └─ model/  page-size.ts（ROWS_PER_LOAD 3 × COLUMNS 5 = 15）
 │
-├─ libs/home/data-access/                  type:data-access  scope:home
-│  └─ src/lib/  models/home-section.ts（HomeSection union · Banner · Shortcut）
+├─ packages/home/data-access/                  type:data-access  scope:home
+│  └─ src/  models/home-section.ts（HomeSection union · Banner · Shortcut）
 │               repository/ home-repository.ts · mock-home-repository.ts · home-repository-context.tsx
 │               fixtures/home-layout.ts · hooks/use-home-layout.ts
-├─ libs/home/feature-flash-sale/           type:feature  scope:home   限時搶購
-│  └─ src/lib/
+├─ packages/home/feature-flash-sale/           type:feature  scope:home   限時搶購
+│  └─ src/
 │     ├─ flash-sale.tsx                   container：useFlashSale；每張 slide = 10 件（5 × 2 grid）
 │     ├─ ui/     countdown.tsx · flash-sale-header.tsx · stock-left.tsx · grab-badge.tsx   ← 私有
 │     └─ model/  get-remaining.ts（純函式）· use-countdown.ts · chunk.ts
-├─ libs/home/feature-ranking/              type:feature  scope:home   今日暢銷榜
-│  └─ src/lib/  ranking.tsx · ui/rank-badge.tsx                                 ← 私有
-├─ libs/home/page/                         type:page  scope:home
-│  └─ src/lib/
+├─ packages/home/feature-ranking/              type:feature  scope:home   今日暢銷榜
+│  └─ src/  ranking.tsx · ui/rank-badge.tsx                                 ← 私有
+├─ packages/home/page/                         type:page  scope:home
+│  └─ src/
 │     ├─ home-page.tsx                    useHomeLayout → <SectionRenderer sections />
 │     ├─ section-renderer/  section-renderer.tsx（純：吃 sections props）· registry.ts · section-boundary.tsx(P1)
 │     └─ blocks/            hero · banner-carousel · banner-grid · shortcut-bar · notice · product-rail   ← 全部 page 私有
 │                           （product-rail = SectionHeader + Carousel + ProductCard + useProductCollection）
 │
-├─ libs/goods/page/                        type:page  scope:goods
-│  └─ src/lib/  goods-detail-page.tsx（props: goodsId；useProduct）
+├─ packages/goods/page/                        type:page  scope:goods
+│  └─ src/  goods-detail-page.tsx（props: goodsId；useProduct）
 │               ui/ goods-gallery · goods-info · goods-actions（純展示，無 handler）· goods-not-found   ← 私有
 │
-├─ libs/shop/layout/                       type:layout  scope:shop
-│  └─ src/lib/  app-layout.tsx（Header + children + Footer）
+├─ packages/shop/layout/                       type:layout  scope:shop
+│  └─ src/  app-layout.tsx（Header + children + Footer）
 │               ui/    top-bar（sticky；捲動後 compact 顯示搜尋框）· main-header（logo + 搜尋框展示）
 │                      category-nav（橫向分類 + 展開「選擇分類」面板）· footer                       ← 私有
 │               model/ use-compact-header.ts（IntersectionObserver）
@@ -251,7 +250,7 @@ momo-shop-work/
 └─ README.md
 ```
 
-每個 lib 只透過 `src/index.ts` 對外（public API）；測試檔 `*.spec.ts(x)` 與原始碼同層。
+每個 package 只透過 `src/index.ts` 對外（public API）；測試檔 `*.spec.ts(x)` 與原始碼同層。
 
 ### 5. 首頁 config-driven 設計
 
@@ -266,7 +265,7 @@ type HomeSection =
   | { id: string; type: 'shortcut-bar';    items: Shortcut[] }
   | { id: string; type: 'notice';          banner: Banner }
   | { id: string; type: 'product-rail';    title: string; collection: string }  // CMS 只給 key，商品由 catalog 提供
-  | { id: string; type: 'flash-sale';      title: string }   // ↓ 三個交給 feature lib，自己抓資料
+  | { id: string; type: 'flash-sale';      title: string }   // ↓ 三個交給 feature package，自己抓資料
   | { id: string; type: 'ranking';         title: string }
   | { id: string; type: 'recommendation';  title: string };
 ```
@@ -291,10 +290,10 @@ type HomeSection =
 | momo 店取 | `product-rail` | momo店快取 |
 | 信用卡加碼優惠 | `banner-carousel` | 信用卡加碼優惠 |
 | 猜你想搜 | `banner-grid`（caption = 關鍵字） | 猜你想搜 |
-| 限時搶購 | `flash-sale` → feature lib | 限時搶購 |
-| 今日暢銷榜 | `ranking` → feature lib | 今日暢銷榜 |
+| 限時搶購 | `flash-sale` → feature package | 限時搶購 |
+| 今日暢銷榜 | `ranking` → feature package | 今日暢銷榜 |
 | moPro 會員專屬價 | `product-rail`（日後有會員價邏輯再抽 feature） | momopro… |
-| 你可能會喜歡（3 列 + 看更多） | `recommendation` → feature lib | 你可能會喜歡 |
+| 你可能會喜歡（3 列 + 看更多） | `recommendation` → feature package | 你可能會喜歡 |
 
 時間不夠時的砍法：**從 `home-layout.ts` 刪一行**即可下架區塊，不用改元件。
 
@@ -353,7 +352,7 @@ interface CatalogRepository {
 Commit 切片（每片一個 commit，帶 `Co-Authored-By`）—— **walking skeleton 先行，不可砍的先做**：
 
 1. `chore:` Nx scaffold
-2. `chore:` 10 libs + tags + boundary rules + restricted imports
+2. `chore:` 10 packages + tags + boundary rules + restricted imports
 3. `docs:` architecture + ADR（設計先於實作，留在 git history）
 4. `feat(shop):` walking skeleton — router + providers + layout 空殼 + 兩個空頁面（此時兩條路由已可走通）
 5. `chore(assets):` 素材搬遷 + `gen-fixtures` + `catalog/data-access`（TDD #3）
@@ -373,7 +372,7 @@ Commit 切片（每片一個 commit，帶 `Co-Authored-By`）—— **walking sk
 | ADR | 決策 | 演進觸發條件 |
 |---|---|---|
 | 0001 | SPA（Vite）而非 Next | 需要 SEO / LCP → RR framework mode 或 Next；因 router 只在 app 層、Link 由 app 注入、資料走 Query，遷移面小 |
-| 0002 | 單一 app + domain libs | `/live`、`/discover`、商家後台由不同團隊負責 → 拆 multi-app / Module Federation |
+| 0002 | 單一 app + domain packages | `/live`、`/discover`、商家後台由不同團隊負責 → 拆 multi-app / Module Federation |
 | 0003 | 只有 TanStack Query，無全域 store | 出現購物車 / 會員 → 輕量 store；購物車 × 優惠券 × 結帳跨 domain → **Redux Toolkit**；state 一律包在 data-access hooks 後面，抽換不動 feature |
 | 0004 | 首頁 config-driven | 接 CMS API 時只換 `home/data-access` 的 repository 實作 |
 | 0005 | Repository + Context 注入，而非 MSW | 要做 contract test / 網路層模擬時再引入 MSW |
