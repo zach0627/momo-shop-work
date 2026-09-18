@@ -7,5 +7,12 @@
     "tags": [
       "type:app"
     ]
+  },
+  "dependencies": {
+    "@momo/goods-page": "workspace:*",
+    "@momo/home-page": "workspace:*",
+    "@momo/shared-ui": "workspace:*",
+    "@momo/shared-util": "workspace:*",
+    "@momo/shell-feature": "workspace:*"
   }
 }

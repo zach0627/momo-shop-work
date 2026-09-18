@@ -18,5 +18,9 @@
       "type:feature",
       "scope:shell"
     ]
+  },
+  "dependencies": {
+    "@momo/shared-ui": "workspace:*",
+    "@momo/shared-util": "workspace:*"
   }
 }
