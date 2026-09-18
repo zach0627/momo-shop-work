@@ -243,7 +243,7 @@ First Commit 至最後 Commit
 | 2 | 10 個 lib（`@nx/react:lib` ×9、`@nx/js:lib` ×1）+ tags；`depConstraints`（type 6 條 + scope 5 條）；`no-restricted-imports`（預設全禁，`apps/shop` 放行 router、`shared/ui` 放行 embla）；各 lib README 改寫為職責說明；移除用不到的 `.babelrc` 與範例碼 | `4e44054` |
 | — | 移除計畫中所有時間紀錄與時間預估；記錄「專案維持在 D: 槽」的決定 | `d4cfdd3` |
 | 3 | `docs/architecture.md`、ADR ×6（新增 0006：domain 依賴地圖）、`docs/agent-workflow.md`、專案自己的 `CLAUDE.md`、README（含照實寫的 Tradeoffs）；`tools/verify-boundaries.mjs` + `pnpm verify:boundaries`；9 個 lib 補上 `"private": true` | `b414f2e` |
-| — | 修正過期的 `pnpm-lock.yaml`（缺 8 個 lib 的 importer 條目 → 全新 clone 的 `--frozen-lockfile` 會失敗）；在乾淨環境驗證通過 | 見 git log |
+| — | 修正過期的 `pnpm-lock.yaml`（缺 8 個 lib 的 importer 條目 → 全新 clone 的 `--frozen-lockfile` 會失敗）；在乾淨環境驗證通過 | `43bff8d` |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -261,7 +261,9 @@ First Commit 至最後 Commit
 - 踩到的坑：PowerShell 會把 `--tags=a,b` 的逗號當陣列 → tags 變成單一字串、boundary 規則靜默失效。已修正並逐一核對 10 個 lib 的 tags。
 
 **環境備註（重要，影響所有後續步驟的耗時）**
-- 專案在 **D: 槽 = 5400 轉傳統硬碟**（C: 才是 NVMe SSD），且 Defender 即時掃描開啟 → 每個 Nx / Vitest 指令光讀檔就 30 秒以上（實測一個 0.5 秒的測試總耗時 34 秒）。與程式碼無關。
+- 開發機：i7-8750H（2018 筆電）、16 GB RAM；專案在 **D: 槽 = 5400 轉傳統硬碟**（C: 才是 NVMe SSD），Defender 即時掃描開啟 → 每個 Nx / Vitest 指令都很慢（實測一個 0.5 秒的測試總耗時 34 秒）。與程式碼無關。
+- **診斷修正**：起初歸因於傳統硬碟、預期搬到 SSD 快 5–10 倍 —— **錯了一半**。在 C: 複本實測：安裝快很多（50 秒 vs 3 分鐘），但跑測試沒有明顯變快。再量：CPU 100%、可用記憶體剩 1.5 GB（Chrome 佔大宗）。**真正的瓶頸是 CPU + 記憶體**，硬碟只是讓它更糟。→ 跑驗證前關掉不用的 Chrome 分頁會有感；一律 `--parallel=1`。
+- 失敗的 Nx 指令會留下孤兒 node 行程（曾發現 7 個掛了 23–55 分鐘），指令異常結束後要檢查並清掉。
 - 目前的因應：`NX_DAEMON=false` + `NX_ISOLATE_PLUGINS=false`（否則 plugin worker 會連線逾時）、`--parallel=1`（否則 Vitest worker 會逾時）。
 - **決定：專案維持在 D: 槽，不搬移。** 以上述參數因應，並善用 Nx 快取（只有驗證關卡才加 `--skip-nx-cache`）。
 - **C: 槽測試複本（僅供跑測試）**：`C:\Users\Zach\momo-shop-work-mirror`。**D: 是唯一的基準** —— 只在 D: 編輯與 commit；複本沒有 `.git`，無法從那裡 commit。同步方向只有 D: → C:：

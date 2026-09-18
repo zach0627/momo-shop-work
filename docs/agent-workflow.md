@@ -65,16 +65,21 @@ Human 要求 Agent 在定案前重新審查自己的設計。Agent 找到 8 個�
 
 ## 6. 環境備註
 
-專案位於 5400 轉的傳統硬碟（系統碟才是 NVMe SSD），且防毒即時掃描開啟。`node_modules` 有數萬個小檔，導致每個 Nx / Vitest 指令光讀檔就 30 秒以上 —— 實測一個 0.5 秒的測試總耗時 34 秒（import 16 秒 + jsdom 環境 16 秒）。**與程式碼無關。**
+開發機是 2018 年的筆電（i7-8750H、16 GB RAM），專案位於 5400 轉的傳統硬碟，防毒即時掃描開啟。每個 Nx / Vitest 指令都很慢 —— 實測一個 0.5 秒的測試總耗時 34 秒（import 16 秒 + jsdom 環境 16 秒）。**與程式碼無關。**
 
-決定：專案維持在原磁碟。因應方式：
+**診斷被修正過一次，值得記下來。** Agent 起初把原因歸給傳統硬碟，並預期搬到 SSD 會快 5–10 倍。在 SSD 上建立測試複本後實測：安裝依賴確實快很多（50 秒 vs 3 分鐘），但跑測試沒有明顯變快。再量才發現 CPU 負載 100%、可用記憶體只剩 1.5 GB —— **真正的瓶頸是 CPU 與記憶體**（每個 Vitest 行程都要起一個 jsdom，Nx 預設同時跑 3 個 task，再加上 daemon 與 plugin worker），硬碟只是讓它更糟。教訓：先量再下結論；第一個看起來合理的原因不一定是主因。
+
+決定：專案維持在原磁碟（基準）。另有一份放在 SSD 的測試複本，**只用來跑安裝與測試**：單向同步（基準 → 複本）、複本沒有 `.git` 所以無法從那裡 commit。它同時是一個沒有 `node_modules` 的乾淨環境，第一次使用就抓到 lockfile 過期的假綠燈（見 §4）。
+
+因應方式：
 
 ```bash
 NX_DAEMON=false NX_ISOLATE_PLUGINS=false pnpm nx run-many -t lint test typecheck --parallel=1
 ```
 
 - `NX_ISOLATE_PLUGINS=false`：否則 plugin worker 子行程無法在 30 秒內連線而載入失敗。
-- `--parallel=1`：否則 Vitest worker 啟動逾時。
+- `--parallel=1`：否則 Vitest worker 啟動逾時，而且同時跑多個 jsdom 會把 CPU 與記憶體吃滿。
 - 日常開發使用 Nx 快取；只有驗證關卡才加 `--skip-nx-cache`。
+- 失敗的 Nx 指令會留下孤兒 node 行程（曾發現 7 個掛了 23–55 分鐘），它們會持續佔用資源讓後續指令更慢。指令異常結束後要檢查並清掉。
 
-在一般的 SSD 環境不需要這些參數。
+在資源充足的機器上不需要這些參數。
