@@ -11,7 +11,6 @@ export default defineConfig(() => ({
   test: {
     name: 'shared-ui',
     watch: false,
-    passWithNoTests: true,
     globals: true,
     environment: 'jsdom',
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
