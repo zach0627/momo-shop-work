@@ -1,6 +1,6 @@
 # Tasks
 
-> 與 `docs/MoMO面試/Phase 2 — Implementation.md` 的 13 個步驟一一對應（每組 = 一個 commit）。
+> 與 `docs/MoMO面試/Phase 2 — Implementation.md` 的 13 個步驟一一對應（組號 = Step 編號）。改動大的步驟會拆成多個 commit，每個 commit 單獨為綠。
 > 規格見 `specs/`（本 change 新增的行為）與主規格 `openspec/specs/module-boundaries/`（所有任務都必須遵守的既有約束），做法見 `design.md`。有邏輯的任務先寫 spec、確認紅燈且理由正確，再實作到綠燈。
 
 ## 1. Workspace（Step 1）
@@ -34,26 +34,30 @@
 - [x] 4.7 以瀏覽器量測真實網站（首頁與商品詳情頁）的計算樣式，建立兩層 design token（`tokens.primitive.css` / `tokens.semantic.css`）並關閉 Tailwind 預設色盤與字級；驗證：建置產物含 semantic utility、`--color-brand` 指向 primitive、不含 `--color-pink-600` 與 `--text-sm`；dev server 上量到 logo `#d62872`、footer `#09355d`、內容寬 1220px、字體堆疊與真站一致；對照表記錄於 `docs/design-tokens.md`
 - [x] 4.8 補上 generator 漏掉的 DOM 型別庫：app 與 9 個 React lib 的 tsconfig 設 `lib: [es2022, dom, dom.iterable]`；驗證：`typecheck` 從失敗（TS2812：`HTMLElement` 沒有 `getAttribute`）變為通過
 
-## 5. 素材與商品資料（Step 5）
+## 5. Layout（Step 5）
 
-- [ ] 5.1 將 `D:\repo\momo素材` 依 slug 對照搬到 `apps/shop/public/assets/`（只搬用得到的）；驗證：圖片路徑無中文、總大小記錄在 commit 訊息
-- [ ] 5.2 `tools/gen-fixtures.mjs` 由素材產生 `products.generated.ts`、`collections.ts`、`categories.ts`（40 個分類，順序依截圖 `02-category-panel-expanded.png`）；驗證：連續執行兩次產出完全相同（spec `product-catalog`「資料是決定性的」「查詢分類清單」）
-- [ ] 5.3 TDD：`createMockCatalogRepository({ now, latencyMs })`；驗證：spec 涵蓋商品存在 / 不存在、未知集合回空清單、分頁 `nextOffset` 與最後一頁、`endsAt` 晚於注入的 `now`（spec `product-catalog`）
-- [ ] 5.4 `CatalogRepositoryProvider`、`useCatalogRepository`、6 個 query hooks、`query-keys.ts`、`testing.ts`（fake repository + wrapper）；於 app 的 providers 注入 mock；驗證：`nx test catalog-data-access` 通過
+> 原本排在共用元件之後。layout 是每一頁的骨架，所以提前到 walking skeleton 之後；原第 5、6 組順延為第 6、7 組。
 
-## 6. 共用元件（Step 6）
+- [ ] 5.1 量測真實網站「選擇分類」展開面板的樣式（膠囊底色、字色、圓角、間距），加入兩層 token 並記錄到 `docs/design-tokens.md`；驗證：建置產物含新的 semantic utility
+- [ ] 5.2 搬移 layout 需要的素材（logo、footer 用圖）到 `apps/shop/public/assets/`，資產路徑採相對於文件 base 的寫法（`assets/...`）；驗證：dev server 上圖片在 `/` 與 `/goods/:id` 都載入成功
+- [ ] 5.3 TDD：`category-nav` —— 橫向分類列、「首頁」為作用中、展開 / 收合「選擇分類」面板；分類清單暫放本 lib 私有的 `model/`；驗證：spec 檢查 `aria-expanded` 的兩個狀態與面板列出全部分類（spec `app-layout`「分類導覽可展開與收合」），並移除本 lib 的 `passWithNoTests`
+- [ ] 5.4 TDD：`search-box` —— 可輸入、送出時不導頁；驗證：spec 確認 submit 事件被 `preventDefault`（spec `app-layout`「搜尋框為展示用」）
+- [ ] 5.5 TDD：`AppLayout` 的 compact 行為 —— 主 header 離開視窗時頂部列出現搜尋框、回到視窗時恢復；以替身 `IntersectionObserver` 驅動；驗證：spec 通過（spec `app-layout`「頂部列在捲動時保留並轉為 compact」）
+- [ ] 5.6 `top-bar`（`position: fixed`、高 40px，版面預留空間）、`main-header`（logo 連回首頁 + 搜尋框 + 熱搜關鍵字）、`footer`（防詐騙提醒框 + 六欄連結）；全部為 lib 私有，`index.ts` 只匯出 `AppLayout`；驗證：dev server 實際捲動確認頂部列保留並轉 compact；切到 `/goods/:id` 外框仍在；以 `getComputedStyle` 抽查數值與真站一致；與截圖 `01`–`04`、`15` 對照
 
-- [ ] 6.1 TDD：`formatPrice`（`49900 → "49,900"`、`0`）；驗證：spec 通過
-- [ ] 6.2 TDD：`PriceTag` —— 有原價才顯示劃線價；驗證：兩個情境的 spec 通過（spec `home-page`「商品卡顯示售價與原價」）
-- [ ] 6.3 TDD：`ProductCard`（`ProductCardItem` 最小形狀、連到 `paths.goods(id)`、slots）；驗證：spec 通過，且 `shared/ui` 內沒有任何 data-access 的 import（spec `module-boundaries`「共用 ui 不認識 domain 資料型別」）
-- [ ] 6.4 安裝 `embla-carousel-react`，實作 `Carousel`（prev / next / dots / `perView`）與 `SectionHeader`；驗證：`nx lint shared-ui` 通過、其他 lib import embla 時被擋
+## 6. 素材與商品資料（Step 6）
 
-## 7. 全站外框（Step 7）
+- [ ] 6.1 將 `D:\repo\momo素材` 其餘的素材依 slug 對照搬到 `apps/shop/public/assets/`（只搬用得到的）；驗證：圖片路徑無中文、總大小記錄在 commit 訊息
+- [ ] 6.2 `tools/gen-fixtures.mjs` 由素材產生 `products.generated.ts`、`collections.ts`、`categories.ts`（40 個分類，**從 layout lib 的私有清單搬過來**，`AppLayout` 改讀 `useCategories`）；驗證：連續執行兩次產出完全相同（spec `product-catalog`「資料是決定性的」「查詢分類清單」）
+- [ ] 6.3 TDD：`createMockCatalogRepository({ now, latencyMs })`；驗證：spec 涵蓋商品存在 / 不存在、未知集合回空清單、分頁 `nextOffset` 與最後一頁、`endsAt` 晚於注入的 `now`（spec `product-catalog`）
+- [ ] 6.4 `CatalogRepositoryProvider`、`useCatalogRepository`、6 個 query hooks、`query-keys.ts`、`testing.ts`（fake repository + wrapper）；於 app 的 providers 注入 mock；驗證：`nx test catalog-data-access` 通過
 
-- [ ] 7.1 `top-bar`（sticky，主 header 捲出後轉 compact 並顯示搜尋框）；驗證：dev server 手動捲動確認（spec `app-layout`「頂部列在捲動時保留並轉為 compact」）
-- [ ] 7.2 `main-header`：logo 連回首頁、搜尋框為展示用；驗證：從詳情頁點 logo 回到 `/`，送出搜尋時網址不變
-- [ ] 7.3 TDD：`category-nav` 的展開與收合；驗證：spec 檢查 `aria-expanded` 的兩個狀態（spec `app-layout`「分類導覽可展開與收合」）
-- [ ] 7.4 `footer`；驗證：與截圖 `docs/pictures/15-footer.png` 對照
+## 7. 共用元件（Step 7）
+
+- [ ] 7.1 TDD：`formatPrice`（`49900 → "49,900"`、`0`）；驗證：spec 通過
+- [ ] 7.2 TDD：`PriceTag` —— 有原價才顯示劃線價；驗證：兩個情境的 spec 通過（spec `home-page`「商品卡顯示售價與原價」）
+- [ ] 7.3 TDD：`ProductCard`（`ProductCardItem` 最小形狀、連到 `paths.goods(id)`、slots）；驗證：spec 通過，且 `shared/ui` 內沒有任何 data-access 的 import（spec `module-boundaries`「共用 ui 不認識 domain 資料型別」）
+- [ ] 7.4 安裝 `embla-carousel-react`，實作 `Carousel`（prev / next / dots / `perView`）與 `SectionHeader`；驗證：`nx lint shared-ui` 通過、其他 lib import embla 時被擋
 
 ## 8. 首頁（Step 8）
 

@@ -76,6 +76,8 @@ D:\repo\momo素材
 > 版本：**v2**（2026-09-18，經自我審查後定案）｜實作 repo：`D:\repo\momo-shop-work`
 > 本段會同步成 repo 的 `docs/architecture.md` 與 `docs/adr/*`，給面試官看。
 
+> [!note] v2 之後的更名：全站外框的 lib 由 `shell` 改為 `layout`（2026-09-18）。「shell library」在 Nx 社群另有所指，而這個 lib 就是一般所說的 layout。下文已一併更新。
+
 > [!note] v1 → v2 自我審查修正了什麼
 > 1. `shared/ui` 不認識 domain model：`ProductCard` 只宣告最小形狀 `ProductCardItem`，`Product` 靠 structural typing 傳入（v1 照寫會變成 ui → data-access 違規依賴）。
 > 2. 補上 `paths`（URL 單一來源），避免各 feature 手寫 `/goods/${id}`。
@@ -129,14 +131,14 @@ D:\repo\momo素材
 ```mermaid
 graph TD
   APP[apps/shop<br/>type:app] --> PAGE[home/page · goods/page<br/>type:page]
-  APP --> SHELL[shell/feature<br/>type:feature]
+  APP --> LAYOUT[layout/feature<br/>type:feature]
   PAGE --> FEAT[feature-flash-sale · feature-ranking<br/>feature-recommendation<br/>type:feature]
   PAGE --> UI
   PAGE --> DA
   FEAT --> UI[shared/ui<br/>type:ui]
   FEAT --> DA[catalog/data-access · home/data-access<br/>type:data-access]
-  SHELL --> UI
-  SHELL --> DA
+  LAYOUT --> UI
+  LAYOUT --> DA
   UI --> UTIL[shared/util<br/>type:util]
   DA --> UTIL
 ```
@@ -150,8 +152,8 @@ graph TD
 | `data-access` | util | 型別、repository interface + 實作、query hooks、fixtures；**data-access ✗ data-access** |
 | `util` | util | 純函式 |
 
-- `scope:` 規則：`home → home, catalog, shared`｜`goods → goods, catalog, shared`｜`shell → shell, catalog, shared`｜`catalog → catalog, shared`｜`shared → shared`
-- Import alias：`@momo/shared-ui`｜`@momo/shared-util`｜`@momo/catalog-data-access`｜`@momo/catalog-feature-recommendation`｜`@momo/home-data-access`｜`@momo/home-feature-flash-sale`｜`@momo/home-feature-ranking`｜`@momo/home-page`｜`@momo/goods-page`｜`@momo/shell-feature`
+- `scope:` 規則：`home → home, catalog, shared`｜`goods → goods, catalog, shared`｜`layout → layout, catalog, shared`｜`catalog → catalog, shared`｜`shared → shared`
+- Import alias：`@momo/shared-ui`｜`@momo/shared-util`｜`@momo/catalog-data-access`｜`@momo/catalog-feature-recommendation`｜`@momo/home-data-access`｜`@momo/home-feature-flash-sale`｜`@momo/home-feature-ranking`｜`@momo/home-page`｜`@momo/goods-page`｜`@momo/layout-feature`
 
 ### 4. 檔案架構（1 app + 10 libs）
 
@@ -176,7 +178,7 @@ momo-shop-work/
 │  └─ src/
 │     ├─ styles/theme.css                  @theme design tokens（品牌粉、價格紅、容器寬、圓角）
 │     └─ lib/
-│        ├─ link/            LinkProvider + AppLink（預設 <a>）      使用者：ProductCard / shell / home blocks
+│        ├─ link/            LinkProvider + AppLink（預設 <a>）      使用者：ProductCard / layout / home blocks
 │        ├─ product-card/    ProductCardItem 型別 + 基底卡片 + slots（topBadge / promoText / footer / priceLabel）
 │        │                                                           使用者：home product-rail / flash-sale / ranking / recommendation
 │        ├─ price-tag/       售價 + 劃線原價                          使用者：ProductCard / goods-info
@@ -232,8 +234,8 @@ momo-shop-work/
 │  └─ src/lib/  goods-detail-page.tsx（props: goodsId；useProduct）
 │               ui/ goods-gallery · goods-info · goods-actions（純展示，無 handler）· goods-not-found   ← 私有
 │
-├─ libs/shell/feature/                     type:feature  scope:shell
-│  └─ src/lib/  shell-layout.tsx（Header + children + Footer）
+├─ libs/layout/feature/                     type:feature  scope:layout
+│  └─ src/lib/  app-layout.tsx（Header + children + Footer）
 │               ui/    top-bar（sticky；捲動後 compact 顯示搜尋框）· main-header（logo + 搜尋框展示）
 │                      category-nav（橫向分類 + 展開「選擇分類」面板）· footer                       ← 私有
 │               model/ use-compact-header.ts（IntersectionObserver）
@@ -349,10 +351,10 @@ Commit 切片（每片一個 commit，帶 `Co-Authored-By`）—— **walking sk
 1. `chore:` Nx scaffold
 2. `chore:` 10 libs + tags + boundary rules + restricted imports
 3. `docs:` architecture + ADR（設計先於實作，留在 git history）
-4. `feat(shop):` walking skeleton — router + providers + shell 空殼 + 兩個空頁面（此時兩條路由已可走通）
+4. `feat(shop):` walking skeleton — router + providers + layout 空殼 + 兩個空頁面（此時兩條路由已可走通）
 5. `chore(assets):` 素材搬遷 + `gen-fixtures` + `catalog/data-access`（TDD #3）
 6. `feat(shared):` util（TDD #1）+ ui：ProductCard / PriceTag / Carousel / SectionHeader / Link（TDD #2）
-7. `feat(shell):` TopBar sticky / MainHeader / CategoryNav（TDD #6）/ Footer
+7. `feat(layout):` TopBar sticky / MainHeader / CategoryNav（TDD #6）/ Footer
 8. `feat(home):` home/data-access + SectionRenderer（TDD #5）+ 6 個 blocks
 9. `feat(recommendation):` 3 列 + 看更多（TDD #4）
 10. `feat(goods):` 詳情頁（TDD #8）
