@@ -1,1 +1,18 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss';
+
+/* Design tokens belong to the design system; the app only imports them. */
+@import '../../../libs/shared/ui/src/styles/theme.css';
+
+/* Class names live in the libs, so Tailwind has to scan them too. */
+@source '../../../libs';
+
+/*
+ * The font family is a token too (--font-sans in tokens.semantic.css), so
+ * nothing is set here. Base text is 16px / 24px, as on the real site.
+ */
+@layer base {
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+  }
+}
