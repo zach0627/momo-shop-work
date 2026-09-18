@@ -76,7 +76,9 @@ D:\repo\momo素材
 > 版本：**v2**（2026-09-18，經自我審查後定案）｜實作 repo：`D:\repo\momo-shop-work`
 > 本段會同步成 repo 的 `docs/architecture.md` 與 `docs/adr/*`，給面試官看。
 
-> [!note] v2 之後的更名：全站外框的 lib 由 `shell` 改為 `layout`（2026-09-18）。「shell library」在 Nx 社群另有所指，而這個 lib 就是一般所說的 layout。下文已一併更新。
+> [!note] v2 之後的兩次修訂（2026-09-18，都是 Human 質疑後才改的，下文已一併更新）
+> 1. 全站外框的 lib 由 `shell` 改名為 `layout`：「shell library」在 Nx 社群另有所指，而這個 lib 就是一般所說的 layout。
+> 2. `libs/layout/feature` → **`libs/shop/layout`**，並新增 **`type:layout`** 一層。路徑的寫法是 `libs/<誰的>/<哪一種>`，「layout」是種類而不是擁有者；而且外框與 `page` 同層（只有 router 會 import 它、它包住 page），標成 `feature` 會讓它無法組合別的 domain 的 feature。
 
 > [!note] v1 → v2 自我審查修正了什麼
 > 1. `shared/ui` 不認識 domain model：`ProductCard` 只宣告最小形狀 `ProductCardItem`，`Product` 靠 structural typing 傳入（v1 照寫會變成 ui → data-access 違規依賴）。
@@ -99,7 +101,7 @@ D:\repo\momo素材
 
 ### 1. 設計原則（所有決策都回到這 5 條）
 
-1. **依賴方向單向且由 lint 強制**：`app → page → feature → ui / data-access → util`，不是靠自律。
+1. **依賴方向單向且由 lint 強制**：`app → layout / page → feature → ui / data-access → util`，不是靠自律。
 2. **切 lib 的準則**：「有自己的邏輯 / 自己的資料 / 首頁以外會被重用」才獨立成 feature lib；純 CMS 圖片區塊不拆（避免空殼 lib）。
    - **Rule of Two（共用門檻）**：元件 / 函式**被 ≥2 個 project（lib 或 app）使用**才能進 `shared/ui`、`shared/util`。只有自己用的，一律放該 lib 自己的 `ui/`（展示）或 `model/`（邏輯、hooks），且**不從 `index.ts` 匯出**（= lib 私有）。
    - **升級路徑**：feature 私有 → 出現第 2 個使用者 → 只在同 domain 共用升到 `libs/<scope>/ui`，跨 domain 才升到 `shared/ui`。
@@ -131,12 +133,13 @@ D:\repo\momo素材
 ```mermaid
 graph TD
   APP[apps/shop<br/>type:app] --> PAGE[home/page · goods/page<br/>type:page]
-  APP --> LAYOUT[layout/feature<br/>type:feature]
+  APP --> LAYOUT[shop/layout<br/>type:layout]
   PAGE --> FEAT[feature-flash-sale · feature-ranking<br/>feature-recommendation<br/>type:feature]
   PAGE --> UI
   PAGE --> DA
   FEAT --> UI[shared/ui<br/>type:ui]
   FEAT --> DA[catalog/data-access · home/data-access<br/>type:data-access]
+  LAYOUT --> FEAT
   LAYOUT --> UI
   LAYOUT --> DA
   UI --> UTIL[shared/util<br/>type:util]
@@ -145,15 +148,16 @@ graph TD
 
 | `type:` | 可依賴 | 職責 |
 |---|---|---|
-| `app` | page, feature, ui, data-access, util | 薄殼 + **composition root**：router、providers、注入 Link 與 repository 實作 |
-| `page` | feature, ui, data-access, util | 組合多個 feature 成一頁（**唯一能同時 import 多個 feature 的層**） |
+| `app` | layout, page, feature, ui, data-access, util | 薄殼 + **composition root**：router、providers、注入 Link 與 repository 實作 |
+| `layout` | feature, ui, data-access, util | 跨頁保留的外框。與 `page` 同層：由 router 巢狀組合，**layout ✗ page、page ✗ layout**；只有 `app` 能依賴它 |
+| `page` | feature, ui, data-access, util | 組合多個 feature 成一頁（**只有 `layout` 與 `page` 能同時 import 多個 feature**） |
 | `feature` | ui, data-access, util | 有邏輯的業務區塊（smart component）；**feature ✗ feature** |
 | `ui` | ui, util | 純展示元件；不碰資料、不碰 router、不認識 domain model |
 | `data-access` | util | 型別、repository interface + 實作、query hooks、fixtures；**data-access ✗ data-access** |
 | `util` | util | 純函式 |
 
-- `scope:` 規則：`home → home, catalog, shared`｜`goods → goods, catalog, shared`｜`layout → layout, catalog, shared`｜`catalog → catalog, shared`｜`shared → shared`
-- Import alias：`@momo/shared-ui`｜`@momo/shared-util`｜`@momo/catalog-data-access`｜`@momo/catalog-feature-recommendation`｜`@momo/home-data-access`｜`@momo/home-feature-flash-sale`｜`@momo/home-feature-ranking`｜`@momo/home-page`｜`@momo/goods-page`｜`@momo/layout-feature`
+- `scope:` 規則：`home → home, catalog, shared`｜`goods → goods, catalog, shared`｜`shop → shop, catalog, shared`｜`catalog → catalog, shared`｜`shared → shared`
+- Import alias：`@momo/shared-ui`｜`@momo/shared-util`｜`@momo/catalog-data-access`｜`@momo/catalog-feature-recommendation`｜`@momo/home-data-access`｜`@momo/home-feature-flash-sale`｜`@momo/home-feature-ranking`｜`@momo/home-page`｜`@momo/goods-page`｜`@momo/shop-layout`
 
 ### 4. 檔案架構（1 app + 10 libs）
 
@@ -234,7 +238,7 @@ momo-shop-work/
 │  └─ src/lib/  goods-detail-page.tsx（props: goodsId；useProduct）
 │               ui/ goods-gallery · goods-info · goods-actions（純展示，無 handler）· goods-not-found   ← 私有
 │
-├─ libs/layout/feature/                     type:feature  scope:layout
+├─ libs/shop/layout/                       type:layout  scope:shop
 │  └─ src/lib/  app-layout.tsx（Header + children + Footer）
 │               ui/    top-bar（sticky；捲動後 compact 顯示搜尋框）· main-header（logo + 搜尋框展示）
 │                      category-nav（橫向分類 + 展開「選擇分類」面板）· footer                       ← 私有

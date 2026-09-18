@@ -69,10 +69,12 @@ First Commit 至最後 Commit
 
 **目標**：架構的「骨架與法律」先到位，之後每一行 code 都受 lint 約束。
 - [x] 用 `@nx/react:lib` 產生 10 個 lib（路徑、import alias、tags 依 Phase 1 §3 / §4）：
-  `shared/ui` `shared/util` `catalog/data-access` `catalog/feature-recommendation` `home/data-access` `home/feature-flash-sale` `home/feature-ranking` `home/page` `goods/page` `layout/feature`
+  `shared/ui` `shared/util` `catalog/data-access` `catalog/feature-recommendation` `home/data-access` `home/feature-flash-sale` `home/feature-ranking` `home/page` `goods/page` `shop/layout`
   - ↳ `shared/util` 是純函式，改用 `@nx/js:lib`；其餘 9 個用 `@nx/react:lib`。10 個 lib 的 tags 逐一核對過。
+  - ↳ 最後一個 lib 建立時叫 `shell/feature`，之後兩度改名，現為 `shop/layout`（`type:layout`、`scope:shop`）。原因見完成紀錄。
 - [x] `apps/shop` 標 `type:app`。
 - [x] `eslint.config.mjs`：`@nx/enforce-module-boundaries` 的 `depConstraints`（type 6 條 + scope 5 條）。
+  - ↳ 之後新增 `type:layout` 一層，現為 **type 7 條** + scope 5 條；`scope:layout` 改名為 `scope:shop`。
 - [x] `no-restricted-imports`：`libs/**` 禁 `react-router`；`libs/shared/ui` 以外禁 `embla-carousel-react`。
   - ↳ 實作為「預設全禁、單點放行」：根設定兩個都禁，`apps/shop` 與 `shared/ui` 在自己的 eslint 設定放行。
 - [x] 每個 lib 的 `index.ts` 只留最小 stub。
@@ -104,7 +106,7 @@ First Commit 至最後 Commit
 
 **目標**：最薄的一條端到端：`/` 與 `/goods/:goodsId` 都走得通，外面包著 layout。之後每一步都只是「把空殼填滿」。
 - [x] **跨專案依賴的做法（這一步第一次出現）**：要 import 另一個 lib 的專案，先在自己的 `package.json` 宣告 `"@momo/<lib>": "workspace:*"` → `pnpm install` → `pnpm nx sync`。三個動作缺一不可（規格複查時實測：未宣告的 workspace 套件不會被解析到）。
-  - ↳ `apps/shop` 宣告 5 個、`layout/feature` 宣告 2 個；`nx sync` 寫入兩份 tsconfig 的 references。
+  - ↳ `apps/shop` 宣告 5 個、`shop/layout`（當時名為 `shell/feature`）宣告 2 個；`nx sync` 寫入兩份 tsconfig 的 references。
 - [x] 安裝：`react-router`、`@tanstack/react-query`、`tailwindcss` + `@tailwindcss/vite`。
   - ↳ **裝到的是 React Router 8（不是 v7）**。先讀實際安裝版本的型別定義確認 API 還在才動手；v8 要求 Node `>=22.22.0`，`engines` 隨之收緊。
 - [x] **TDD**：`shared/util/paths.ts` — `paths.home()`、`paths.goods(id)`、route pattern。
@@ -114,7 +116,7 @@ First Commit 至最後 Commit
   - ↳ **大幅超出原計畫**：改為 Primitive / Semantic 兩層 token，數值從真實網站的計算樣式量出（見下方完成紀錄）。
 - [x] `apps/shop`：`providers.tsx`（QueryClient + LinkProvider）、`router.tsx`（lazy routes、路徑取自 `paths`）、`router-link.tsx`、3 個 route 檔。
   - ↳ 路由測試 4 個 + App smoke 1 個，對應 spec `app-layout`「每個頁面都有共用外框」「Logo 連回首頁」。
-- [x] `layout/feature`：`AppLayout` 空殼（Header / Footer 先放文字）。
+- [x] `shop/layout`（當時名為 `shell/feature`）：`AppLayout` 空殼（Header / Footer 先放文字）。
 - [x] `home/page`、`goods/page`：placeholder（goods 顯示收到的 `goodsId`）。
 - [x] （計畫外）app 與 9 個 React lib 的 tsconfig 補上 DOM 型別庫 —— generator 漏掉的，只有 `typecheck` 抓得到。
 
@@ -125,7 +127,7 @@ First Commit 至最後 Commit
 ### Step 5 ★ — Layout：TopBar / Header / 分類 / Footer ✅
 
 > **順序調整**：這一步原本排在 Step 7（資料層與共用元件之後）。layout 是每一頁的骨架，也是 Phase 1 最先描述的東西（「header scroll 保留區塊」「滑到下面要有 footer」），所以提前到 walking skeleton 之後。原 Step 5、6 順延為 Step 6、7；Step 8 之後不變。
-> lib 已由 `shell` 改名為 `layout`（`libs/layout/feature`、`@momo/layout-feature`、`scope:layout`、`AppLayout`）。
+> lib 改過兩次名：`shell/feature` → `layout/feature` → **`shop/layout`**（`@momo/shop-layout`、`type:layout`、`scope:shop`，元件仍是 `AppLayout`）。第二次同時把 layout 升為正式的一層：與 `page` 同層、可以組合 feature、只有 app 能依賴它。
 
 **目標**：所有頁面共用、跨頁保留的外框。對照截圖 `01`–`04`、`15`、`16`；數值用從真站量到的 token。
 - [x] 量測真站「選擇分類」展開面板的樣式（膠囊的底色、字色、圓角、間距 —— 目前還沒量），加進 token 與 `docs/design-tokens.md`。
@@ -138,6 +140,7 @@ First Commit 至最後 Commit
 - [x] `ui/main-header`：logo（連回首頁）+ 搜尋框 + 熱搜關鍵字列。右側三張活動小圖沒有素材 → 不做，記入 Known Gaps。
 - [x] `ui/footer`：背景 `footer`、內容寬 1220px；防詐騙提醒框（3px `footer-accent-line`、圓角 8px）；六欄連結（標題 19px / 700 `footer-accent`、連結 13px 白字，皆為純文字）。
 - [x] 以上全部為 lib 私有，`index.ts` 只匯出 `AppLayout`；移除本 lib 的 `passWithNoTests`。
+- [x] （計畫外，Human review 後）**layout 升為 `type:layout` 一層**，lib 搬到 `libs/shop/layout`。先用探針確認改規則前 layout→feature 會被擋（紅燈），改規則後通過；page→layout、feature→layout、`scope:shop`→`scope:home` 被擋；app→layout 通過。
 
 **驗證**：`pnpm nx run-many -t lint test typecheck`（無快取）+ `pnpm nx build shop` + `pnpm verify:boundaries`；dev server 上實際捲動確認 TopBar 保留並轉 compact、分類面板可展開；**切到 `/goods/:id` 確認 TopBar 與 footer 仍在**；用 `getComputedStyle` 抽查數值與真站一致。
 **Review 重點**：與截圖 `01`–`04`、`15` 的差異；商品詳情頁是否保留同一組外框。
@@ -156,6 +159,7 @@ First Commit 至最後 Commit
 - [ ] `CatalogRepositoryProvider` + `useCatalogRepository`；6 個 query hooks；`query-keys.ts`。
 - [ ] `testing.ts` 次要入口：`createFakeCatalogRepository` + 測試用 wrapper。
 - [ ] `app/providers.tsx` 注入 mock repository（composition root）。
+- [ ] `shop/layout` 宣告對 `@momo/catalog-data-access` 的依賴（`workspace:*` → `pnpm install` → `pnpm nx sync`），並確認 `pnpm-lock.yaml` 的 importer；`scope:shop` → `scope:catalog` 已在放行清單內。
 
 **驗證**：`pnpm nx test catalog-data-access`、`pnpm nx lint catalog-data-access`
 **Review 重點**：`CatalogRepository` interface 是不是你心中「真 API 會長的樣子」；repo 體積（圖片總大小）。
@@ -276,7 +280,9 @@ First Commit 至最後 Commit
 | 4 | **Walking skeleton**：`/`、`/goods/:goodsId`、找不到頁面三條路由走得通，外面包著 layout；`paths`（URL 單一來源）與 `AppLink`（由 app 注入 router 的 Link）走 TDD；composition root（QueryClient + LinkProvider）；第一批跨專案依賴（7 條，0 違規）。**兩層 design token**：數值從真實網站量出，關閉 Tailwind 預設色盤。拆成 6 個 commit，**每一個都匯出到乾淨環境單獨驗證為綠** | `c589060` `240e2f1` `ab34cea` `ae1bd4d` `d6aca28` `3628bdd` |
 | — | **`shell` 改名為 `layout`**（lib、套件名、scope tag、元件、規格 capability）；`architecture.md` 補上 Layout 一節（layout route 的機制、跨頁保留哪些部分、如何加第二種 layout）。起因：Human 指出「看起來我們沒有設計 layout」—— layout 其實存在且有測試，但命名、文件與順序三個缺口讓它看不出來 | `ef285aa` |
 | — | **步驟重新編排**：Layout 由 Step 7 提前為 Step 5（它是每一頁的骨架）；原 Step 5、6 順延為 6、7；`tasks.md` 同步重新編號 | `4140d12` |
-| 5 | **Layout**：`fixed` 的 TopBar（捲動後轉 compact 顯示搜尋框）、主 header（logo + 展示用搜尋框 + 熱搜關鍵字）、可展開的分類列（40 個分類、五種色調）、footer（防詐騙提醒框 + 六欄 + QR code）。三份 spec 共 11 個測試（TDD）。分類面板的樣式從真站量出並進入兩層 token | 見 git log |
+| 5 | **Layout**：`fixed` 的 TopBar（捲動後轉 compact 顯示搜尋框）、主 header（logo + 展示用搜尋框 + 熱搜關鍵字）、可展開的分類列（40 個分類、五種色調）、footer（防詐騙提醒框 + 六欄 + QR code）。三份 spec 共 11 個測試（TDD）。分類面板的樣式從真站量出並進入兩層 token。拆成 5 個 commit，中間的 3 個都匯出到乾淨環境單獨驗證為綠 | `8063454` `fc73d14` `0d2a0ef` `4678d8e` `3e8caf5` |
+| — | **全專案健檢**（Human 回報編輯器在 `tsconfig.app.json` 顯示 not found）：85 個 tsconfig 引用全部存在；直接驅動 tsserver（TS 6.0.3 與 5.9.3）取得編輯器層級的診斷 → 0 個，並以故意寫壞的 tsconfig 確認這個檢查抓得到 `TS6053 … not found`；歷史上每個 commit 的引用也都存在。磁碟上的狀態沒有問題，研判是編輯器留著改名當下的過期診斷。順帶發現並修正：本機外掛的狀態資料夾 `.omc/` 沒有被 ignore | `5142b29` |
+| — | **Layout 升為正式的一層**：`libs/layout/feature` → `libs/shop/layout`（`@momo/shop-layout`）；新增 `type:layout`（與 `page` 同層、可組合 feature、只有 app 能依賴）；`scope:layout` 改名為 `scope:shop`；ADR-0006 改寫，並記錄為什麼推翻原本「外框不能依賴 feature」那句話；主規格 `module-boundaries` 新增 3 個 scenario。起因：Human 質疑「layout 裡面卻有 feature，這是好的設計嗎？」 | `5966dcf` `d815c11`（+ 文件與步驟的 commit） |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -344,4 +350,11 @@ First Commit 至最後 Commit
 - 沒做的：主 header 右側三張活動小圖（沒有素材）。
 - 沒複核的：footer 與倒數數字幾個顏色的透明度（量的時候轉換函式把 alpha 丟掉了；複核時瀏覽器面板是隱藏的、虛擬化區塊沒掛載）。從截圖看是實色，做限時搶購時一併確認。
 
-**下一步：Step 6 — 素材 + fixtures + `catalog/data-access`**（分類清單會從 layout lib 搬進 catalog fixtures）→ 對應 `tasks.md` 第 6 組
+**Layout 升為一層：驗證結果與過程中的錯誤**
+- 拆成 3 個 commit（規則與 tags → 搬資料夾 → 文件與步驟），前兩個在 commit 前都跑過 11 個專案的 `lint / test / typecheck`（無快取）+ `verify:boundaries`；第二個另跑 `sync:check` 與 `build`。`verify:boundaries`：11 個專案、**12 條規則**、7 條依賴、0 違規。
+- **Agent 向 Human 提案時說得太滿**：提案理由之一是「header 的購物車數量會是一個 feature，現在放不進來」。動手後才讀到自己寫的 ADR-0006 明載「外框只透過 `data-access` 讀摘要資料」—— 數量徽章根本不需要 feature。重新釐清後的分界：**摘要資料走 `data-access`；由別的 domain 擁有的互動元件（mini-cart、搜尋自動完成）才是 feature**，新的一層解決的是後者。結論不變，但理由要改對，已寫進 ADR。教訓：提案前先讀自己寫過的決策紀錄。
+- 一個探針回報「通過」其實是探針檔沒寫進去（那個 lib 還是空殼，沒有 `src/lib/`）。沒有把它當成通過，換位置重跑後確認被擋。
+- `git mv` 整個資料夾再次遇到 Permission denied（這次 dev server 已停，佔用者無法辨識）→ 改為逐檔 `git mv`，git 記錄的 rename 完全相同。
+- 自己把 `CI=true` 帶進 `pnpm install`，pnpm 因此以 frozen 模式拒絕更新 lockfile → 安裝這一步不帶 `CI`。
+
+**下一步：Step 6 — 素材 + fixtures + `catalog/data-access`**（分類清單會從 `shop/layout` 搬進 catalog fixtures）→ 對應 `tasks.md` 第 6 組

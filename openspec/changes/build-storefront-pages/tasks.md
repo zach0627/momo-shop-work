@@ -44,6 +44,7 @@
 - [x] 5.4 TDD：`search-box` —— 可輸入、送出時不導頁；驗證：spec 確認 submit 事件被 `preventDefault`（spec `app-layout`「搜尋框為展示用」）
 - [x] 5.5 TDD：`AppLayout` 的 compact 行為 —— 主 header 離開視窗時頂部列出現搜尋框、回到視窗時恢復；以替身 `IntersectionObserver` 驅動；驗證：spec 通過（spec `app-layout`「頂部列在捲動時保留並轉為 compact」）
 - [x] 5.6 `top-bar`（`position: fixed`、高 40px，版面預留空間）、`main-header`（logo 連回首頁 + 搜尋框 + 熱搜關鍵字）、`footer`（防詐騙提醒框 + 六欄連結）；全部為 lib 私有，`index.ts` 只匯出 `AppLayout`；驗證：dev server 實際捲動確認頂部列保留並轉 compact；切到 `/goods/:id` 外框仍在；以 `getComputedStyle` 抽查數值與真站一致；與截圖 `01`–`04`、`15` 對照
+- [x] 5.7 （計畫外，Human review 後）外框升為 `type:layout` 一層並搬到 `libs/shop/layout`；`scope:layout` 改名為 `scope:shop`；驗證：5 個探針 —— 改規則前 layout→feature 被擋、改規則後通過；page→layout、feature→layout、`scope:shop`→`scope:home` 被擋；app→layout 通過（主規格 `module-boundaries`「依賴方向是單向的」新增的 3 個 scenario）；`pnpm verify:boundaries` 12 條規則、0 違規
 
 ## 6. 素材與商品資料（Step 6）
 
@@ -51,6 +52,7 @@
 - [ ] 6.2 `tools/gen-fixtures.mjs` 由素材產生 `products.generated.ts`、`collections.ts`、`categories.ts`（40 個分類，**從 layout lib 的私有清單搬過來**，`AppLayout` 改讀 `useCategories`）；驗證：連續執行兩次產出完全相同（spec `product-catalog`「資料是決定性的」「查詢分類清單」）
 - [ ] 6.3 TDD：`createMockCatalogRepository({ now, latencyMs })`；驗證：spec 涵蓋商品存在 / 不存在、未知集合回空清單、分頁 `nextOffset` 與最後一頁、`endsAt` 晚於注入的 `now`（spec `product-catalog`）
 - [ ] 6.4 `CatalogRepositoryProvider`、`useCatalogRepository`、6 個 query hooks、`query-keys.ts`、`testing.ts`（fake repository + wrapper）；於 app 的 providers 注入 mock；驗證：`nx test catalog-data-access` 通過
+- [ ] 6.5 `shop/layout` 改讀 `useCategories`：宣告 `"@momo/catalog-data-access": "workspace:*"` → `pnpm install` → `pnpm nx sync`，並確認 `pnpm-lock.yaml` 的 importer；刪除 lib 私有的分類清單；驗證：`pnpm verify:boundaries` 出現 `shop-layout -> catalog-data-access` 且 0 違規，`app-layout` 的 spec 仍通過
 
 ## 7. 共用元件（Step 7）
 
