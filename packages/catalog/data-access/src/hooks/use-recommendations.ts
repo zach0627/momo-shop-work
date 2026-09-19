@@ -29,8 +29,12 @@ export function useRecommendations(pageSize: number) {
   );
 
   const loadMore = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) void fetchNextPage();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+    // `cancelRefetch: false` is what makes a repeated call harmless: by
+    // default fetchNextPage cancels the request in flight and starts over.
+    // `isFetchingNextPage` alone cannot guard this - a double click arrives
+    // before React has re-rendered, so this closure still sees `false`.
+    if (hasNextPage) void fetchNextPage({ cancelRefetch: false });
+  }, [hasNextPage, fetchNextPage]);
 
   return {
     items,

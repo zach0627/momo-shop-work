@@ -160,6 +160,25 @@ describe('useRecommendations', () => {
     expect(result.current.hasMore).toBe(false);
   });
 
+  // A double click lands before React has re-rendered, so the `loadMore` of
+  // the same render is called again: its view of "already loading" is stale.
+  it('asks for a page once when loadMore is called again before it arrives', async () => {
+    const { wrapper } = wrapperFor({ getRecommendations });
+    const { result } = renderHook(() => useRecommendations(2), { wrapper });
+    await waitFor(() => expect(result.current.items).toHaveLength(2));
+    const loadMore = result.current.loadMore;
+
+    act(() => {
+      loadMore();
+      loadMore();
+      loadMore();
+    });
+
+    await waitFor(() => expect(result.current.items).toEqual(all.slice(0, 4)));
+    // The first page, and ONE second page.
+    expect(getRecommendations).toHaveBeenCalledTimes(2);
+  });
+
   it('does not ask again once the last page is loaded', async () => {
     const { wrapper } = wrapperFor({ getRecommendations });
     const { result } = renderHook(() => useRecommendations(5), { wrapper });
