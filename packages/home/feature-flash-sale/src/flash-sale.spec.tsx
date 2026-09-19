@@ -98,6 +98,33 @@ describe('FlashSale', () => {
     expect(within(section).getByRole('timer')).toBeTruthy();
   });
 
+  // 規格 home-page：區塊的商品載入中
+  it('stands in for a page of ten cards until the sale arrives', async () => {
+    let deliver: (sale: {
+      endsAt: string;
+      items: FlashSaleItem[];
+    }) => void = () => undefined;
+    renderWith(
+      () =>
+        new Promise((resolve) => {
+          deliver = resolve;
+        }),
+    );
+
+    const section = screen.getByRole('region', { name: '限時搶購' });
+    expect(within(section).getByRole('status').textContent).toBe(
+      '限時搶購載入中',
+    );
+    expect(section.querySelectorAll('[data-card-placeholder]')).toHaveLength(
+      10,
+    );
+
+    deliver({ endsAt: END, items: makeItems(3) });
+    expect(await within(section).findAllByRole('article')).toHaveLength(3);
+    expect(within(section).queryByRole('status')).toBeNull();
+    expect(section.querySelectorAll('[data-card-placeholder]')).toHaveLength(0);
+  });
+
   it('leaves the page when the sale cannot be loaded', async () => {
     const getFlashSale = vi.fn<CatalogRepository['getFlashSale']>(async () => {
       throw new Error('network');

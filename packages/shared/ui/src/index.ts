@@ -22,3 +22,9 @@ export {
   SectionHeader,
   type SectionHeaderProps,
 } from './section-header/section-header';
+export {
+  ProductCardSkeleton,
+  Skeleton,
+  type ProductCardSkeletonProps,
+  type SkeletonProps,
+} from './skeleton/skeleton';

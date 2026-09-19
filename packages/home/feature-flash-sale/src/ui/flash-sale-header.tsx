@@ -6,7 +6,8 @@ export function FlashSaleHeader({
   endsAt,
 }: {
   title: string;
-  endsAt: string;
+  /** 還在載入時沒有結束時間：只顯示標題，不顯示倒數。 */
+  endsAt?: string;
 }) {
   return (
     <div className="bg-surface-sale flex h-17.5 items-center justify-between px-4">
@@ -26,10 +27,12 @@ export function FlashSaleHeader({
         </svg>
         {title}
       </h2>
-      <p className="text-ec-xl text-ink flex items-center gap-2">
-        倒數
-        <Countdown endsAt={endsAt} />
-      </p>
+      {endsAt && (
+        <p className="text-ec-xl text-ink flex items-center gap-2">
+          倒數
+          <Countdown endsAt={endsAt} />
+        </p>
+      )}
     </div>
   );
 }

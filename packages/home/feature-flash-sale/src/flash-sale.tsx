@@ -1,5 +1,5 @@
 import { useFlashSale } from '@momo/catalog-data-access';
-import { Carousel, ProductCard } from '@momo/shared-ui';
+import { Carousel, ProductCard, ProductCardSkeleton } from '@momo/shared-ui';
 import { paths } from '@momo/shared-util';
 
 import { chunk } from './model/chunk';
@@ -60,12 +60,21 @@ export function FlashSale({ title, lead }: FlashSaleProps) {
           </div>
         </>
       ) : (
-        <p
-          role="status"
-          className="text-ec-base text-ink-muted px-4 py-16 text-center"
-        >
-          限時搶購載入中…
-        </p>
+        <>
+          <FlashSaleHeader title={label} />
+          <p role="status" className="sr-only">
+            {label}載入中
+          </p>
+          {/* pb-10：內距 16 + 圓點那一列 24 */}
+          <div
+            className="grid grid-cols-5 px-4 pt-4 pb-10"
+            style={{ gap: CARD_GAP }}
+          >
+            {Array.from({ length: PAGE_SIZE }, (_, index) => (
+              <ProductCardSkeleton key={index} frame="raised" stacked />
+            ))}
+          </div>
+        </>
       )}
     </section>
   );

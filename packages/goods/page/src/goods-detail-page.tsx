@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { useProduct } from '@momo/catalog-data-access';
+import { Skeleton } from '@momo/shared-ui';
 
 import { GoodsActions } from './ui/goods-actions';
 import { GoodsGallery } from './ui/goods-gallery';
@@ -24,12 +25,20 @@ export function GoodsDetailPage({ goodsId }: GoodsDetailPageProps) {
   if (isPending) {
     return (
       <PageContainer>
-        <p
-          role="status"
-          className="text-ec-base text-ink-muted py-16 text-center"
-        >
-          商品載入中…
+        <p role="status" className="sr-only">
+          商品載入中
         </p>
+        {/* 和載入後同樣的兩欄：左邊主圖 440，右邊標題、說明、價格、按鈕 */}
+        <div className="flex items-start gap-8">
+          <Skeleton className="size-110 shrink-0" />
+          <div className="flex-1 space-y-4">
+            <Skeleton className="rounded-tile h-7 w-4/5" />
+            <Skeleton className="rounded-tile h-5 w-3/5" />
+            <Skeleton className="rounded-tile h-5 w-2/5" />
+            <Skeleton className="rounded-tile h-12 w-1/3" />
+            <Skeleton className="h-action w-126" />
+          </div>
+        </div>
       </PageContainer>
     );
   }

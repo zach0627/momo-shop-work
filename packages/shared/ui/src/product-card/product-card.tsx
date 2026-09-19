@@ -16,7 +16,8 @@ export type ProductCardLayout = 'vertical' | 'horizontal';
 /** outlined：框線 + 8px 圓角 + 淡陰影；bordered：較深的框線、沒有陰影；plain：只有 4px 圓角；raised：淺框線 + 較深陰影 + 內距 10px（限時搶購）。 */
 export type ProductCardFrame = 'outlined' | 'bordered' | 'plain' | 'raised';
 
-const FRAMES: Record<ProductCardFrame, string> = {
+/** 佔位用的 ProductCardSkeleton 也用這張表，外框才會一模一樣。不從 index 匯出。 */
+export const PRODUCT_CARD_FRAMES: Record<ProductCardFrame, string> = {
   outlined: 'rounded-card border border-line shadow-card',
   bordered: 'rounded-card border border-line-card',
   plain: 'rounded-tile',
@@ -51,7 +52,9 @@ export function ProductCard({
   const isPadded = frame === 'raised';
 
   return (
-    <article className={`${FRAMES[frame]} bg-surface h-full overflow-hidden`}>
+    <article
+      className={`${PRODUCT_CARD_FRAMES[frame]} bg-surface h-full overflow-hidden`}
+    >
       <AppLink
         href={href}
         className={`focus-visible:outline-brand focus-visible:outline-2 ${

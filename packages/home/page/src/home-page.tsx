@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { useHomeLayout } from '@momo/home-data-access';
+import { Skeleton } from '@momo/shared-ui';
 
 import { SECTION_REGISTRY } from './section-renderer/section-registry';
 import { SectionRenderer } from './section-renderer/section-renderer';
@@ -24,12 +25,19 @@ export function HomePage() {
   if (isPending) {
     return (
       <PageSurface>
-        <p
-          role="status"
-          className="bg-surface text-ec-base text-ink-muted px-4 py-16 text-center"
-        >
-          首頁內容載入中…
+        <p role="status" className="sr-only">
+          首頁內容載入中
         </p>
+        {/* 版位還沒到，不知道有哪些區塊：先放三條區帶的輪廓（主要活動 + 兩個有標題的區塊） */}
+        <div className="bg-surface p-4">
+          <Skeleton className="h-112 w-full" />
+        </div>
+        {[0, 1].map((band) => (
+          <div key={band} className="bg-surface space-y-4 p-4">
+            <Skeleton className="rounded-tile h-8 w-48" />
+            <Skeleton className="h-44 w-full" />
+          </div>
+        ))}
       </PageSurface>
     );
   }

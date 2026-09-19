@@ -147,8 +147,12 @@ describe('GoodsDetailPage', () => {
         }),
     });
 
-    renderPage('15687497', repository);
+    const { container } = renderPage('15687497', repository);
     expect(screen.getByRole('status').textContent).toContain('載入中');
+    // 主圖與文字的佔位，版面和載入後相同
+    expect(
+      container.querySelectorAll('[aria-hidden="true"]').length,
+    ).toBeGreaterThan(2);
     expect(screen.queryAllByRole('button')).toHaveLength(0);
 
     deliver(iphone);

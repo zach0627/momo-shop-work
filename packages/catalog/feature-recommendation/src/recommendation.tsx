@@ -1,5 +1,5 @@
 import { useRecommendations } from '@momo/catalog-data-access';
-import { SectionHeader } from '@momo/shared-ui';
+import { ProductCardSkeleton, SectionHeader, Skeleton } from '@momo/shared-ui';
 import { paths } from '@momo/shared-util';
 
 import { PAGE_SIZE } from './model/page-size';
@@ -25,12 +25,16 @@ export function Recommendation({ title, lead }: RecommendationProps) {
       <SectionHeader lead={lead} title={title} />
       <div className="px-4">
         {isPending ? (
-          <p
-            role="status"
-            className="text-ec-base text-ink-muted py-16 text-center"
-          >
-            推薦商品載入中…
-          </p>
+          <>
+            <p role="status" className="sr-only">
+              推薦商品載入中
+            </p>
+            <div className="grid grid-cols-5 gap-x-4 gap-y-6">
+              {Array.from({ length: PAGE_SIZE }, (_, index) => (
+                <ProductCardSkeleton key={index} frame="plain" />
+              ))}
+            </div>
+          </>
         ) : (
           <RecommendationGrid
             items={items.map((product) => ({
@@ -40,6 +44,12 @@ export function Recommendation({ title, lead }: RecommendationProps) {
           />
         )}
       </div>
+      {/* 多數情況載完第一批還有下一批：先替「看更多」留位置，它出現時頁尾才不會往下跳 */}
+      {isPending && (
+        <div className="mt-8">
+          <Skeleton className="rounded-pill mx-auto h-9.5 w-46" />
+        </div>
+      )}
       {hasMore && (
         <div className="mt-8">
           <LoadMoreButton busy={isLoadingMore} onClick={loadMore} />

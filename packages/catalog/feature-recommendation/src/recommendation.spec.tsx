@@ -139,6 +139,31 @@ describe('Recommendation', () => {
   });
 
   // 規格：推薦商品可點擊
+  // 規格 home-page：區塊的商品載入中
+  it('stands in for the first 3 rows until the products arrive', async () => {
+    let deliver: (page: { items: Product[]; nextOffset: null }) => void = () =>
+      undefined;
+    const repository = createFakeCatalogRepository({
+      getRecommendations: () =>
+        new Promise((resolve) => {
+          deliver = resolve;
+        }),
+    });
+    const { container } = renderWith(repository);
+
+    expect(screen.getByRole('status').textContent).toBe('推薦商品載入中');
+    expect(container.querySelectorAll('[data-card-placeholder]')).toHaveLength(
+      15,
+    );
+
+    deliver({ items: makeProducts(10), nextOffset: null });
+    await vi.waitFor(() => expect(shownNames()).toHaveLength(10));
+    expect(screen.queryByRole('status')).toBeNull();
+    expect(container.querySelectorAll('[data-card-placeholder]')).toHaveLength(
+      0,
+    );
+  });
+
   it('links every product to its detail page', async () => {
     const { repository } = pagingRepository(makeProducts(3));
 

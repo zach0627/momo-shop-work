@@ -115,8 +115,12 @@ describe('HomePage', () => {
         }),
     });
 
-    renderHomePage(home);
+    const { container } = renderHomePage(home);
     expect(screen.getByRole('status').textContent).toContain('載入中');
+    // 不只是一行字：有幾條區帶的佔位
+    expect(
+      container.querySelectorAll('[aria-hidden="true"]').length,
+    ).toBeGreaterThan(2);
 
     deliver([notice]);
     expect(
@@ -193,6 +197,40 @@ describe('HomePage', () => {
     expect(within(cards[0]).getByRole('link').getAttribute('href')).toBe(
       '/goods/b3',
     );
+  });
+
+  // 規格 home-page：區塊的商品載入中
+  it('stands in for the cards of a rail until its products arrive', async () => {
+    let deliver: (products: typeof BEST_SELLERS) => void = () => undefined;
+    const slowCatalog = createFakeCatalogRepository({
+      getCollection: () =>
+        new Promise((resolve) => {
+          deliver = resolve;
+        }),
+    });
+    const home = createFakeHomeRepository({
+      getLayout: async () => [bestSellers],
+    });
+    render(
+      <HomeTestProvider repository={home}>
+        <CatalogTestProvider repository={slowCatalog}>
+          <HomePage />
+        </CatalogTestProvider>
+      </HomeTestProvider>,
+    );
+
+    const section = await screen.findByRole('region', { name: '今日暢銷榜' });
+    expect(within(section).getByRole('status').textContent).toBe(
+      '今日暢銷榜載入中',
+    );
+    // perView 3.47 → 4 張佔位
+    expect(section.querySelectorAll('[data-card-placeholder]')).toHaveLength(4);
+    expect(within(section).queryAllByRole('article')).toHaveLength(0);
+
+    deliver(BEST_SELLERS);
+    expect(await within(section).findAllByRole('article')).toHaveLength(3);
+    expect(within(section).queryByRole('status')).toBeNull();
+    expect(section.querySelectorAll('[data-card-placeholder]')).toHaveLength(0);
   });
 
   // 真站：底色與標題旁的標籤都是這個區塊的資料，不是另一種元件

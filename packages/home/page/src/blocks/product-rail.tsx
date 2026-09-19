@@ -1,6 +1,6 @@
 import { useProductCollection } from '@momo/catalog-data-access';
 import type { ProductRailSection } from '@momo/home-data-access';
-import { Carousel, ProductCard } from '@momo/shared-ui';
+import { Carousel, ProductCard, ProductCardSkeleton } from '@momo/shared-ui';
 import { paths } from '@momo/shared-util';
 
 import { SectionFrame } from '../ui/section-frame';
@@ -10,9 +10,11 @@ const CARD_GAP = 10;
 
 /** 有標題的商品列。版位資料只給 collection key，商品由 catalog 提供，每張卡片連到詳情頁。 */
 export function ProductRail({ section }: { section: ProductRailSection }) {
-  const { data: products = [], isError } = useProductCollection(
-    section.collection,
-  );
+  const {
+    data: products = [],
+    isPending,
+    isError,
+  } = useProductCollection(section.collection);
   const label = `${section.title.lead ?? ''}${section.title.text}`;
   const isHorizontal = section.card === 'horizontal';
 
@@ -25,8 +27,39 @@ export function ProductRail({ section }: { section: ProductRailSection }) {
       title={section.title}
       background={section.background}
     >
-      {/* 載入中先保留高度，下面的區塊才不會跳動 */}
+      {/* 載入中顯示佔位卡片並保留高度，下面的區塊才不會跳動 */}
       <div className={isHorizontal ? 'min-h-44' : 'min-h-60'}>
+        {isPending && (
+          <>
+            <p role="status" className="sr-only">
+              {label}載入中
+            </p>
+            {/* 和 Carousel 同樣的排法：每張佔 100 / perView %，間距放在左邊；pb-6 是圓點那一列的高度 */}
+            <div className="overflow-hidden pb-6">
+              <div className="flex" style={{ marginLeft: -CARD_GAP }}>
+                {Array.from(
+                  { length: Math.ceil(section.perView) },
+                  (_, index) => (
+                    <div
+                      key={index}
+                      className="shrink-0"
+                      style={{
+                        flexBasis: `${100 / section.perView}%`,
+                        paddingLeft: CARD_GAP,
+                      }}
+                    >
+                      <ProductCardSkeleton
+                        layout={section.card}
+                        frame={isHorizontal ? 'bordered' : 'outlined'}
+                        stacked={!isHorizontal}
+                      />
+                    </div>
+                  ),
+                )}
+              </div>
+            </div>
+          </>
+        )}
         {products.length > 0 && (
           <Carousel label={label} perView={section.perView} gap={CARD_GAP} dots>
             {products.map((product) => (
