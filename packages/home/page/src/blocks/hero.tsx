@@ -22,6 +22,7 @@ export function Hero({ section }: { section: HeroSection }) {
           gap={BANNER_GAP}
           loop
           dots
+          dotsPlacement="overlay"
         >
           {section.banners.map((banner, index) => (
             <BannerImage

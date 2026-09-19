@@ -19,6 +19,8 @@ export interface CarouselProps {
   loop?: boolean;
   arrows?: boolean;
   dots?: boolean;
+  /** below：圓點在 slide 下方（商品列）；overlay：疊在圖的下緣（主要活動）。 */
+  dotsPlacement?: 'below' | 'overlay';
 }
 
 interface Paging {
@@ -37,6 +39,24 @@ const NOT_READY: Paging = {
 
 const ARROW =
   'bg-carousel-arrow hover:bg-carousel-arrow-hover text-on-action absolute top-1/2 flex h-14 w-8 -translate-y-1/2 items-center justify-center transition disabled:opacity-25';
+
+// 兩種圓點：數值都是真站實測。overlay 的外層不吃滑鼠事件，圖本身才點得到
+const DOTS = {
+  below: {
+    row: 'mt-1 flex justify-center',
+    button: 'px-0.5 py-2',
+    dot: 'h-1',
+    current: 'w-3',
+    other: 'w-1',
+  },
+  overlay: {
+    row: 'pointer-events-none absolute inset-x-0 bottom-1.5 flex justify-center gap-0.75',
+    button: 'pointer-events-auto py-1.5',
+    dot: 'h-0.75',
+    current: 'w-2',
+    other: 'w-0.75',
+  },
+} as const;
 
 function Chevron({ direction }: { direction: 'left' | 'right' }) {
   return (
@@ -64,6 +84,7 @@ export function Carousel({
   loop = false,
   arrows = true,
   dots = false,
+  dotsPlacement = 'below',
 }: CarouselProps) {
   const [viewportRef, embla] = useEmblaCarousel({
     align: 'start',
@@ -145,7 +166,7 @@ export function Carousel({
       )}
 
       {dots && paging.pageCount > 1 && (
-        <div className="mt-1 flex justify-center">
+        <div className={DOTS[dotsPlacement].row}>
           {Array.from({ length: paging.pageCount }, (_, index) => (
             // 圓點只有 4px 高（同真站），靠按鈕的 padding 才點得到
             <button
@@ -154,13 +175,13 @@ export function Carousel({
               aria-label={`第 ${index + 1} 頁`}
               aria-current={index === paging.current ? 'true' : undefined}
               onClick={() => embla?.scrollTo(index)}
-              className="px-0.5 py-2"
+              className={DOTS[dotsPlacement].button}
             >
               <span
-                className={`block h-1 rounded-full transition-all duration-300 ${
+                className={`block rounded-full transition-all duration-300 ${DOTS[dotsPlacement].dot} ${
                   index === paging.current
-                    ? 'bg-brand w-3'
-                    : 'bg-carousel-dot w-1'
+                    ? `bg-brand ${DOTS[dotsPlacement].current}`
+                    : `bg-carousel-dot ${DOTS[dotsPlacement].other}`
                 }`}
               />
             </button>
