@@ -21,6 +21,8 @@ export interface Shortcut {
 export interface SectionTitle {
   lead?: string;
   text: string;
+  /** 標題旁的小標籤，例：今日暢銷榜的「即時更新」。 */
+  badge?: string;
 }
 
 interface SectionBase {
@@ -71,6 +73,8 @@ export interface ProductRailSection extends SectionBase {
   collection: string;
   card: 'vertical' | 'horizontal';
   perView: number;
+  /** 區帶的底色（CSS 顏色）。真站由 CMS 逐區塊指定，隨檔期更換，所以是資料、不是 token。 */
+  background?: string;
 }
 
 /** 以下三種有自己的邏輯，由各自的 feature package 抓資料。 */

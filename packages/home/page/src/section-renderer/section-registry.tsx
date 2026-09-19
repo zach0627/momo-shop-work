@@ -32,7 +32,7 @@ export const SECTION_REGISTRY: SectionRegistry = {
   // 單張橫幅公告：詐騙發票提醒
   notice: Notice,
 
-  // 商品列：降價好貨（直式卡）、momo 店取（橫式卡）；商品來自 catalog，可點進詳情頁
+  // 商品列：降價好貨（直式卡）、momo 店取與今日暢銷榜（橫式卡）；商品來自 catalog，可點進詳情頁
   'product-rail': ProductRail,
 
   // ── 有自己邏輯的區塊：各自是獨立的 feature package，這裡只轉交標題 ──

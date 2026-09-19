@@ -20,7 +20,11 @@ export function ProductRail({ section }: { section: ProductRailSection }) {
   if (isError) return null;
 
   return (
-    <SectionFrame label={label} title={section.title}>
+    <SectionFrame
+      label={label}
+      title={section.title}
+      background={section.background}
+    >
       {/* 載入中先保留高度，下面的區塊才不會跳動 */}
       <div className={isHorizontal ? 'min-h-44' : 'min-h-60'}>
         {products.length > 0 && (
@@ -31,6 +35,8 @@ export function ProductRail({ section }: { section: ProductRailSection }) {
                 item={product}
                 href={paths.goods(product.id)}
                 layout={section.card}
+                // 真站實測：橫式卡是較深的框線、沒有陰影
+                frame={isHorizontal ? 'bordered' : 'outlined'}
                 // 直式：品牌色價格、原價放下面；橫式：原價放旁邊，並顯示促銷文字
                 priceTag={
                   isHorizontal ? undefined : { tone: 'brand', stacked: true }

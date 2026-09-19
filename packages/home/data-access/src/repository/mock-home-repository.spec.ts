@@ -58,10 +58,30 @@ describe('the home layout fixture', () => {
       'card-offers:banner-carousel',
       'search-suggest:banner-carousel',
       'flash-sale:flash-sale',
-      'best-sellers:ranking',
+      'best-sellers:product-rail',
       'mopro:banner-carousel',
       'recommendations:recommendation',
     ]);
+  });
+
+  // 規格 home-page：今日暢銷榜以橫式商品卡呈現。真站上它和 momo 店取是同一種區塊（bt_7_777），只差資料與底色
+  it('makes the best sellers a rail of horizontal cards, like the store pickup rail', async () => {
+    const sections = await real.getLayout();
+    const byId = (id: string) => sections.find((section) => section.id === id);
+    const bestSellers = byId('best-sellers');
+    const storePickup = byId('store-pickup');
+
+    expect(bestSellers?.type).toBe('product-rail');
+    if (bestSellers?.type !== 'product-rail') return;
+    if (storePickup?.type !== 'product-rail') return;
+    expect(bestSellers.collection).toBe('best-sellers');
+    expect(bestSellers.card).toBe('horizontal');
+    expect(bestSellers.perView).toBe(storePickup.perView);
+    expect(bestSellers.title).toEqual({
+      text: '今日暢銷榜',
+      badge: '即時更新',
+    });
+    expect(bestSellers.background).toBe('#f6e8eb');
   });
 
   it('gives every section and every banner a unique id', async () => {

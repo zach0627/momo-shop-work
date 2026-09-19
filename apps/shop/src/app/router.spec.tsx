@@ -57,6 +57,21 @@ describe('routes', () => {
     expect(within(hero).queryAllByRole('link')).toHaveLength(0);
   });
 
+  // 規格 home-page：今日暢銷榜的順序與商品目錄回傳的相同
+  it('lists the best sellers of the catalog, in its order, on the home page', async () => {
+    const expected =
+      await createMockCatalogRepository().getCollection('best-sellers');
+    expect(expected.length).toBeGreaterThan(3);
+
+    renderAt('/');
+
+    const section = await screen.findByRole('region', { name: '今日暢銷榜' });
+    const cards = await within(section).findAllByRole('link');
+    expect(cards.map((card) => card.getAttribute('href'))).toEqual(
+      expected.map((product) => `/goods/${product.id}`),
+    );
+  });
+
   // 規格 goods-detail：與首頁卡片為同一件商品
   it('leads from a home page card to a detail page with the same name and price', async () => {
     const router = renderAt('/');

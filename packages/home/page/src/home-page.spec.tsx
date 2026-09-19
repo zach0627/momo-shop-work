@@ -44,21 +44,45 @@ const flagship: HomeSection = {
   ],
 };
 
+const bestSellers: HomeSection = {
+  id: 'best-sellers',
+  type: 'product-rail',
+  title: { text: '今日暢銷榜', badge: '即時更新' },
+  collection: 'best-sellers',
+  card: 'horizontal',
+  perView: 3.47,
+  background: '#f6e8eb',
+};
+
+const BEST_SELLERS = [
+  { id: 'b3', name: '【紅布朗】堅果禮盒', price: 599, originalPrice: 1040 },
+  { id: 'b1', name: '【Columbia】越野鞋', price: 2988, originalPrice: 5980 },
+  { id: 'b2', name: '【SHARP】除濕機', price: 20900, originalPrice: 25900 },
+].map((item) => ({
+  ...item,
+  imageUrl: `${item.id}.jpg`,
+  images: [`${item.id}.jpg`],
+  promoText: '滿1件折100',
+  description: [],
+}));
+
 const catalog = createFakeCatalogRepository({
   getCollection: async (key) =>
-    key === 'price-drop'
-      ? [
-          {
-            id: '15687497',
-            name: '【Apple】iPhone 18 Pro Max',
-            imageUrl: 'iphone.webp',
-            images: ['iphone.webp'],
-            price: 49900,
-            originalPrice: 49999,
-            description: [],
-          },
-        ]
-      : [],
+    key === 'best-sellers'
+      ? BEST_SELLERS
+      : key === 'price-drop'
+        ? [
+            {
+              id: '15687497',
+              name: '【Apple】iPhone 18 Pro Max',
+              imageUrl: 'iphone.webp',
+              images: ['iphone.webp'],
+              price: 49900,
+              originalPrice: 49999,
+              description: [],
+            },
+          ]
+        : [],
 });
 
 function renderHomePage(home: HomeRepository) {
@@ -147,5 +171,43 @@ describe('HomePage', () => {
     expect(link.getAttribute('href')).toBe('/goods/15687497');
     expect(within(link).getByText('【Apple】iPhone 18 Pro Max')).toBeTruthy();
     expect(screen.getAllByRole('link')).toHaveLength(1);
+  });
+
+  // 規格 home-page：今日暢銷榜以橫式商品卡呈現（卡片內容與順序、點擊暢銷商品）
+  it('lists the best sellers in the order of the catalog, as cards with no rank on them', async () => {
+    const home = createFakeHomeRepository({
+      getLayout: async () => [bestSellers],
+    });
+
+    renderHomePage(home);
+
+    const section = await screen.findByRole('region', { name: '今日暢銷榜' });
+    const cards = await within(section).findAllByRole('article');
+    expect(
+      cards.map((card) => within(card).getByRole('heading').textContent),
+    ).toEqual(BEST_SELLERS.map((item) => item.name));
+    // 卡片上只有促銷文字、名稱與價格：沒有名次，也沒有別的東西
+    expect(cards[0].textContent).toBe(
+      '滿1件折100【紅布朗】堅果禮盒$599原價$1,040',
+    );
+    expect(within(cards[0]).getByRole('link').getAttribute('href')).toBe(
+      '/goods/b3',
+    );
+  });
+
+  // 真站：底色與標題旁的標籤都是這個區塊的資料，不是另一種元件
+  it('gives the best sellers their tinted band and their badge from the data', async () => {
+    const home = createFakeHomeRepository({
+      getLayout: async () => [bestSellers, priceDrop],
+    });
+
+    renderHomePage(home);
+
+    const tinted = await screen.findByRole('region', { name: '今日暢銷榜' });
+    const plain = await screen.findByRole('region', { name: '降價好貨' });
+    expect(tinted.style.backgroundColor).toBe('rgb(246, 232, 235)');
+    expect(within(tinted).getByText('即時更新')).toBeTruthy();
+    expect(plain.style.backgroundColor).toBe('');
+    expect(within(plain).queryByText('即時更新')).toBeNull();
   });
 });

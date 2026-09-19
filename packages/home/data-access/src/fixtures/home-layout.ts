@@ -202,8 +202,16 @@ export const HOME_LAYOUT: HomeSection[] = [
   },
   // 12. 限時搶購：只給標題，倒數與商品由 home/feature-flash-sale 負責
   { id: 'flash-sale', type: 'flash-sale', title: { text: '限時搶購' } },
-  // 13. 今日暢銷榜：只給標題，內容由 home/feature-ranking 負責（佔位中）
-  { id: 'best-sellers', type: 'ranking', title: { text: '今日暢銷榜' } },
+  // 13. 今日暢銷榜：和 momo 店取同一種商品列，只差商品、粉色底與「即時更新」標籤
+  {
+    id: 'best-sellers',
+    type: 'product-rail',
+    title: { text: '今日暢銷榜', badge: '即時更新' },
+    collection: 'best-sellers',
+    card: 'horizontal',
+    perView: 3.47,
+    background: '#f6e8eb',
+  },
   // 14. moPro 會員專屬價：整張做好的促銷磚，不可點
   {
     id: 'mopro',
