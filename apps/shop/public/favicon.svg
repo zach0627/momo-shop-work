@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#f200ca" />
+  <g fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path id="mo" d="M12 27V18.875a4.875 4.875 0 0 1 9.75 0V27M21.75 18.875a4.875 4.875 0 0 1 9.75 0V27M53 20.5a6.5 6.5 0 1 1-13 0a6.5 6.5 0 0 1 13 0Z" />
+    <use href="#mo" y="23" />
+  </g>
+</svg>
