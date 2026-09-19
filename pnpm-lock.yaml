@@ -407,6 +407,12 @@ importers:
 
   packages/home/page:
     dependencies:
+      '@momo/home-data-access':
+        specifier: workspace:*
+        version: link:../data-access
+      '@momo/shared-util':
+        specifier: workspace:*
+        version: link:../../shared/util
       react:
         specifier: 'catalog:'
         version: 19.3.0
