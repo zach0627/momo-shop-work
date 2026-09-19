@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # nx affected 要比對 git 歷史，所以不能只取最後一個 commit
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 版本來自 package.json 的 packageManager
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # lockfile 過期就在這裡失敗，不會帶著不一致的依賴往下跑
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm format:check
+
+      # 依賴規則真的套用到每個專案、依賴圖 0 違規（規則設定錯誤時 lint 會靜默通過，這一步不會）
+      - run: pnpm verify:boundaries
+
+      # 商品 fixtures 與素材一致
+      - run: pnpm verify:fixtures
+
+      # 算出上一次成功的 CI 到現在改了哪些專案
+      - uses: nrwl/nx-set-shas@v4
+
+      - run: pnpm exec nx affected -t lint test typecheck build
