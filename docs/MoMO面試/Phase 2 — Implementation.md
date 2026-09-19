@@ -47,7 +47,7 @@ First Commit 至最後 Commit
 | ✅ | 9 | 你可能會喜歡：3 列 + 看更多 | `feat(recommendation): paginated grid with load more` | #4 | ✗ |
 | ✅ | 10 ★ | 商品詳情頁（純展示） | `feat(goods): display-only goods detail page` | #8 | ✗ |
 | ✅ | 11 | 限時搶購：倒數 + 2 列輪播 | `feat(flash-sale): countdown and two-row carousel` | #7 | ✓ |
-| ⬜ | 12 | 今日暢銷榜（橫式商品卡，沒有名次） | `feat(ranking): best sellers as horizontal cards` | — | ✓ |
+| ✅ | 12 | 今日暢銷榜（橫式商品卡，沒有名次）—— 是 `product-rail` 的一筆設定，不是 package | `feat(home): best sellers as one more product rail` | — | ✓ |
 | ⬜ | 13 ★ | README + CI | `docs: readme with tradeoffs and roadmap` / `ci: nx affected` | — | README ✗ / CI ✓ |
 | ⬜ | P2 | Playwright / SectionBoundary / Skeleton / 部署 | 各自一個 commit | — | ✓ |
 
@@ -333,14 +333,21 @@ First Commit 至最後 Commit
   - ↳ 2 個 commit（先 `shared/ui` 的選項，再 feature），外加文件。
   - ↳ **收尾逐項核對時找到一個漏掉的**：這個 package 現在有明寫的 `import … from 'react'`（`use-countdown`、`countdown`），eslint 設定裡「只寫 JSX 所以對 react 放行」的例外與那行註解已經不成立。比照 `home/page`、`goods/page` 移除；移除後 lint 仍通過（表示規則真的看得到 import），`verify:boundaries` 0 違規。ADR-0008 裡過期的放行清單一併更新。
 
-### Step 12 — 今日暢銷榜　（可砍）
+### Step 12 — 今日暢銷榜　（可砍） ✅
 
-- [ ] `ranking.tsx`：以橫式商品卡呈現 `getRanking()` 的商品（含促銷文字）；registry 換成真的元件。
+- [x] ~~`ranking.tsx`：以橫式商品卡呈現 `getRanking()` 的商品（含促銷文字）；registry 換成真的元件。~~ → 改為 `product-rail` 的一筆版位設定（Human 選方案 A）。
+  - ↳ **Human 在動工後要求先到真站確認切法**（第 12 次糾正）。真站的 DOM：今日暢銷榜與 momo 店取的標題圖是 `bt_7_777_01` / `bt_7_777_02` —— momo 自己的 CMS 把它們當成**同一種區塊**；商品卡的 class 字串完全相同（335×174、1px `#d9d9d9`、圓角 8px、padding 16px）；區帶同為 294px。差別只有資料：標題、商品、以及**每個區塊容器都會收到的 inline 背景色**（其他是白色，這裡 `#f6e8eb`）。對照組：限時搶購（713）、你可能會喜歡（712）各有自己的 DOM，仍是 feature。→ 方案 A 成立。
+  - ↳ 真站帶來兩個只看截圖看不到的修正：(1) 粉色底是**版位資料的欄位**（`background`，CSS 顏色），不是元件變體、也不是 token —— 它是 CMS 隨檔期給的內容；(2) 橫式商品卡的框線是 `#d9d9d9`、沒有陰影（新的 `frame="bordered"`），momo 店取從 Step 8 起一直沿用直式卡的樣式，一併修正。
+  - ↳ 標題旁的「即時更新」：`SectionTitle.badge` → `SectionHeader` 的 `badge`。放在 h2 外面，區塊仍然叫「今日暢銷榜」。顏色 `#f73f64` 取樣自目標截圖（真站的標題列是一張圖）。
+  - ↳ **移除沒有使用者的東西**：`ranking` 型別（9 → 8 種）與 registry 項目、`packages/home/feature-ranking`（package 10 → 9 個）、`getRanking()` / `useRanking` / query key（在 mock 裡它就是 `getCollection('best-sellers')`）。
+  - ↳ TDD：版位 fixture 2 個、底色與標籤 1 個、`SectionHeader` 標籤 1 個、app 層整合 1 個先紅。頁面層「順序相同、沒有名次」一寫就綠（既有 block 本來就做得到），改用**變異測試**確認會紅：順序反過來 → 紅；卡片上印名次 → 紅。
+  - ↳ 量測時發現並修正 Step 8 的間距誤差：有標題的區塊，真站是標題列下方 16px、圓點列下方沒有額外留白（原本相反）。
   - ↳ **原本寫的 `ui/rank-badge` 已移除**：真站與目標截圖上都沒有名次，那是規劃時自己加的。
   - ↳ **動工前先決定**：它已經沒有自己的邏輯，是否還需要獨立的 `home/feature-ranking` package，或改為 `product-rail` 的一種版型（`architecture.md` §5：沒有邏輯的區塊不拆）。
 
-**驗證**：`pnpm nx test home-feature-ranking`、dev server
-**Commit**：`feat(ranking): best sellers as horizontal cards`
+**驗證**：~~`pnpm nx test home-feature-ranking`~~ `home-data-access`、`home-page`、`shop` 的 spec + dev server
+**Commit**：~~`feat(ranking): best sellers as horizontal cards`~~
+  - ↳ 5 個 commit：`shared/ui` 的兩個選項 → 今日暢銷榜成為一筆設定 → 移除 `ranking` 型別與 package → 移除 `getRanking` → 間距修正；外加文件。
 
 ### Step 13 ★ — README + CI
 
@@ -394,6 +401,8 @@ First Commit 至最後 Commit
 | 10 | **商品詳情頁（展示用）**：`GoodsDetailPage` 的四種狀態（載入中 / 失敗 / 找不到商品 / 頁面）；私有的 `goods-gallery`、`goods-info`、`goods-actions`（無 onClick，有 spec 守著）、`goods-not-found`；app 整合測試改用真的商品並新增兩條；移除 `breadcrumb-root`、`ink-meta`。goods-page 10 個測試、app 11 個 | `d4eba24`（+ 文件的 commit） |
 | — | **程式碼註解全面改寫**（Human 第 11 次糾正）：繁體中文、以一行為主，只留對照資訊、不直覺的流程、重要或太難的函式、spec 對應的規格；設計沿革與取捨移到文件。868 行 → 418 行。規則寫進 `CLAUDE.md` | `e250c76` `d680f80` |
 | 11 | **限時搶購**：`get-remaining`、`chunk`、`use-countdown`（重新讀時鐘、到零停止）；私有的 `flash-sale-header`、`countdown`、`card-footer`；每頁 2 × 5 的輪播；`shared/ui` 補上 `PriceTag` 的 `sale` / `lg` / `label` 與 `ProductCard` 的 `raised`、token `surface-sale` `surface-stock`。feature 20 個測試 | `41cbf92` `8e51f22`（+ 文件的 commit） |
+| 11+ | 逐項核對 Step 11 時找到的收尾：`feature-flash-sale` 有了明寫的 `import react`，eslint 對 react 的放行與註解已不成立 → 移除；ADR-0008 過期的放行清單更新 | `935da30` `0e2fc15` |
+| 12 | **今日暢銷榜**：對照真站後成為 `product-rail` 的一筆設定（`background`、標題的 `badge`）；`SectionHeader` 的 `badge`、`ProductCard` 的 `frame="bordered"`；移除 `ranking` 型別、`home/feature-ranking`（package 10 → 9）、`getRanking` / `useRanking`；有標題區塊的間距修正。home-data-access 9 個測試、home-page 11 個、app 12 個、shared-ui 35 個 | `3181acf` `37c5e0a` `e2de477` `ee99a32` `ab38102`（+ 文件的 commit） |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -539,6 +548,18 @@ First Commit 至最後 Commit
 - 下一頁 / 下一頁 / 上一頁 → 目前頁的圓點 2 → 3 → 2，最後一頁「下一頁」停用；點商品卡 → 同文件導頁到它的詳情頁；console 無錯誤。
 - **和真站的差距**：卡片高 380.4（真站 386）、列距 391（真站 396），差在哪一段沒有逐項比對。列入 Known Gaps。
 - **沒有驗到的**：(1) slide 實際位移 —— 預覽面板在背景，瀏覽器暫停 `requestAnimationFrame`，embla 的動畫不會前進；只驗到狀態。同一個 `Carousel` 的位移在 Step 7 面板在前景時驗過。(2) 用眼睛對照截圖 `11-flash-sale.png` —— 收尾時再試一次，面板仍在背景、截圖是空白的。**需要 Human 在瀏覽器看一次，並按一次下一頁。**
+  - ↳ **Step 12 時補驗**（面板在前景）：每按一次下一頁位移 −1198px（1188 + 間距 10）、第 3 頁「下一頁」停用、上一頁回到 0；截圖與 `11-flash-sale.png` 並排對照，版面相符，看得出的差異是「搶」的形狀（真站是貼齊右下角的斜邊標籤）。
 - 過程中的錯誤：量測腳本判斷目前頁時沒把 slide 的 `padding-left` 算進去；和上面的 rAF 暫停疊在一起，一開始分不出是誰的問題。已記在 `agent-workflow.md`。
 
-**下一步：Step 12 — 今日暢銷榜。動工前要 Human 先決定**：保留獨立的 `home/feature-ranking` package，或改為 `product-rail` 的一種版型（它已經沒有自己的邏輯）。
+**Human 的決定**：方案 A（改為 `product-rail` 的一筆設定）。動工後 Human 追加：先到 momo 首頁抓內容，再回來確認這個切法。
+
+**Step 12 驗證結果**
+- 全部 **10 個**專案 `lint / test / typecheck`（無快取、循序）全綠；`nx build shop` 成功；`pnpm verify:boundaries`：10 個專案、**26 條依賴**（少了 `home-page → home-feature-ranking` 與 `home-feature-ranking → shared-ui`）、0 違規；`pnpm verify:fixtures` 通過（best-sellers 11 件）。
+- 真站（1440px）：今日暢銷榜區帶 `rgb(246, 232, 235)`、294px；卡片 335.4 × 174、每張間隔 345.4、1px `#d9d9d9`、沒有陰影；與 momo 店取同一個 class 字串。
+- 自己的頁面（1440px，**面板在前景，有截圖**）：區帶同色、288px；11 張卡片 335.2 × 174、間隔 345.2、同樣的框線；標籤高 24px `#f73f64`；下一頁位移 3 張（−1036px）、上一頁回到 0；點卡片 → 同文件導頁到 `/goods/13683504`，名稱與售價（8,269）一致；首頁 15 個區塊、沒有「建置中」；console 無錯誤。
+- 間距修正後的區帶高度：降價好貨 353.6（真站 352）、猜你想搜 348.1（348）、momo 店取與今日暢銷榜 288（294）。
+- 截圖與 `12-best-sellers-and-mopro.png` 對照：粉色區帶、標題與紅色標籤、3.5 張橫式卡、圓點都相符。差異：商品卡沒有影片播放圖示（資料模型沒有）；標題是文字不是圖。
+
+> **檢查點：首頁 15 個區塊與商品詳情頁都已完成。** 剩下 Step 13（README 總整理 + CI + `.prettierignore`）與 P2 加分項。
+
+**下一步：Step 13 ★ — README + CI** → 對應 `tasks.md` 第 13 組

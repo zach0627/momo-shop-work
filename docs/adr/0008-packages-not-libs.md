@@ -51,7 +51,7 @@ Human review 時指出：「`libs` 裡每一個資料夾都有 `package.json`，
 
 ## 代價與已知的盲點
 
-- `@nx/dependency-checks` **只看得到明寫的 import**。只寫 JSX、沒有 `import … from 'react'` 的 package 會被誤判為沒用到 react，所以這種 package 要在自己的 eslint 設定對 react 放行；放行之後，它少宣告 react 時工具也看不出來（探針 P5 證實）。寫下這份 ADR 時是 `home/page` 與 `goods/page`；它們與 `home/feature-flash-sale` 有了明寫的 import 之後已把放行拿掉。目前剩 `catalog/feature-recommendation` 與 `home/feature-ranking`（兩者確實沒有任何 `import … from 'react'`）。
+- `@nx/dependency-checks` **只看得到明寫的 import**。只寫 JSX、沒有 `import … from 'react'` 的 package 會被誤判為沒用到 react，所以這種 package 要在自己的 eslint 設定對 react 放行；放行之後，它少宣告 react 時工具也看不出來（探針 P5 證實）。寫下這份 ADR 時是 `home/page` 與 `goods/page`；它們與 `home/feature-flash-sale` 有了明寫的 import 之後已把放行拿掉。目前只剩 `catalog/feature-recommendation`（它確實沒有任何 `import … from 'react'`）；另一個 `home/feature-ranking` 在 Step 12 整個移除了。
 - 這條規則在專案沒有對應的 target 時**靜默地什麼都不檢查**。預設值 `['build']` 只有 app 有，所以改用 `typecheck`，並由 `verify-boundaries` 檢查「規則開著，而且專案真的有那個 target」。
 - 一律忽略 `tslib`：`tsconfig.base.json` 開了 `importHelpers`，規則因此假設編譯產物需要它；但這些 package 只輸出型別宣告、原始碼由 Vite 轉譯，實際上沒有任何東西 import 它。
 - 資料夾路徑與 package 名稱仍是兩套寫法（`packages/shop/layout` ↔ `@momo/shop-layout`），這是選擇分組的代價。
@@ -69,4 +69,4 @@ Human review 時指出：「`libs` 裡每一個資料夾都有 `package.json`，
 
 - **要把某個 package 發佈到 registry**（例：design system 給其他產品用）→ 該 package 需要真正的 build、`dist/` 與版本號，`react` 改為 `peerDependencies`；`private` 拿掉。
 - **package 數量多到 `packages/*/*` 兩層不夠分**（例：一個 domain 底下再分子領域）→ 改為明列各組的 glob（`packages/home/*`…），不要改用 `**`。
-- **`@nx/dependency-checks` 支援隱含的 JSX runtime** → 拿掉兩個 package 對 react 的放行。
+- **`@nx/dependency-checks` 支援隱含的 JSX runtime** → 拿掉剩下的 package 對 react 的放行。

@@ -85,6 +85,8 @@
 
 ### 5. 首頁 config-driven：9 種 renderer 對應 15 筆設定
 
+> **Step 12 修訂：現在是 8 種。** 原規劃把今日暢銷榜當成第三個 feature。動工前對照真站：momo 自己的 CMS 把它和 momo 店取當成同一種區塊（`bt_7_777_01` / `_02`，商品卡的 class 完全相同），差別只有資料與一個 inline 的背景色。所以它成了 `product-rail` 的一筆設定（加上選填的 `background` 與標題的 `badge`），`ranking` 型別、`home/feature-ranking` package 與 `getRanking()` 一併移除。package 由 10 個變成 9 個。下文保留原本的寫法。
+
 **選擇**：`HomeSection` 是 discriminated union；`SectionRenderer` 透過型別化的 registry 對應 `type → Component`。
 
 - 沒有邏輯的區塊收斂成 6 種通用 block，留在 `home/page`。
@@ -146,7 +148,7 @@ UI → query hooks → useCatalogRepository() → CatalogRepository（interface�
 
 ### 10. 商品卡用 slots 而不是 variant
 
-**選擇**：`ProductCard` 提供 `promoText` 與 `footer` 兩個 slot；限時搶購的「最後 N 組」與「搶」由它的 feature 填進 `footer`。外觀用**視覺性質**的選項表達：`layout`（直式：圖在上 —— 降價好貨、限時搶購；橫式：圖在左、335×174 —— momo 店取、今日暢銷榜）、`frame`（`outlined` / `plain` / `raised`）、`priceTag`（顏色、大小、原價放旁邊或下面、價格前的標籤）。兩種版型都可以帶一行紅色的促銷文字 —— 這些是對照真實網站的 DOM 得到的。`href` 由呼叫端用 `paths.goods(id)` 組好傳入，`shared/ui` 不認識路由。
+**選擇**：`ProductCard` 提供 `promoText` 與 `footer` 兩個 slot；限時搶購的「最後 N 組」與「搶」由它的 feature 填進 `footer`。外觀用**視覺性質**的選項表達：`layout`（直式：圖在上 —— 降價好貨、限時搶購；橫式：圖在左、335×174 —— momo 店取、今日暢銷榜）、`frame`（`outlined` / `bordered` / `plain` / `raised`）、`priceTag`（顏色、大小、原價放旁邊或下面、價格前的標籤）。兩種版型都可以帶一行紅色的促銷文字 —— 這些是對照真實網站的 DOM 得到的。`href` 由呼叫端用 `paths.goods(id)` 組好傳入，`shared/ui` 不認識路由。
 
 **為什麼**：三種卡片長得不一樣。用 `variant="flash-sale"` 會讓 `shared/ui` 知道業務概念；視覺選項加 slot 讓業務留在它所屬的 feature。`footer` 渲染在連結**外面**，因為 feature 可能放按鈕進去，而按鈕放在連結裡是無效的 HTML。
 

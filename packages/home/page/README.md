@@ -19,7 +19,7 @@ src/
 - **The order of the page is the order of the data.** `SectionRenderer` fetches nothing and takes the registry as a prop, so its specs use one-line components and are about dispatch, order and fault tolerance - not about blocks.
 - **A missing renderer is a compile error.** `SectionRegistry` maps every type of the union to a component of exactly that variant.
 - **An unknown type at run time is skipped and reported, once.** The data comes from outside; a CMS can ship a type this build does not know.
-- **Blocks have no logic of their own**, which is why they are private files here and not packages. `product-rail` is the one that fetches: it turns a collection key into products through the catalog, and links every card to `paths.goods(id)`. Banners are images, never links.
+- **Blocks have no logic of their own**, which is why they are private files here and not packages. `product-rail` is the one that fetches: it turns a collection key into products through the catalog, and links every card to `paths.goods(id)`. It serves three sections - 降價好貨 (vertical cards), momo 店取 and 今日暢銷榜 (horizontal cards; the latter on a tinted band with a badge, both from the data). Banners are images, never links.
 - **The page owns its width and background** (full-width grey, white 1220px bands); the layout around it only says where the page goes.
 - **Reporting a failed load is not done here**: the app's query cache reports every failed query once. The page shows the state (`role="status"`, `role="alert"`).
 

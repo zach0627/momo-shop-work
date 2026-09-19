@@ -48,7 +48,7 @@ graph TD
 | Domain     | 預期內容                                | 可依賴                                   |
 | ---------- | --------------------------------------- | ---------------------------------------- |
 | `catalog`  | 商品、分類、推薦                        | shared                                   |
-| `home`     | 首頁版位、限時搶購、暢銷榜              | catalog, shared                          |
+| `home`     | 首頁版位、限時搶購                      | catalog, shared                          |
 | `goods`    | 商品詳情                                | catalog, shared（＋ cart：加入購物車）   |
 | `brand`    | 品牌頁                                  | catalog, shared                          |
 | `cart`     | 購物車（此時才引入 store，見 ADR-0003） | catalog, shared                          |

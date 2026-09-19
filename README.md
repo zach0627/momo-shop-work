@@ -2,7 +2,7 @@
 
 Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情頁。全程使用 Mock Data，不呼叫任何真實 API。
 
-> **狀態：進行中。** 目前完成 workspace、10 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）、共用元件（`PriceTag`、兩種版型的 `ProductCard`、`Carousel`、`SectionHeader`）、**由版位資料驅動的首頁**（15 筆設定、6 種通用 block；商品卡可點進詳情頁）。「你可能會喜歡」每次載入 3 列、載完後「看更多」消失。**商品詳情頁**（展示用：主圖、標題、說明、價格與三顆不綁行為的按鈕；商品不存在時顯示提示）。需求要求的兩個頁面都已完成。**限時搶購**（每秒更新的倒數、每頁 2 列 × 5 件可換頁的商品，卡片顯示限搶價、劃線原價與「最後 N 組」）。今日暢銷榜目前是佔位區塊。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
+> **狀態：進行中。** 目前完成 workspace、9 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）、共用元件（`PriceTag`、兩種版型的 `ProductCard`、`Carousel`、`SectionHeader`）、**由版位資料驅動的首頁**（15 筆設定、6 種通用 block 加 2 個 feature；商品卡可點進詳情頁）。「你可能會喜歡」每次載入 3 列、載完後「看更多」消失。**商品詳情頁**（展示用：主圖、標題、說明、價格與三顆不綁行為的按鈕；商品不存在時顯示提示）。需求要求的兩個頁面都已完成。**限時搶購**（每秒更新的倒數、每頁 2 列 × 5 件可換頁的商品，卡片顯示限搶價、劃線原價與「最後 N 組」）。**今日暢銷榜**（橫式商品卡、粉色區帶與「即時更新」標籤 —— 是一筆版位設定，不是一個元件）。首頁的 15 個區塊都已完成。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
 
 ## 先看這幾份
 
@@ -31,7 +31,7 @@ Nx（pnpm workspaces）· React 19 · TypeScript strict · Vite · Vitest + Test
 app → layout / page → feature → ui / data-access → util
 ```
 
-- 一個薄殼 app + 10 個依 domain 與職責切分的 package。依賴方向由 `@nx/enforce-module-boundaries` 強制（7 條 type 規則 + 5 條 scope 規則），不靠自律。
+- 一個薄殼 app + 9 個依 domain 與職責切分的 package。依賴方向由 `@nx/enforce-module-boundaries` 強制（7 條 type 規則 + 5 條 scope 規則），不靠自律。
 - 只有 `layout`（跨頁保留的外框）與 `page` 能組合多個 feature；`feature ✗ feature`。兩者同層，由 router 巢狀組合、互不 import —— 和 Next.js 的 `layout.tsx` / `page.tsx` 是同一種關係。
 - `react-router` 只准出現在 `apps/shop`、`embla` 只准出現在 `packages/shared/ui`（`no-restricted-imports`，預設全禁、單點放行）。
 - **Rule of Two**：被 ≥2 個專案使用的東西才能進 `shared/*`；其餘留在各 package 私有的 `ui/`、`model/`。
@@ -43,7 +43,7 @@ app → layout / page → feature → ui / data-access → util
 
 **以目前 2 個頁面的規模，這個結構是偏重的。**
 
-10 個 package 帶來約 80 個設定檔。它換到的邊界，在這個規模下用單一 Vite app + 資料夾分層 + `eslint-plugin-boundaries` 也做得到，而且設定少一個數量級。
+9 個 package 帶來約 70 個設定檔。它換到的邊界，在這個規模下用單一 Vite app + 資料夾分層 + `eslint-plugin-boundaries` 也做得到，而且設定少一個數量級。
 
 層級也是：7 種 `type:` 裡，`layout` 這一層目前只約束一個 package。它存在的理由（外框日後要能組合別的 domain 的 feature）在只有一種外框、沒有購物車的現在還用不到。
 
@@ -51,23 +51,23 @@ app → layout / page → feature → ui / data-access → util
 
 這裡選擇 Nx + domain packages，是因為題目明確把「系統演進」與「可維護性」放在功能完成度之前。這個結構要回答的問題是「變成 30 頁、5 個團隊時怎麼辦」：
 
-- 成長方式是**新增 scope**（`cart`、`checkout`、`payment`、`brand`、`member`…），而不是養大既有的 package —— 現有的 10 個 package 不需要修改。
+- 成長方式是**新增 scope**（`cart`、`checkout`、`payment`、`brand`、`member`…），而不是養大既有的 package —— 現有的 9 個 package 不需要修改。
 - Domain 之間的依賴方向有一張明確、無環、需要審查才能修改的地圖（[ADR-0006](./docs/adr/0006-domain-dependency-map.md)）。
 
 它也有已知的弱點，寫在 [`architecture.md` §5](./docs/architecture.md)：`catalog/data-access` 是最可能先變肥的 package、`shared/ui` 長大後會讓 `nx affected` 失去意義、scope 放行清單會隨時間腐化。每一項都寫了拆分的觸發條件。
 
 其他取捨：
 
-| 決策                                                  | 換到什麼                                                                                | 付出什麼                                                                                                                                                        |
-| ----------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SPA 而非 Next                                         | 靜態部署、沒有 server、沒有 RSC 邊界的決策                                              | 沒有 SSR 的 SEO 與 LCP —— 不適合直接上正式環境的電商（[ADR-0001](./docs/adr/0001-spa-over-next.md)）                                                            |
-| 首頁 config-driven                                    | 13 個區塊只需要 9 種 renderer；調整版位只改資料                                         | 多一層間接；通用 block 的 props 會膨脹（[ADR-0004](./docs/adr/0004-config-driven-home-page.md)）                                                                |
-| Repository + Context 而非 MSW                         | 接縫在 TypeScript interface 上；測試可注入小的 fake                                     | 不驗證 HTTP 細節（[ADR-0005](./docs/adr/0005-repository-seam-with-context-injection.md)）                                                                       |
-| 整個 layout 放 package，而非 `apps/shop/src/layouts`  | app 只有接線；路由層級的組合（page、layout）都受 lint 約束                              | 多一條自訂的型別規則，而且和 Nx 官方範例的放法不同（[ADR-0007](./docs/adr/0007-layout-as-a-lib-and-a-tier.md)）                                                 |
-| 每個 package 宣告自己的依賴，版本用 pnpm catalog 統一 | package 不靠根目錄偷渡依賴；整個 workspace 只有一份 React；少宣告、多宣告都由 lint 擋下 | 檢查工具只看得到明寫的 import，只寫 JSX 的 package 要單點放行；而且它在設定不對時會靜默地不檢查，得另外驗證（[ADR-0008](./docs/adr/0008-packages-not-libs.md)） |
-| 共用元件的選項跟著第一個使用者出現，不預留            | `ProductCard` 的每個 prop 都說得出誰在用；計畫裡的 `topBadge` 因為查無使用者而沒做      | 做到限時搶購時要回頭改 `shared/ui`：「限搶價」標籤、浮起的外框、紅色 23px 價格三個選項是 Step 11 才加的，各是一小筆改動（`design.md` 第 10 點）                 |
-| 輪播的換頁邏輯對假的 embla API 測試                   | jsdom 不做排版也測得到包裝邏輯；另有一個 spec 用真的 embla 掛載，套件升級改名時會被發現 | 「真的會捲動」沒有自動化測試，只在瀏覽器手動驗證過                                                                                                              |
-| TDD 只打有邏輯的地方                                  | 測試數量少、每個都有意義                                                                | 純版面區塊沒有單元測試保護                                                                                                                                      |
+| 決策                                                  | 換到什麼                                                                                                                                                          | 付出什麼                                                                                                                                                        |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SPA 而非 Next                                         | 靜態部署、沒有 server、沒有 RSC 邊界的決策                                                                                                                        | 沒有 SSR 的 SEO 與 LCP —— 不適合直接上正式環境的電商（[ADR-0001](./docs/adr/0001-spa-over-next.md)）                                                            |
+| 首頁 config-driven                                    | 13 個區塊只需要 8 種 renderer；調整版位只改資料。今日暢銷榜原本規劃成一個 feature package，做到時發現它和 momo 店取是同一種區塊，就成了一筆設定，package 也移除了 | 多一層間接；通用 block 的 props 會膨脹；版位資料可以帶任意的背景色，設計系統管不到（[ADR-0004](./docs/adr/0004-config-driven-home-page.md)）                    |
+| Repository + Context 而非 MSW                         | 接縫在 TypeScript interface 上；測試可注入小的 fake                                                                                                               | 不驗證 HTTP 細節（[ADR-0005](./docs/adr/0005-repository-seam-with-context-injection.md)）                                                                       |
+| 整個 layout 放 package，而非 `apps/shop/src/layouts`  | app 只有接線；路由層級的組合（page、layout）都受 lint 約束                                                                                                        | 多一條自訂的型別規則，而且和 Nx 官方範例的放法不同（[ADR-0007](./docs/adr/0007-layout-as-a-lib-and-a-tier.md)）                                                 |
+| 每個 package 宣告自己的依賴，版本用 pnpm catalog 統一 | package 不靠根目錄偷渡依賴；整個 workspace 只有一份 React；少宣告、多宣告都由 lint 擋下                                                                           | 檢查工具只看得到明寫的 import，只寫 JSX 的 package 要單點放行；而且它在設定不對時會靜默地不檢查，得另外驗證（[ADR-0008](./docs/adr/0008-packages-not-libs.md)） |
+| 共用元件的選項跟著第一個使用者出現，不預留            | `ProductCard` 的每個 prop 都說得出誰在用；計畫裡的 `topBadge` 因為查無使用者而沒做                                                                                | 做到限時搶購時要回頭改 `shared/ui`：「限搶價」標籤、浮起的外框、紅色 23px 價格三個選項是 Step 11 才加的，各是一小筆改動（`design.md` 第 10 點）                 |
+| 輪播的換頁邏輯對假的 embla API 測試                   | jsdom 不做排版也測得到包裝邏輯；另有一個 spec 用真的 embla 掛載，套件升級改名時會被發現                                                                           | 「真的會捲動」沒有自動化測試，只在瀏覽器手動驗證過                                                                                                              |
+| TDD 只打有邏輯的地方                                  | 測試數量少、每個都有意義                                                                                                                                          | 純版面區塊沒有單元測試保護                                                                                                                                      |
 
 ## Known Gaps
 
@@ -90,9 +90,11 @@ app → layout / page → feature → ui / data-access → util
 | 詳情頁只有主圖，沒有縮圖列與放大鏡；沒有相關商品、付款與配送資訊、麵包屑、「你可能會喜歡」              | 需求筆記寫明詳情頁只要「左邊商品圖、右邊 title 與商品說明、下面三顆按鈕」，其餘可忽略；縮圖切換與放大屬於互動，而這一頁是展示用                                   |
 | 詳情頁的三顆按鈕點了沒有反應                                                                            | **刻意的**，不是未完成：需求明訂不可往下做。購物車與結帳是未來的 domain（[ADR-0006](./docs/adr/0006-domain-dependency-map.md)），有測試確保按鈕不會被順手接上行為 |
 | 限時搶購的標題列是用文字、圖示與色塊重現的；真站的整條標題列（含火焰與「限時搶購」字樣）是一張圖        | 素材裡沒有這張圖。粉色底從目標截圖取樣；「倒數」與數字方塊在真站是真的 DOM，數值為實測                                                                            |
-| 限時搶購卡片上的「搶」只是裝飾，不是按鈕                                                                | 整張卡片就是連到詳情頁的連結；搶購與結帳流程不在範圍內                                                                                                            |
+| 限時搶購卡片上的「搶」只是裝飾，不是按鈕；形狀是小的圓角方塊，真站是貼齊卡片右下角的斜邊標籤            | 整張卡片就是連到詳情頁的連結；搶購與結帳流程不在範圍內。形狀是並排對照截圖時看到的差異，沒有再調                                                                  |
 | 限時搶購的商品卡比真站矮約 6px（380 對 386），列距也因此少 5px                                          | 寬度、欄距、框線、圓角、陰影與內距都和真站相同；高度差在哪一段沒有逐項比對，也沒有為了湊高度加空白                                                                |
 | 限時搶購倒數歸零後停在 00:00:00，區塊不會消失、也不會換下一檔                                           | mock 的結束時間固定是「現在 + 3 小時」，重新整理就重新倒數；檔期輪替是後端的事                                                                                    |
+| 今日暢銷榜的標題與「即時更新」標籤是文字；真站的整條標題列是一張圖                                      | 素材裡沒有這張圖。標籤的紅色從目標截圖取樣；區帶的粉色底（`#f6e8eb`）與商品卡是真站實測                                                                           |
+| 今日暢銷榜與 momo 店取的商品卡沒有影片播放圖示、「店+」標記                                             | 商品資料模型沒有這些欄位                                                                                                                                          |
 | 主 header 右側的三張活動小圖沒有做                                                                      | 素材裡沒有這三張圖                                                                                                                                                |
 
 ## 開發

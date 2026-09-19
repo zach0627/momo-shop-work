@@ -31,7 +31,7 @@
 graph TD
   APP["apps/shop<br/>type:app"] --> PAGE["home/page · goods/page<br/>type:page"]
   APP --> LAYOUT["shop/layout<br/>type:layout"]
-  PAGE --> FEAT["feature-flash-sale · feature-ranking<br/>feature-recommendation<br/>type:feature"]
+  PAGE --> FEAT["feature-flash-sale<br/>feature-recommendation<br/>type:feature"]
   PAGE --> UI
   PAGE --> DA
   FEAT --> UI["shared/ui<br/>type:ui"]
@@ -85,7 +85,7 @@ Nx 文件只列四種 type：feature、ui、data-access、util。**`page` 與 `l
 
   限制是從有效的 ESLint 設定讀出來的，沒有第二份要同步。這支腳本本身也被驗證過會報紅：故意把一個 package 的 tags 改壞，它以 exit 1 指出是哪個 package、什麼問題。
 
-## 4. Workspace 結構（1 app + 10 packages）
+## 4. Workspace 結構（1 app + 9 packages）
 
 Nx 23、pnpm workspaces、TypeScript project references。每個專案都是一個 pnpm workspace package：`@momo/*` 能被 import，是因為 pnpm 依它的 `package.json` 建立連結（舊版 Nx 靠 `tsconfig` 的 `paths`，那時的 lib 才沒有 `package.json`）。所以資料夾叫 `packages/`，不叫 `libs/`。決策與比較見 [ADR-0008](./adr/0008-packages-not-libs.md)。
 
@@ -97,13 +97,14 @@ packages/catalog/data-access               @momo/catalog-data-access            
 packages/catalog/feature-recommendation    @momo/catalog-feature-recommendation  type:feature      scope:catalog
 packages/home/data-access                  @momo/home-data-access                type:data-access  scope:home
 packages/home/feature-flash-sale           @momo/home-feature-flash-sale         type:feature      scope:home
-packages/home/feature-ranking              @momo/home-feature-ranking            type:feature      scope:home
 packages/home/page                         @momo/home-page                       type:page         scope:home
 packages/goods/page                        @momo/goods-page                      type:page         scope:goods
 packages/shop/layout                       @momo/shop-layout                     type:layout       scope:shop
 ```
 
 每個 package 的 README 寫明它的職責、可依賴的層、以及 `src/index.ts` 是唯一公開 API。
+
+原本有第 10 個 package `home/feature-ranking`（今日暢銷榜）。做到它的時候發現它沒有自己的邏輯，就依下面 §5 的準則移除了 —— 經過見 §6「今日暢銷榜為什麼不是 feature」。
 
 **一個 package 要遵守的四件事**（pnpm 與 Nx 對 package 的慣例，見 ADR-0008）：
 
@@ -155,7 +156,7 @@ Nx 的 generator 會把程式碼放在 `src/lib/` 底下，這一層已經拿掉
 
 | Package               | 風險                                                              | 觸發條件 → 動作                                                                                 |
 | --------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `catalog/data-access` | 目前同時放商品、分類、限時搶購、暢銷榜、推薦                      | 出現第 2 種促銷型別，或促銷有自己的後端 → 抽 `promotion/data-access`                            |
+| `catalog/data-access` | 目前同時放商品、分類、限時搶購、推薦                              | 出現第 2 種促銷型別，或促銷有自己的後端 → 抽 `promotion/data-access`                            |
 | `shared/ui`           | 全專案都依賴它；長大後任何修改都讓 `nx affected` = 全部，快取失效 | 元件超過約 15 個，或 affected 雜訊明顯 → 依元件家族拆（`shared/ui-product`、`shared/ui-form`…） |
 | scope 放行清單        | scope 變多後，遇到 lint 錯誤就「加一個放行」，最後誰都能依賴誰    | 新增任何 scope 放行前必須先更新 [ADR-0006](./adr/0006-domain-dependency-map.md)                 |
 
@@ -234,9 +235,9 @@ type HomeSection =
       collection: string; // CMS 只給 key，商品由 catalog 提供
       card: 'vertical' | 'horizontal';
       perView: number;
+      background?: string; // 區帶底色，CSS 顏色。是內容，不是 token
     }
-  | { id: string; type: 'flash-sale'; title: SectionTitle } // ↓ 三個交給 feature package，自己抓資料
-  | { id: string; type: 'ranking'; title: SectionTitle }
+  | { id: string; type: 'flash-sale'; title: SectionTitle } // ↓ 兩個交給 feature package，自己抓資料
   | { id: string; type: 'recommendation'; title: SectionTitle };
 ```
 
@@ -245,7 +246,7 @@ HomePage            useHomeLayout() → 載入中 / 載入失敗 / <SectionRende
 └─ SectionRenderer  純元件：sections + registry → 依序渲染；未知 type 略過並回報
    └─ SECTION_REGISTRY
       ├─ 6 個 page 私有的 block      hero · banner-carousel · banner-grid · shortcut-bar · notice · product-rail
-      └─ 3 個 feature 的轉接         flash-sale · ranking · recommendation（feature 只收 { title, lead? }）
+      └─ 2 個 feature 的轉接         flash-sale · recommendation（feature 只收 { title, lead? }）
 ```
 
 - `SectionRegistry` 是對 union 的 mapped type：union 新增型別卻沒註冊元件 → **編譯期報錯**（實際驗證：暫時加入 `video-wall` → `TS2741: Property '"video-wall"' is missing`）。每個元件拿到的正好是自己那一種 section。
@@ -256,7 +257,15 @@ HomePage            useHomeLayout() → 載入中 / 載入失敗 / <SectionRende
 - **版面數值放在資料裡**（`perView`、`gap`、`columns`）：這是 config-driven 的代價之一 —— CMS 要懂一點版面。數值都是在真站 1220px 版面量到的，實作後再到瀏覽器對過一次（hero 327×445、圖示 148.5、品牌磚 218.8×365、信用卡 250×125、猜你想搜 186×234）。
 - 商品列拿到的是 collection key，商品由 catalog 提供，所以卡片與它連到的詳情頁不可能對不起來。商品列載入失敗時自己消失，不拖垮整頁；載入中先保留高度，下面的區塊不會跳動。
 
-13 個業務區塊對應 15 筆 section 設定（官方優惠拆成 3 筆），只需要 9 種 renderer。調整區塊順序、上下架區塊都只改資料（實際驗證：調換 `home-layout.ts` 的兩筆，畫面上兩個區塊跟著對調，沒有動任何元件）。對照表見 [設計筆記 §5](./MoMO面試/Phase%201%20—%20%20Design%20and%20Planning.md)。
+13 個業務區塊對應 15 筆 section 設定（官方優惠拆成 3 筆），只需要 8 種 renderer。調整區塊順序、上下架區塊都只改資料（實際驗證：調換 `home-layout.ts` 的兩筆，畫面上兩個區塊跟著對調，沒有動任何元件）。對照表見 [設計筆記 §5](./MoMO面試/Phase%201%20—%20%20Design%20and%20Planning.md)。
+
+**今日暢銷榜為什麼不是 feature。** 原規劃給它一個 package（`home/feature-ranking`），因為「暢銷榜」聽起來像有邏輯。做到它的時候它只剩「把一個 collection 畫成橫式商品卡」，和 momo 店取一模一樣。動工前到真站確認這個切法：
+
+- momo 自己的 CMS 把兩者當成**同一種區塊**：標題圖是 `bt_7_777_01`（今日暢銷榜）與 `bt_7_777_02`（momo 店取）—— 同一個區塊型別的兩個實例；商品卡的 class 字串完全相同（335×174、1px `#d9d9d9`、圓角 8px、padding 16px、同樣的字級）；區帶同為 294px 高。
+- 差別只有資料：標題、商品清單，以及一個背景色。真站的**每一個**區塊容器都會收到一個 inline 的 `background-color`（其他區塊是白色，今日暢銷榜是 `#f6e8eb`）—— 它是 CMS 逐區塊給的內容，不是另一種元件。
+- 對照組：限時搶購（`bt_7_713`）與你可能會喜歡（`bt_7_712`）各有自己的 DOM 結構與行為（倒數、分頁載入），它們仍是 feature。
+
+所以今日暢銷榜是 `product-rail` 的一筆設定，加上兩個選填欄位：`background`（CSS 顏色）與標題的 `badge`（「即時更新」）。`background` 刻意**不是** design token：token 描述的是設計系統裡固定的角色，而這個顏色是行銷隨檔期更換的內容，和 banner 圖片是同一類東西；代價是資料可以送來任何顏色，設計系統管不到。目前只有 `product-rail` 認得它 —— 第二種 block 需要時再移到共用的基底型別。`ranking` 型別、package 與 `CatalogRepository.getRanking()`（在 mock 裡它就是 `getCollection('best-sellers')`）都沒有使用者了，一併移除；日後暢銷榜若有了自己的邏輯（名次、分時段、自己的 API），再依 §5 的準則升級成 feature。
 
 `apps/shop` 有一個 spec 檢查版位資料指到的每一張圖都存在於 `public/`（60 多個路徑）：資料和檔案之間沒有別的東西把它們綁在一起，打錯字只會在瀏覽器裡變成破圖。放在 app 是因為檔案由 app 提供。
 
@@ -284,14 +293,13 @@ interface CatalogRepository {
     limit: number;
   }): Promise<Page<Product>>;
   getFlashSale(): Promise<{ endsAt: string; items: FlashSaleItem[] }>;
-  getRanking(): Promise<Product[]>;
   getCategories(): Promise<Category[]>;
 }
 ```
 
 - `createMockCatalogRepository({ data, now, latencyMs })` 在 composition root 建立並以 Context 注入；hooks 透過 `useCatalogRepository()` 取得。「查不到」是一種答案而不是失敗：回 `null` 或 `[]`，不 throw。
 - `getFlashSale().endsAt` = `now() + N 小時`，不寫死在 fixture（否則倒數會過期）。
-- **一份商品表，集合只存 id**：同一個商品 id 會出現在好幾個區塊的素材裡（例：同時在限時搶購、暢銷榜、你可能會喜歡）。所以「首頁與詳情頁的名稱與售價一致」是結構上保證的。
+- **一份商品表，集合只存 id**：同一個商品 id 會出現在好幾個區塊的素材裡（例：同時在限時搶購、今日暢銷榜、你可能會喜歡）。所以「首頁與詳情頁的名稱與售價一致」是結構上保證的。
 - **`Category` 只有 `id` 與 `name`**：真站「選擇分類」面板的五種底色是「第幾列」決定的（每列 9 個），那是版面的事，由 `shop/layout` 依位置算出，不進資料層。
 - **測試的兩種資料來源**：邏輯測試注入小而可控的資料（repository 的 `data` 選項，或 UI 測試用的 fake repository），不依賴真 fixture 的內容與筆數；另有一組測試專門對真 fixture 檢查規格寫明的數字（55 件推薦、40 個分類）。
 - **`home/data-access` 是同一個形狀**：`HomeRepository` interface、`createMockHomeRepository({ layout, latencyMs })`、Context、`useHomeLayout`、`./testing` 入口。它和 catalog 刻意分開 —— 正式環境裡版位來自 CMS、商品來自商品服務 —— 兩者只靠一個 collection key 字串相連，互不 import。

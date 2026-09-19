@@ -11,11 +11,11 @@ momo 首頁由上到下有 13 個業務區塊。從素材檔名（`bt_7_701_01_e
 首頁由一份資料 `HomeSection[]`（discriminated union）驅動。`SectionRenderer` 透過一張型別化的 registry 把 `type` 對到元件。
 
 - 沒有邏輯的純版面區塊，收斂成 6 種通用 block（hero、banner-carousel、banner-grid、shortcut-bar、notice、product-rail），留在 `home/page`。
-- 有自己邏輯 / 資料 / 重用性的區塊（限時搶購、暢銷榜、你可能會喜歡）是獨立的 feature package，registry 只是把它們掛上去。
+- 有自己邏輯 / 資料 / 重用性的區塊（限時搶購、你可能會喜歡）是獨立的 feature package，registry 只是把它們掛上去。
 
 ## 理由
 
-- 13 個區塊只需要 9 種 renderer；調整順序、上下架區塊都只改資料。
+- 13 個區塊只需要 8 種 renderer；調整順序、上下架區塊都只改資料。
 - registry 用 mapped type：union 新增型別卻沒寫 renderer 會在**編譯期**報錯。
 - 執行期遇到未知的 type（後端先上了新區塊）→ 不渲染並回報，頁面不壞。這是 API 與前端分開發版時必要的容錯。
 
@@ -23,6 +23,12 @@ momo 首頁由上到下有 13 個業務區塊。從素材檔名（`bt_7_701_01_e
 
 - 多一層間接：要找「降價好貨長什麼樣」得先看 layout 資料，再找對應的 block。
 - 通用 block 的 props（`perView`、`columns`）會隨需求變多。當某個區塊需要的特例超過 2–3 個，就該把它從通用 block 升級成自己的 feature，而不是繼續加 props。
+
+## 修訂：今日暢銷榜從 feature 降為一筆設定
+
+原本的決策把「暢銷榜」列為第三個 feature（9 種 renderer）。實作到它時，它沒有任何自己的邏輯；對照真站後確認 momo 的 CMS 也把它和 momo 店取當成同一種區塊（`bt_7_777_01` / `bt_7_777_02`），只差資料與一個 inline 的背景色。於是它成為 `product-rail` 的一筆設定，`ProductRailSection` 多了選填的 `background`，標題多了選填的 `badge`。
+
+這是上面「代價」那一節的反方向：特例超過 2–3 個就升級成 feature；**一個 feature 沒有任何特例，就降回設定**。判斷依據不是名字聽起來像不像功能，而是它有沒有自己的邏輯。細節見 [`architecture.md`](../architecture.md) §6。
 
 ## 演進觸發條件
 

@@ -16,7 +16,7 @@ context: |
 
   ## 為什麼這樣設置
   - 用 2 個頁面的實作，展示一套在 30 個頁面、5 個團隊時仍能運作的結構。
-    以目前規模這個結構是偏重的（10 個 package 約 80 個設定檔）；這是刻意的選擇，
+    以目前規模這個結構是偏重的（9 個 package 約 70 個設定檔）；這是刻意的選擇，
     代價照實寫在 README 的 Tradeoffs 與 docs/adr/0002。
   - Nx 23 + pnpm workspaces + TypeScript project references。1 個薄殼 app + 依
     domain 與職責切分的 packages。選 Nx 是因為依賴方向可以由 lint 強制，而不是靠 review。

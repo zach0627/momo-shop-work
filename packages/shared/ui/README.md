@@ -10,9 +10,9 @@ src/
 ├─ testing.ts          second entry: '@momo/shared-ui/testing'
 ├─ link/               AppLink + LinkProvider: the app injects its router's link
 ├─ price-tag/          price, struck original price, optional label in front
-├─ product-card/       vertical / horizontal, outlined / plain / raised, two slots
+├─ product-card/       vertical / horizontal, outlined / bordered / plain / raised, two slots
 ├─ carousel/           the only file that imports embla
-├─ section-header/     the title of a home page section
+├─ section-header/     the title of a home page section, optional badge beside it
 └─ styles/             tokens.primitive.css → tokens.semantic.css → theme.css
 ```
 
