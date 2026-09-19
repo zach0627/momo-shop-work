@@ -104,11 +104,15 @@
 - [x] 13.2 `.github/workflows/ci.yml`：`pnpm install --frozen-lockfile` → `format:check` → `verify:boundaries` → `verify:fixtures` → **push 到 main 跑全部專案**的 `lint test typecheck build`，PR 才跑 `nx affected`；驗證：push 後 CI 綠燈，而且 log 裡是 `Successfully ran targets lint, test, typecheck, build for 10 projects`（Linux、Node 24、約 1 分鐘）。**第一版照計畫用 `nx affected`，第一次執行 29 秒就綠了 —— log 是 `No tasks were run`**：沒有上一次成功的 CI 可比，退回 `HEAD~1`，而那個 commit 只加了 workflow 檔。那個空的綠燈還會成為之後每次比較的基準，所以改為 main 全跑。**沒有驗到的**：PR 的路徑（`nx affected`）與「CI 真的會紅」—— 兩者都需要開一個故意違規的 PR，這是公開的動作，留給 Human 決定
 - [x] 13.3 最終驗證：`nx run-many -t lint test typecheck`（10 個專案、163 個測試）與 `nx build shop` 全綠、`pnpm verify:boundaries` 0 違規、`pnpm verify:fixtures` 通過、`openspec validate --all --strict` 通過 —— 在開發機、另一顆磁碟的全新 clone、以及 CI（Linux）三個環境。收尾時另外找到並移除 `home/page` 早該拿掉的 `passWithNoTests`
 
+## 13a. 分頁圖示（Step 13 之後，Human 要求）
+
+- [x] 13a.1 把 Human 給的 momo 方形標誌做成網頁的分頁圖示。來源是一張 28×28、364 bytes 的縮圖，直接用會糊；repo 裡的 logo 素材是橫式字標。所以照那張圖的像素配置**重畫成向量**：`favicon.svg`（洋紅 `#f200ca` 取自字標素材；用筆畫畫字母，不依賴字型）+ 由它產生的 `favicon.ico`（16 / 32 / 48，取代 Nx 產生器的預設圖示）；`index.html` 先連 SVG、`.ico` 當後備；驗證：spec 確認 `index.html` 連到的圖示檔存在、`.ico` 含三個尺寸（變異測試：拿掉檔案、截斷 `.ico` 都會紅）；dev 與 build 產物都送出正確的 content-type。**沒有驗到的**：分頁列上實際顯示的樣子（預覽工具只擷取頁面，不含瀏覽器的外框）
+
 ## 14. 加分項（P2）
 
-沒有做。已在 README 的狀態與「後續演進」照實寫明。
+Step 13 之後，Human 要求直接做完。順序是 14.2 → 14.3 → 14.1 → 14.4。
 
-- [ ] 14.1 Playwright smoke：首頁 → 點商品卡 → 詳情頁標題可見；驗證：`nx e2e shop-e2e` 通過
-- [ ] 14.2 `SectionBoundary`（error boundary）：單一區塊拋錯時其餘區塊仍顯示並回報；驗證：spec 讓一個 block 拋錯
-- [ ] 14.3 `Skeleton` 載入狀態；驗證：以延遲的 fake repository 確認出現
-- [ ] 14.4 靜態部署並在 README 放網址；驗證：網址可開啟兩條路由
+- [x] 14.1 Playwright smoke：對 **build 出來的產物**（`vite preview`）跑三個測試 —— 首頁商品卡 → 同名的詳情頁（三顆按鈕、外框還在）→ logo 回首頁；商品列按「下一頁」後第一張卡真的捲出視窗（jsdom 測不到）；不存在的商品有回首頁的路、沒有按鈕。放在 `apps/shop/e2e`、是 shop 專案的 `e2e` target，**不是新專案**（`verify-boundaries` 要求每個專案都有 type 標籤與入口檔，為一個 smoke 檔新增第 8 種 type 不值得）；不下載瀏覽器（本機 Edge、CI 用 runner 內建的 Chrome）；web server 以 `NX_DAEMON=false` 啟動；驗證：`nx e2e shop` 3 / 3（第一次 2 / 3：測試沒先捲到第一屏下面的商品列就斷言它在視窗內，是測試的錯）；`tsc --listFilesOnly` 確認 typecheck 真的包含 e2e 檔；CI 在 main 上跑，失敗時上傳 trace
+- [x] 14.2 `SectionBoundary`（error boundary）：`SectionRenderer` 替每個區塊包一層，渲染時拋錯的區塊被移除、其餘照常、以 `reportError` 回報一次（帶 `sectionId`、`sectionType`）；版位資料更新後同一個區塊會再試一次（內容沒變的區塊是同一個物件，不會白白重試）。手寫的 class（約 40 行），沒有加 `react-error-boundary`。先改規格：`home-page` 新增 requirement「單一區塊出錯不影響其他區塊」與兩個 scenario；驗證：兩個 spec 先紅（錯誤逃出去、整棵樹卸載）；瀏覽器中暫時讓「詐騙發票提醒」拋錯 → 其餘 14 個區塊、header、footer 都在，telemetry 收到一筆 `{ sectionId: "fraud-notice", sectionType: "notice" }`；已還原
+- [x] 14.3 `Skeleton` 載入狀態：`shared/ui` 的 `Skeleton` 與 `ProductCardSkeleton`（和 `ProductCard` 共用外框、照它的行高排），五處使用 —— 商品列、限時搶購、你可能會喜歡、首頁版位載入前、詳情頁。佔位是 `aria-hidden`，每個載入狀態仍以視覺上隱藏的 `role="status"` 告知；`prefers-reduced-motion` 時不閃。先改規格：`home-page` 新增 scenario「區塊的商品載入中」；驗證：全部先紅（三個區塊的 spec 對 HEAD 的實作跑、兩個頁面的 spec 在新斷言上失敗、元件的 spec 對空 stub 失敗）。瀏覽器（mock 延遲拉到 4 秒）：**第一版是錯的 —— 載入中的區塊比載入後矮**（今日暢銷榜 266 → 288、限時搶購 739 → 897），版面照樣跳；照真卡片的行高重排並預留圓點列與「看更多」之後：降價好貨 +1px、兩個橫式商品列 0、限時搶購 +1.5、你可能會喜歡 −3，整頁 7010 → 7009px；詳情頁 504 → 504、主圖佔位 440×440 且位置相同。延遲已還原
+- [x] 14.4 靜態部署（Human 指定 GitHub Pages、越簡單越好）：同一個 workflow 裡的 `deploy` job，`verify` 通過後才跑；一個環境變數 `BASE_PATH` 同時決定 Vite 的 `base`、`<base href>`、router 的 basename 與 e2e 的 baseURL；`404.html` 複製自 `index.html`（Pages 沒有 SPA fallback）；`noindex`。**部署前先在本機對子路徑的 build 跑 e2e，抓到一個會讓部署壞掉的問題：Nx 的快取 key 不含 `BASE_PATH`** —— 要根路徑的 build 卻從快取拿到子路徑版（3 / 3 失敗、整頁空白）；在 CI 會反過來，把根路徑版部署到子路徑。已把 `BASE_PATH` 加進 `nx.json` 的 `sharedGlobals`，並在開著快取的情況下驗證：子路徑 → 未命中；根路徑 → 未命中且 `<base href="/">`；再一次子路徑 → 命中且產物正確。驗證：兩種 build 的 e2e 都 3 / 3；CI 的 `verify` 與 `deploy` 都成功；正式站 https://zach0627.github.io/momo-shop-work/ —— 首頁 15 個區塊、倒數在跑、沒有破圖、連結帶子路徑；直接開 `/goods/12305064`（HTTP 404 但內容是 SPA）渲染出正確的商品、主圖與三顆按鈕；console 無錯誤

@@ -4,6 +4,8 @@
 
 Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情頁。全程使用 Mock Data，不呼叫任何真實 API。
 
+**Demo：<https://zach0627.github.io/momo-shop-work/>**（GitHub Pages；CI 通過後自動部署）
+
 由一位工程師與 Claude Code 協作完成。這個 repo 想回答的不是「畫面像不像」，而是三個問題：**系統怎麼切、為什麼這樣切；和真實網站差在哪、為什麼；Human 怎麼監督 Agent、效率如何。** 每一個都有對應的文件，而且照實寫。
 
 ## 狀態：兩個頁面都已完成
@@ -16,7 +18,7 @@ Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情�
 
 三條路由都包在同一個 layout 裡：捲動後收合的頂部列、搜尋框、可展開的 40 個分類、footer。
 
-沒做的、和真站不一樣的，全部列在 [Known Gaps](#known-gaps)。計畫裡的加分項（Playwright E2E、區塊層級的 error boundary、skeleton、靜態部署）**沒有做**，列在[後續演進](#後續演進)。實作進度逐項記在 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md)：每一項都寫了怎麼驗證的、哪些沒驗到。
+沒做的、和真站不一樣的，全部列在 [Known Gaps](#known-gaps)。計畫裡的加分項也都做了：區塊層級的 error boundary、載入中的佔位（skeleton）、Playwright smoke test、靜態部署。實作進度逐項記在 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md)：每一項都寫了怎麼驗證的、哪些沒驗到。
 
 ## 快速開始
 
@@ -26,8 +28,9 @@ pnpm nx dev shop                           # 開發伺服器 http://localhost:42
 ```
 
 ```bash
-pnpm nx run-many -t lint test typecheck    # 全部專案（10 個專案、163 個測試）
+pnpm nx run-many -t lint test typecheck    # 全部專案（10 個專案、173 個測試）
 pnpm nx build shop
+pnpm nx e2e shop                           # Playwright smoke：對 build 產物跑，用本機的 Edge（CI 用 Chrome），不用下載瀏覽器
 pnpm format:check
 pnpm verify:boundaries                     # 依賴規則真的套用到每個專案、依賴圖 0 違規
 pnpm verify:fixtures                       # 商品 fixtures 與素材一致（過期時失敗）；重新產生用 pnpm gen:fixtures
@@ -42,7 +45,7 @@ pnpm nx graph                              # 看依賴圖
 | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`docs/architecture.md`](./docs/architecture.md)                                        | 系統怎麼切、為什麼這樣切、規模變大時怎麼管                                                                                                                              |
 | [`docs/adr/`](./docs/adr)                                                               | 8 個決策：背景、理由、**代價**、演進觸發條件                                                                                                                            |
-| [`docs/agent-workflow.md`](./docs/agent-workflow.md)                                    | Human ↔ Agent 怎麼協作；Human 糾正 Agent 12 次、Agent 出錯 31 件、偏離計畫 47 項的完整紀錄；**協作效率評估**                                                            |
+| [`docs/agent-workflow.md`](./docs/agent-workflow.md)                                    | Human ↔ Agent 怎麼協作；Human 糾正 Agent 12 次、Agent 出錯 33 件、偏離計畫 51 項的完整紀錄；**協作效率評估**                                                            |
 | [`docs/design-tokens.md`](./docs/design-tokens.md)                                      | 兩層 design token（Primitive / Semantic）；每個顏色、字級、框線的數值都是從真實網站的計算樣式**量出來的**，並記錄在哪裡量到、哪些沒量到                                 |
 | [`openspec/changes/build-storefront-pages/`](./openspec/changes/build-storefront-pages) | **行為規格**（OpenSpec，已全部實作）：5 個 capability，scenario 直接翻成測試；`design.md` 說明專案設置原因、每個設計決策與放棄的方案；`tasks.md` 是逐項的實作與驗證紀錄 |
 | [`openspec/specs/module-boundaries/`](./openspec/specs/module-boundaries)               | 工程約束的規格：依賴方向、框架耦合的單點放行、package 的公開入口、可重現的安裝。每一條「會被擋下」都放過違規樣本確認                                                    |
@@ -135,22 +138,25 @@ app → layout / page → feature → ui / data-access → util
 
 **「綠燈」本身也要被驗證。** 這個專案裡，回報成功但其實什麼都沒檢查的情況出現過四次：lint 規則的 tags 寫壞而靜默失效、`@nx/dependency-checks` 在預設設定下什麼都不檢查、負向探針因為別的理由失敗卻被當成「被擋下」、CI 第一次執行時 `nx affected` 一個 task 都沒跑。所以：
 
-| 做法                                                                                                       | 在哪裡                                                                                     |
-| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| 依賴規則除了 lint，另有一支工具確認「規則真的套用到每個專案、而且專案真的有它要的 target」，並有自我測試   | `pnpm verify:boundaries`（[`tools/verify-boundaries.mjs`](./tools/verify-boundaries.mjs)） |
-| 聲稱「會被工具擋下」的行為，都放過故意違規的樣本；探針的輸出必須出現那條規則的名稱才算數                   | [`module-boundaries` 規格](./openspec/specs/module-boundaries)、[`CLAUDE.md`](./CLAUDE.md) |
-| 產生的資料可以檢查是否過期；版位資料指到的每一張圖都要存在                                                 | `pnpm verify:fixtures`、`apps/shop` 的 `home-assets.spec`                                  |
-| 安裝要可重現：在沒有 `node_modules` 的乾淨複本與 CI 上跑 `--frozen-lockfile`                               | [CI](./.github/workflows/ci.yml)                                                           |
-| TDD 的紅燈要因為正確的理由而紅；只斷言「不存在」的測試要同時斷言一個「存在」；一寫就綠的測試用變異測試補驗 | [`agent-workflow.md`](./docs/agent-workflow.md) §4                                         |
-| main 的 CI 跑全部專案，PR 才跑 affected：main 的綠燈要代表整個 repo 是好的                                 | [CI](./.github/workflows/ci.yml)                                                           |
-| 沒驗到的照實寫，之後補驗到再回頭更新                                                                       | [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 各項的「沒有驗到的」      |
+| 做法                                                                                                                                            | 在哪裡                                                                                     |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| 依賴規則除了 lint，另有一支工具確認「規則真的套用到每個專案、而且專案真的有它要的 target」，並有自我測試                                        | `pnpm verify:boundaries`（[`tools/verify-boundaries.mjs`](./tools/verify-boundaries.mjs)） |
+| 聲稱「會被工具擋下」的行為，都放過故意違規的樣本；探針的輸出必須出現那條規則的名稱才算數                                                        | [`module-boundaries` 規格](./openspec/specs/module-boundaries)、[`CLAUDE.md`](./CLAUDE.md) |
+| 產生的資料可以檢查是否過期；版位資料指到的每一張圖都要存在                                                                                      | `pnpm verify:fixtures`、`apps/shop` 的 `home-assets.spec`                                  |
+| 安裝要可重現：在沒有 `node_modules` 的乾淨複本與 CI 上跑 `--frozen-lockfile`                                                                    | [CI](./.github/workflows/ci.yml)                                                           |
+| TDD 的紅燈要因為正確的理由而紅；只斷言「不存在」的測試要同時斷言一個「存在」；一寫就綠的測試用變異測試補驗                                      | [`agent-workflow.md`](./docs/agent-workflow.md) §4                                         |
+| main 的 CI 跑全部專案，PR 才跑 affected：main 的綠燈要代表整個 repo 是好的                                                                      | [CI](./.github/workflows/ci.yml)                                                           |
+| 用真的瀏覽器對 **build 出來的產物**走一次主要路徑；部署前對「要部署的那一份」再走一次                                                           | `pnpm nx e2e shop`、[CI](./.github/workflows/ci.yml) 的 `deploy` job                       |
+| 會改變 build 產物的環境變數要是快取 key 的一部分（`BASE_PATH`）。少了它，Nx 會把根路徑版的產物還原給子路徑的 build —— 部署前在本機跑 e2e 才抓到 | [`nx.json`](./nx.json) 的 `sharedGlobals`                                                  |
+| 沒驗到的照實寫，之後補驗到再回頭更新                                                                                                            | [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 各項的「沒有驗到的」      |
 
 **執行期的可觀測性**只做到接縫，沒有接真的後端：
 
 - `reportError(error, context)`（`shared/util`）是唯一的回報入口，sink 可替換：預設是 `console`，正式環境換成 Sentry 之類只改 composition root。它自己絕不 throw。
 - **每個失敗的查詢由 app 的 `QueryCache.onError` 回報一次、帶上 query key**，頁面與 hook 不重複回報 —— 不會漏報，也不會同一個錯誤報三次。
 - 首頁遇到這個版本不認識的區塊型別（CMS 先上了新區塊）→ 略過那一塊、其餘照常、回報一次。單一區塊的資料載入失敗時自己消失，不拖垮整頁。
-- 沒做的：使用者行為事件（`track` 沒有呼叫者，所以沒做）、效能指標（Web Vitals）、error boundary（單一區塊 render 時 throw 仍會拖垮整頁，見「後續演進」）。
+- **單一區塊渲染時拋錯**（CMS 或商品資料送來一個壞掉的值）→ `SectionBoundary` 拿掉那一塊、其餘區塊與外框照常、回報一次並帶上區塊的 id 與型別；資料更新後會再試一次。
+- 沒做的：使用者行為事件（`track` 沒有呼叫者，所以沒做）、效能指標（Web Vitals）；事件處理與非同步程式裡的錯誤 error boundary 接不到，目前也沒有這類程式。
 
 ## Human ↔ Agent 協作與效率
 
@@ -158,11 +164,11 @@ app → layout / page → feature → ui / data-access → util
 
 **協作方式**：先設計、後實作，設計文件是 source of truth → 行為規格（OpenSpec）的 scenario 直接翻成測試 → 一次一步，每步走「TDD 實作 → 無快取驗證 → 回報（含沒驗到的）→ Human review → commit」→ 每次事故的教訓寫回 `CLAUDE.md`，成為下一次的規則。決定權在 Human 的事（架構取捨、範圍、要不要公開某個檔案），Agent 提出建議與理由後停下來等。
 
-**數字**（時間紀錄依 Human 的要求拿掉了，所以用數得出來的東西評估）：約 80 個 commit、163 個測試；Human 糾正 Agent 12 次；Agent 出錯 31 件；偏離原計畫 47 項。
+**數字**（時間紀錄依 Human 的要求拿掉了，所以用數得出來的東西評估）：約 90 個 commit、173 個單元與整合測試加 3 個 E2E；Human 糾正 Agent 12 次；Agent 出錯 33 件；偏離原計畫 51 項。
 
 **三個結論**：
 
-1. **Human 的 review 和自動化檢查抓到的是不同種類的錯，互相取代不了。** 31 件事故裡，Human 抓到 8 件，其中 7 件是方向或事實層級（規格寫了沒驗證過的行為、需求其實不存在、架構的說法站不住）；測試與工具抓到的 12 件全部是實作層級。（第 8 件是 Agent 的一個驗證指令掛了 20 分鐘沒發現，Human 等得不耐煩才問出來的。）
+1. **Human 的 review 和自動化檢查抓到的是不同種類的錯，互相取代不了。** 33 件事故裡，Human 抓到 8 件，其中 7 件是方向或事實層級（規格寫了沒驗證過的行為、需求其實不存在、架構的說法站不住）；測試與工具抓到的 13 件全部是實作層級。（第 8 件是 Agent 的一個驗證指令掛了 20 分鐘沒發現，Human 等得不耐煩才問出來的。）
 2. **最貴的是重工，而重工幾乎都來自「沒先查證就提案」。** layout 改了三輪、`libs/` → `packages/`、design token 重量一次、一條規格與一個 package 寫了又刪 —— 起因都是沒有先對照真實網站或業界慣例。12 次糾正裡有 3 次的內容就是「去看真實網站」。如果重來，最大的效率改善不是寫得更快，而是把查證放在提案之前。
 3. **Agent 擅長把一個方向做完整，不擅長質疑方向本身。** 它明顯加速的是機械性的大範圍修改（資料夾改制、118 個檔案的註解改寫，逐 commit 保持綠燈）、到真站量測數值、scenario → 測試 → 實作的迴圈，以及文件；Human 的糾正則多半來自「這樣以後會怎樣」這種問題。
 
@@ -170,17 +176,17 @@ app → layout / page → feature → ui / data-access → util
 
 ## 後續演進
 
-每個 ADR 都寫了自己的演進觸發條件（彙整在 [`architecture.md` §9](./docs/architecture.md)）。下表依「現在的結構已經為它準備了什麼」整理：
+每個 ADR 都寫了自己的演進觸發條件（彙整在 [`architecture.md` §10](./docs/architecture.md)）。下表依「現在的結構已經為它準備了什麼」整理：
 
-| 方向                                                | 觸發條件                             | 要改的地方                                                                                       | 現在的結構幫了什麼                                                                                                                                                                                                     |
-| --------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 接真實的商品 API / CMS API                          | 有後端                               | 在 composition root 換掉 repository 的實作；`HomeSection` 就是和 CMS 的契約                      | UI 只認 hooks，hooks 只認 interface；執行期遇到未知的區塊型別已經有容錯                                                                                                                                                |
-| 網路層的模擬與 contract test（MSW）                 | 接了真的 API 之後                    | 在 HTTP 版的 repository 底下加 MSW；現有的 fake repository 留給元件測試                          | 兩者不衝突：接縫在 interface，MSW 在更下面一層（[ADR-0005](./docs/adr/0005-repository-seam-with-context-injection.md)）                                                                                                |
-| 購物車、結帳、會員                                  | 出現需要跨頁保留的 client state      | 新增 `cart`、`checkout` scope；這時才引入全域 store（Zustand 或 RTK），而且只放在擁有它的 domain | 成長方式是新增 scope；依賴方向已有地圖（[ADR-0006](./docs/adr/0006-domain-dependency-map.md)）；詳情頁的三顆按鈕有 spec 守著，接上行為必須是刻意的（[ADR-0003](./docs/adr/0003-server-state-only-no-global-store.md)） |
-| SSR / SEO（Next.js 或 React Router framework mode） | 要上正式環境、需要 SEO 與 LCP        | 換掉 `apps/shop`；page 與 layout 以下不動                                                        | `react-router` 只准出現在 app；page 收 props 而不自己讀網址；連結走注入的 `AppLink`（[ADR-0001](./docs/adr/0001-spa-over-next.md)）                                                                                    |
-| 第二個 app（活動頁、App 內嵌頁、後台）              | 不同團隊負責，或需要獨立部署         | 新增 `apps/*`，重用既有的 package                                                                | package 不依賴 app；外框是 package，不是 app 裡的資料夾（[ADR-0007](./docs/adr/0007-layout-as-a-lib-and-a-tier.md)）                                                                                                   |
-| 單一區塊失敗不拖垮整頁                              | 區塊變多、來源變多                   | `SectionRenderer` 替每個區塊包一層 error boundary，接到 `reportError`                            | 分派集中在一個純元件；回報入口已經有了                                                                                                                                                                                 |
-| E2E（Playwright）                                   | 互動變多                             | 首頁 → 點商品卡 → 詳情頁的 smoke test；收合的頂部列與輪播的實際捲動目前只有手動驗證              | 測試用角色與名稱查詢，selector 可以沿用                                                                                                                                                                                |
-| 載入體驗（skeleton、圖片格式、Web Vitals）          | 接了真的、會慢的 API                 | 區塊層級的 skeleton；`reportError` 旁邊加效能指標的 sink                                         | 版位資料已帶圖片原始尺寸，載入時不會跳動                                                                                                                                                                               |
-| 部署                                                | 任何時候                             | 靜態檔放 CDN（Cloudflare Pages / GitHub Pages）；CI 已經有 build                                 | SPA，沒有 server                                                                                                                                                                                                       |
-| `shared/ui` 拆成元件家族；Nx remote cache           | 元件超過約 15 個，或 CI 時間變成問題 | 依 [`architecture.md` §5](./docs/architecture.md) 的觸發條件                                     | —                                                                                                                                                                                                                      |
+| 方向                                                | 觸發條件                                 | 要改的地方                                                                                                       | 現在的結構幫了什麼                                                                                                                                                                                                     |
+| --------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 接真實的商品 API / CMS API                          | 有後端                                   | 在 composition root 換掉 repository 的實作；`HomeSection` 就是和 CMS 的契約                                      | UI 只認 hooks，hooks 只認 interface；執行期遇到未知的區塊型別已經有容錯                                                                                                                                                |
+| 網路層的模擬與 contract test（MSW）                 | 接了真的 API 之後                        | 在 HTTP 版的 repository 底下加 MSW；現有的 fake repository 留給元件測試                                          | 兩者不衝突：接縫在 interface，MSW 在更下面一層（[ADR-0005](./docs/adr/0005-repository-seam-with-context-injection.md)）                                                                                                |
+| 購物車、結帳、會員                                  | 出現需要跨頁保留的 client state          | 新增 `cart`、`checkout` scope；這時才引入全域 store（Zustand 或 RTK），而且只放在擁有它的 domain                 | 成長方式是新增 scope；依賴方向已有地圖（[ADR-0006](./docs/adr/0006-domain-dependency-map.md)）；詳情頁的三顆按鈕有 spec 守著，接上行為必須是刻意的（[ADR-0003](./docs/adr/0003-server-state-only-no-global-store.md)） |
+| SSR / SEO（Next.js 或 React Router framework mode） | 要上正式環境、需要 SEO 與 LCP            | 換掉 `apps/shop`；page 與 layout 以下不動                                                                        | `react-router` 只准出現在 app；page 收 props 而不自己讀網址；連結走注入的 `AppLink`（[ADR-0001](./docs/adr/0001-spa-over-next.md)）                                                                                    |
+| 第二個 app（活動頁、App 內嵌頁、後台）              | 不同團隊負責，或需要獨立部署             | 新增 `apps/*`，重用既有的 package                                                                                | package 不依賴 app；外框是 package，不是 app 裡的資料夾（[ADR-0007](./docs/adr/0007-layout-as-a-lib-and-a-tier.md)）                                                                                                   |
+| 元件層級的錯誤處理再往下                            | 出現會在事件處理或非同步程式裡出錯的互動 | error boundary 接不到這兩種，要各自 `try` 並呼叫 `reportError`                                                   | **已做**：渲染時拋錯的區塊由 `SectionBoundary` 拿掉並回報，其餘照常；失敗的查詢由 `QueryCache` 回報                                                                                                                    |
+| E2E 擴充                                            | 互動變多                                 | 目前只有 3 個 smoke test；收合的頂部列、分類面板、「看更多」還沒有 E2E                                           | **已做**：對 build 產物跑的 Playwright smoke（首頁 → 詳情頁 → 回首頁、輪播真的會捲、找不到商品），CI 與部署前都會跑；測試用角色與名稱查詢，selector 可以沿用                                                           |
+| 載入體驗（圖片格式、Web Vitals）                    | 接了真的、會慢的 API                     | 圖片改 AVIF / WebP 與 `srcset`；`reportError` 旁邊加效能指標的 sink                                              | **已做**：照商品卡行高排的佔位，載入前後版面位移 ≤ 3px；版位資料已帶圖片原始尺寸                                                                                                                                       |
+| 正式的部署                                          | 不只是 demo                              | 換成有 SPA fallback 與 preview 環境的平台（Cloudflare Pages 之類）；現在深層網址靠 `404.html`，HTTP 狀態碼是 404 | **已做**：GitHub Pages，CI 綠了才部署，部署前對同一份 build 跑 smoke test                                                                                                                                              |
+| `shared/ui` 拆成元件家族；Nx remote cache           | 元件超過約 15 個，或 CI 時間變成問題     | 依 [`architecture.md` §5](./docs/architecture.md) 的觸發條件                                                     | —                                                                                                                                                                                                                      |

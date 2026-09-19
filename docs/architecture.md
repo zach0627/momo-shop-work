@@ -251,6 +251,8 @@ HomePage            useHomeLayout() → 載入中 / 載入失敗 / <SectionRende
 
 - `SectionRegistry` 是對 union 的 mapped type：union 新增型別卻沒註冊元件 → **編譯期報錯**（實際驗證：暫時加入 `video-wall` → `TS2741: Property '"video-wall"' is missing`）。每個元件拿到的正好是自己那一種 section。
 - 執行期遇到未知 type（CMS 先上了新區塊）→ 該區塊略過、其餘照常、呼叫 `reportError`。回報放在 effect 裡並以「未知區塊的清單」為 key，所以是**一次**，不是每次 render 一次。查表用 `Object.hasOwn`：`registry['constructor']` 在每個物件上都存在。
+- **渲染時拋錯的區塊**由 `SectionBoundary` 接住：`SectionRenderer` 替每個區塊包一層，出錯的那一塊被拿掉、其餘照常、回報一次（帶 `sectionId` 與 `sectionType`，和未知型別的回報同一種 context）。資料更新後同一個區塊會再試一次；內容沒變的區塊是同一個物件（TanStack Query 的 structural sharing），不會白白重試。它是手寫的 class（error boundary 只能用 class），沒有為了一個「什麼都不渲染」的 fallback 加套件。於是一個區塊有三種失敗方式、三種都不拖垮整頁：型別不認得、資料載入失敗、渲染時拋錯。
+- **載入中是佔位，不是一行字**：商品列、限時搶購、你可能會喜歡在商品到之前顯示 `ProductCardSkeleton`。它和 `ProductCard` 共用外框、照它的行高排，所以商品到了之後區塊高度幾乎不變（實測位移 ≤ 3px）。代價：改 `ProductCard` 的版面要一起改它。佔位是 `aria-hidden`，載入狀態另以視覺上隱藏的 `role="status"` 告知輔助技術。
 - `SectionRenderer` 是純元件，registry 由 props 傳入，所以它的測試用「每種 type 一行」的假元件，測的是分派與順序，不牽涉任何 block。抓資料只在 `HomePage`。
 - **錯誤回報集中在 app 的 QueryCache**：每個失敗的查詢由 `createQueryClient()` 回報一次、帶上 query key。頁面只負責顯示狀態，不會漏報也不會重複報。
 - **一個 block 撐起 5 個區塊**：官方優惠圖示、品牌折扣、信用卡加碼、猜你想搜、moPro 都是 `banner-carousel`，差別只在資料（一次幾張、間距、有沒有說明文字）。
@@ -319,11 +321,22 @@ interface CatalogRepository {
 
 TDD 只打有邏輯的地方：純函式、repository、分頁與「看更多」、`SectionRenderer` 的降級行為、分類展開、倒數計時、詳情頁的存在 / 不存在兩種狀態。
 
-**刻意不測**：純版面區塊（banner 類）、`use-compact-header`（jsdom 沒有 IntersectionObserver，交給 E2E）。
+**E2E**：`apps/shop/e2e` 的 Playwright smoke，對 **build 出來的產物**（`vite preview`）跑 —— 首頁商品卡 → 同名的詳情頁 → 回首頁、商品列真的會捲、不存在的商品。它驗的是 jsdom 驗不到的東西（排版、真的導頁、輪播的位移），刻意只有三個。它是 shop 專案的一個 target 而不是新專案：每個專案都要有 type 標籤與入口檔，為一個檔案新增一種 type 不值得。部署的 job 會對「要部署的那一份 build」再跑一次。
 
-每個專案都有測試（10 個專案、163 個），所以沒有任何一個設 `passWithNoTests`：測試被誤刪時那個專案的 `test` 會失敗，而不是悄悄通過。新增的空 package 若暫時需要它，**加入第一個 spec 時就要拿掉**。
+**刻意不測**：純版面區塊（banner 類）、`use-compact-header`（jsdom 沒有 IntersectionObserver；E2E 目前也還沒涵蓋）。
 
-## 9. 決策紀錄與演進方向
+每個專案都有測試（10 個專案、173 個），所以沒有任何一個設 `passWithNoTests`：測試被誤刪時那個專案的 `test` 會失敗，而不是悄悄通過。新增的空 package 若暫時需要它，**加入第一個 spec 時就要拿掉**。
+
+## 9. 建置、快取與部署
+
+Demo 站在 GitHub Pages：<https://zach0627.github.io/momo-shop-work/>。CI 的 `verify` 通過後，`deploy` job 重新 build、對那一份 build 跑 E2E，再上傳。
+
+- **一個環境變數 `BASE_PATH` 決定所有要一致的東西**：Vite 的 `base`、`index.html` 的 `<base href="%BASE_URL%">`（版位資料裡的圖是相對路徑 `assets/…`，靠它接到子路徑）、router 的 basename（讀 `import.meta.env.BASE_URL`）、E2E 的 baseURL。沒設就是 `/`。
+- **會改變產物的環境變數必須是 Nx 快取 key 的一部分。** `BASE_PATH` 列在 `nx.json` 的 `sharedGlobals`。少了它，Nx 會把另一種 base 的產物從快取還原回來，而且不會有任何警告 —— 部署前在本機對子路徑的 build 跑 E2E 才發現。之後新增任何會影響 build 的環境變數，都要加在這裡。
+- Pages 沒有 SPA fallback：`404.html` 是 `index.html` 的複本，直接開或重新整理深層網址時 router 會依網址渲染（HTTP 狀態碼仍是 404，這是這個做法的代價）。
+- `noindex`：它是真實品牌的仿作，公開但不該被搜尋引擎收錄。
+
+## 10. 決策紀錄與演進方向
 
 | ADR                                                          | 決策                                                    | 演進觸發條件                                         |
 | ------------------------------------------------------------ | ------------------------------------------------------- | ---------------------------------------------------- |

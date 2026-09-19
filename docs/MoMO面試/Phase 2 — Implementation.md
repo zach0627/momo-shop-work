@@ -49,7 +49,7 @@ First Commit 至最後 Commit
 | ✅ | 11 | 限時搶購：倒數 + 2 列輪播 | `feat(flash-sale): countdown and two-row carousel` | #7 | ✓ |
 | ✅ | 12 | 今日暢銷榜（橫式商品卡，沒有名次）—— 是 `product-rail` 的一筆設定，不是 package | `feat(home): best sellers as one more product rail` | — | ✓ |
 | ✅ | 13 ★ | README + CI | `docs: readme with tradeoffs and roadmap` / `ci: nx affected` | — | README ✗ / CI ✓ |
-| ⬜ | P2 | Playwright / SectionBoundary / Skeleton / 部署 | 各自一個 commit | — | ✓ |
+| ✅ | P2 | Playwright / SectionBoundary / Skeleton / 部署（GitHub Pages） | 各自一個 commit | SectionBoundary、Skeleton | ✓ |
 
 > ★ = 里程碑，建議至少在這四步停下來看畫面。不可砍的路徑是 Step 1–10 + 13；Step 11 / 12 若最後沒做，要在 README 的 Known Gaps 照實寫明。
 
@@ -368,12 +368,25 @@ First Commit 至最後 Commit
 **Commit**：`docs: readme with tradeoffs, known gaps and roadmap`、`ci: run nx affected on push`
   - ↳ 實際是 5 個 commit：`.prettierignore` → CI → CI 改為 main 全跑 → `passWithNoTests` → README 與效率評估；外加這份紀錄。
 
-### P2 — 加分項（各自獨立 commit）
+### P2 — 加分項（各自獨立 commit） ✅
 
-- [ ] `test(e2e)`：Playwright smoke — 首頁 → 點商品卡 → 詳情頁 title 可見。
-- [ ] `feat(home)`：`SectionBoundary`（react-error-boundary）— 單一區塊失敗不拖垮整頁 + `reportError`。
-- [ ] `feat(shared)`：`Skeleton` loading 狀態。
-- [ ] `chore(deploy)`：靜態部署（Cloudflare Pages / GitHub Pages）+ README 放網址。
+- [x] `test(e2e)`：Playwright smoke — 首頁 → 點商品卡 → 詳情頁 title 可見。
+  - ↳ 三個測試，對 **build 出來的產物**（`vite preview`）跑：首頁卡片 → 同名的詳情頁 → logo 回首頁；商品列「下一頁」後第一張卡真的捲出視窗（jsdom 測不到）；不存在的商品。
+  - ↳ 放在 `apps/shop/e2e`、是 shop 專案的 `e2e` target，**不是新專案**：`verify-boundaries` 要求每個專案都有 type 標籤與入口檔，為一個檔案新增第 8 種 type 不值得。
+  - ↳ 不下載瀏覽器：本機用 Edge、CI 用 runner 內建的 Chrome。web server 以 `NX_DAEMON=false` 啟動（上次卡 20 分鐘的教訓）。
+  - ↳ 第一次 2 / 3：測試沒先捲到第一屏下面的商品列就斷言它在視窗內 —— 測試的錯，不是 app 的。
+- [x] `feat(home)`：`SectionBoundary`（react-error-boundary）— 單一區塊失敗不拖垮整頁 + `reportError`。
+  - ↳ 先改規格：`home-page` 新增 requirement「單一區塊出錯不影響其他區塊」與兩個 scenario。兩個 spec 先紅（錯誤逃出去、整棵樹卸載）。
+  - ↳ **手寫的 class，沒有用 `react-error-boundary`**：fallback 是「什麼都不渲染」，約 40 行，不為它多一個依賴。資料更新後同一個區塊會再試一次；內容沒變的是同一個物件，不會白白重試。
+  - ↳ 瀏覽器：暫時讓「詐騙發票提醒」拋錯 → 其餘 14 個區塊、header、footer 都在，telemetry 收到一筆 `{ sectionId: "fraud-notice", sectionType: "notice" }`。已還原。
+- [x] `feat(shared)`：`Skeleton` loading 狀態。
+  - ↳ `shared/ui` 的 `Skeleton` 與 `ProductCardSkeleton`，五處使用（商品列、限時搶購、你可能會喜歡、首頁版位載入前、詳情頁）→ 符合 Rule of Two。佔位是 `aria-hidden`，載入狀態另以視覺上隱藏的 `role="status"` 告知。
+  - ↳ 先改規格（scenario「區塊的商品載入中」）；全部先紅。
+  - ↳ **第一版是錯的，而且 spec 全綠看不出來**：在瀏覽器量高度才發現載入中的區塊比載入後**矮**（今日暢銷榜 266 → 288、限時搶購 739 → 897），版面照樣跳。照 `ProductCard` 的行高重排、預留圓點列與「看更多」之後：位移 ≤ 3px，整頁 7010 → 7009px；詳情頁 504 → 504。測試驗的是「有佔位」，「佔位有用」要用量的。
+- [x] `chore(deploy)`：靜態部署（Cloudflare Pages / GitHub Pages）+ README 放網址。
+  - ↳ 你指定 GitHub Pages、越簡單越好：同一個 workflow 裡的 `deploy` job，`verify` 綠了才跑。網址：https://zach0627.github.io/momo-shop-work/
+  - ↳ 一個環境變數 `BASE_PATH` 同時決定 Vite 的 `base`、`<base href>`、router 的 basename、E2E 的 baseURL；`404.html` 複製自 `index.html`（Pages 沒有 SPA fallback）；加了 `noindex`（公開的真實品牌仿作，不該被搜尋引擎收錄）。
+  - ↳ **部署前先在本機對子路徑的 build 跑 E2E，抓到一個會讓部署壞掉的問題：Nx 的快取 key 不含 `BASE_PATH`。** 要根路徑的 build 卻從快取拿到子路徑版 → 3 / 3 失敗、整頁空白。在 CI 會反過來：把根路徑版部署到子路徑，上線的是一個什麼都載不到的網站。已把它加進 `nx.json` 的 `sharedGlobals`，並在開著快取的情況下驗證三次 build。
 
 
 ## 完成項目
@@ -413,6 +426,8 @@ First Commit 至最後 Commit
 | 11+ | 逐項核對 Step 11 時找到的收尾：`feature-flash-sale` 有了明寫的 `import react`，eslint 對 react 的放行與註解已不成立 → 移除；ADR-0008 過期的放行清單更新 | `935da30` `0e2fc15` |
 | 12 | **今日暢銷榜**：對照真站後成為 `product-rail` 的一筆設定（`background`、標題的 `badge`）；`SectionHeader` 的 `badge`、`ProductCard` 的 `frame="bordered"`；移除 `ranking` 型別、`home/feature-ranking`（package 10 → 9）、`getRanking` / `useRanking`；有標題區塊的間距修正。home-data-access 9 個測試、home-page 11 個、app 12 個、shared-ui 35 個 | `3181acf` `37c5e0a` `e2de477` `ee99a32` `ab38102`（+ 文件的 commit） |
 | 13 | **README + CI**：README 依考核要點重排（狀態、快速開始、驗證與可觀測性、協作與效率、後續演進）；`agent-workflow.md` §7 協作效率評估；CI（frozen install、format、兩個 verify、main 全跑 / PR affected）；`.prettierignore`；移除最後一個 `passWithNoTests`；`CLAUDE.md` 加兩條規則 | `3a65994` `e53d164` `8c109a0` `e695ed4` `cf6214c`（+ 這份紀錄的 commit） |
+| 13a | **分頁圖示**（你給的 momo 方形標誌）：來源是 28×28 的縮圖，直接用會糊 → 照它的像素配置重畫成 `favicon.svg`（洋紅 `#f200ca` 取自字標素材），再產生 16 / 32 / 48 的 `favicon.ico` 取代 Nx 的預設圖示；spec 確認檔案存在與 `.ico` 的結構（變異測試過） | `c0c4455` |
+| P2 | **四個加分項都做了**：`SectionBoundary`；`Skeleton` / `ProductCardSkeleton`（載入前後位移 ≤ 3px）；Playwright smoke（對 build 產物、3 個）；GitHub Pages 部署（`BASE_PATH`、`404.html`、`noindex`、Nx 快取 key 的修正）。173 個單元與整合測試 + 3 個 E2E | `092097a` `80cd4a2` `09a975f` `bdeef1b`（+ 文件的 commit） |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -577,6 +592,17 @@ First Commit 至最後 Commit
 - CI 的 log 確認真的跑了：`Successfully ran targets lint, test, typecheck, build for 10 projects`，約 1 分鐘。
 - **沒有驗到的**：PR 的路徑（`nx affected`）與「CI 真的會紅」。兩者都要開一個故意違規的 PR，那是公開的動作，留給你決定。
 
-> **Step 1–13 全部完成。** P2 加分項（Playwright、error boundary、skeleton、部署）沒有做，已在 README 照實寫明。
+> **Step 1–13 全部完成。**（寫這一行時 P2 還沒做；之後你要求直接做完，見下。）
 
-**下一步：由 Human 決定** —— (a) 用眼睛把兩個頁面對照截圖看一次；(b) 要不要開一個探針 PR 驗證 CI 會紅；(c) 要不要把 OpenSpec 的 change 歸檔（`openspec archive`，會搬動 `openspec/changes/…` 的路徑，README 與文件的連結要跟著改）；(d) 做不做 P2。
+**Human 的決定**：先把 momo 的方形標誌做成分頁圖示，commit 後直接做 P2；部署用 GitHub Pages，越簡單越好。
+
+**P2 驗證結果**
+- 全部 10 個專案 `lint / test / typecheck`（無快取、循序）全綠：173 個測試；`format:check`、`verify:boundaries`（10 個專案、26 條依賴、0 違規）、`openspec validate --all --strict` 通過。
+- E2E：根路徑與子路徑（`BASE_PATH=/momo-shop-work/`）兩種 build 都 3 / 3；`tsc --listFilesOnly` 確認 typecheck 真的包含 e2e 檔。
+- CI：`verify`（含 E2E）與 `deploy` 都成功；log 確認真的跑了 10 個專案與 3 個 E2E。
+- 正式站 https://zach0627.github.io/momo-shop-work/：首頁 15 個區塊、倒數在跑、沒有破圖、連結都帶子路徑；直接開 `/goods/12305064`（HTTP 404、內容是 SPA）渲染出正確的商品、主圖與三顆按鈕；console 無錯誤。
+- **沒有驗到的**：分頁列上圖示實際顯示的樣子（預覽工具只擷取頁面）；PR 的路徑（`nx affected`）與「CI 真的會紅」—— 仍然需要一個故意違規的 PR。
+
+> **計畫裡的東西全部做完了**：Step 1–13、分頁圖示、P2 四項。
+
+**下一步：由 Human 決定** —— (a) 用眼睛把正式站的兩個頁面對照截圖看一次，也看一下分頁上的圖示；(b) 要不要開一個探針 PR 驗證 CI 會紅；(c) 要不要把 OpenSpec 的 change 歸檔（`openspec archive`，會搬動 `openspec/changes/…` 的路徑，README 與文件的連結要跟著改）。

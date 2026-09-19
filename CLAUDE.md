@@ -44,6 +44,9 @@
   - **不要寫**：設計沿革、取捨的論述、誰在用它、怎麼驗證的 —— 那些屬於 `docs/`、ADR 與 commit message。看程式碼就知道的事也不要寫。
 - **首頁的區塊動工前，先到真實網站讀它的 DOM，不只看截圖**：它和哪個既有區塊是同一種 CMS 區塊（標題圖的 `bt_7_<型別>_<序號>`、卡片的 class）、哪些差異其實是資料。今日暢銷榜就是這樣從一個 package 變成一筆設定的。
 - **放到背景的指令要有預期的完成時間，超過就去查**（行程還在嗎、輸出檔還在長嗎），不要只等完成通知。在這台機器上擷取 `nx` 的輸出時一律設 `NX_DAEMON=false`：常駐的 daemon 會繼承輸出管線，指令做完了管線也不會結束。
+- **會改變 build 產物的環境變數，要加進 `nx.json` 的 `sharedGlobals`**（目前有 `BASE_PATH`）。否則 Nx 會從快取還原另一種設定的產物，而且不會警告。
+- 改 `ProductCard` 的版面時，一起改 `ProductCardSkeleton`（`shared/ui/src/skeleton`）並在瀏覽器量載入前後的區塊高度：佔位比真卡片矮或高，版面就會跳。
+- E2E 在 `apps/shop/e2e`（`pnpm nx e2e shop`），對 build 產物跑。路徑一律寫相對於 baseURL 的 `./…`，它也要能對子路徑的 build 跑（`BASE_PATH=/momo-shop-work/`）。只放 jsdom 驗不到的東西。
 - **回報成功的檢查，要確認它真的檢查了東西。** 結果快得或整齊得不合理就去讀原始輸出（CI 的第一次綠燈是 `No tasks were run`）。
 - 每個 commit 都要是綠的，使用 Conventional Commits。
 
