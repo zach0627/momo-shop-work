@@ -43,7 +43,7 @@ First Commit 至最後 Commit
 | ✅ | 5 ★ | **Layout**：TopBar(fixed→compact) + Header + 分類展開 + Footer（原 Step 7，提前） | 依內容拆分 | 分類展開、搜尋框、compact | ✗ |
 | ✅ | 6 | 素材 + fixtures + catalog/data-access | `feat(catalog): mock repository, fixtures and query hooks` | #3 | ✗ |
 | ✅ | 7 | shared util / ui | `feat(shared): price formatting and core ui components` | #1 #2 | ✗ |
-| ⬜ | 8 ★ | 首頁 config-driven + 6 blocks | `feat(home): config-driven section renderer and blocks` | #5 | ✗ |
+| ✅ | 8 ★ | 首頁 config-driven + 6 blocks | `feat(home): config-driven section renderer and blocks` | #5 | ✗ |
 | ⬜ | 9 | 你可能會喜歡：3 列 + 看更多 | `feat(recommendation): paginated grid with load more` | #4 | ✗ |
 | ⬜ | 10 ★ | 商品詳情頁（純展示） | `feat(goods): display-only goods detail page` | #8 | ✗ |
 | ⬜ | 11 | 限時搶購：倒數 + 2 列輪播 | `feat(flash-sale): countdown and two-row carousel` | #7 | ✓ |
@@ -225,23 +225,44 @@ First Commit 至最後 Commit
 **Commit**：`feat(shared): price formatting and core ui components`
   - ↳ 實際拆成 5 個 commit（`formatPrice` → `PriceTag` → `ProductCard` → `Carousel` + `SectionHeader` → 文件）。
 
-### Step 8 ★ — 首頁 config-driven
+### Step 8 ★ — 首頁 config-driven ✅
 
 > **Step 6 的發現**：moPro 的素材是整張做好的促銷磚，不是商品照 → `home-layout.ts` 裡它是 `banner-carousel`，不是 `product-rail`。`主要活動/today-brand/` 是 hero 右側「今日大牌」的圖。
 
 **目標**：13 個業務區塊由 `HomeSection[]` 驅動渲染。
-- [ ] `home/data-access`：`HomeSection` union、`Banner`、`Shortcut`；`home-layout.ts`（15 筆設定）；`HomeRepository` + Provider + `useHomeLayout`；app 注入。
-- [ ] `shared/util/telemetry.ts`：`reportError` / `track`，sink 可替換（同時接到 `app/providers` 的 QueryClient `onError` → 滿足 Rule of Two）。
-- [ ] **TDD #5**：`SectionRenderer`
-  - [ ] 依 `type` 渲染對應元件
-  - [ ] 未知 `type` → 不渲染、不 throw、呼叫 `reportError`
-- [ ] `registry.ts`：mapped type（漏寫 renderer → 編譯錯誤）；3 個 feature package 各建立一個 placeholder container（從 Step 2 移過來的項目），registry 先指向它們。
-- [ ] 6 個私有 blocks：`hero`、`banner-carousel`、`banner-grid`、`shortcut-bar`、`notice`、`product-rail`（商品卡連到 `paths.goods(id)`）。
-- [ ] `HomePage`：`useHomeLayout` → loading / error / `<SectionRenderer>`。
+- [x] （Step 7 留下的決定）`Product` 加選填的 `promoText`，產生器為 momo 店取與今日暢銷榜的商品填入（122 件中 18 件）。要不要顯示由商品列決定：橫式卡片顯示、直式不顯示。
+- [x] `home/data-access`：`HomeSection` union、`Banner`、`Shortcut`；`home-layout.ts`（15 筆設定）；`HomeRepository` + Provider + `useHomeLayout`；app 注入。
+  - ↳ 和 catalog 同一個形狀（interface → mock → Context → hook → `./testing` 入口）；8 個 spec 先全紅。
+  - ↳ **版位資料多了版面數值**：`Banner` 的 `width` / `height`（瀏覽器先留位置）、`SectionTitle { lead?, text }`、carousel 的 `label` / `perView` / `gap`、grid 的 `label` / `columns`、商品列的 `card` / `perView`。讓一個 `banner-carousel` 撐起 5 個區塊的代價。
+  - ↳ **動工前到真站量過每個區塊**：內容寬 1188px（區帶 1220、padding 16）；hero 327×444.8 間距 12；圖示 148.5、8 張；品牌磚 218.9×364.8、5.43 張；信用卡 250×125、4.75 張；猜你想搜 186×234 間距 10、6.11 張。
+  - ↳ **品牌折扣與猜你想搜是輪播**，不是計畫寫的 grid（截圖上有箭頭與圓點）。
+  - ↳ 猜你想搜的 9 個關鍵字：前 6 個照目標截圖，逐張看圖對上檔名；後 3 個截圖上被切掉，依圖片內容命名（「哈利波特」後來發現真站當天也有）。
+  - ↳ 「今日大牌」素材只有四格中的一格；banner 的 alt 是「區塊名 + 序號」（圖上的字沒有逐張抄寫）→ 都列入 Known Gaps。
+  - ↳ app 多一個 spec：版位資料指到的 60 多張圖都存在於 `public/`。它第一次跑就是綠的，所以先故意打錯一個路徑確認它真的會失敗。
+- [x] `shared/util/telemetry.ts`：`reportError`，sink 可替換（同時接到 `app/providers` 的 QueryClient `onError` → 滿足 Rule of Two）。
+  - ↳ **沒做 `track`**：沒有呼叫者。
+  - ↳ `reportError` 永遠不 throw（sink 自己壞掉時也一樣）。「不 throw」那個 spec 對空實作空洞通過 → 補上「sink 有被呼叫」的斷言，**這次在寫實作之前**就對「什麼都不做」的版本跑過：4 / 4 紅。
+  - ↳ app 的 `createQueryClient()`：`QueryCache.onError` 對每個失敗的查詢回報一次、帶 query key。**錯誤回報因此不在 `HomePage` 裡** —— 兩邊都報會重複。
+- [x] **TDD #5**：`SectionRenderer`
+  - [x] 依 `type` 渲染對應元件
+  - [x] 未知 `type` → 不渲染、不 throw、呼叫 `reportError`
+  - ↳ registry 由 props 傳入，測試用「每種 type 一行」的假元件，不必掛任何 provider。5 個 spec 先全紅。
+  - ↳ 回報放在 effect、以未知區塊的清單為 key：**一次**，不是每次 render 一次（有 spec）。查表用 `Object.hasOwn` —— `registry['constructor']` 在每個物件上都存在（有 spec）。
+- [x] `registry.ts`：mapped type（漏寫 renderer → 編譯錯誤）；3 個 feature package 各建立一個 placeholder container（從 Step 2 移過來的項目），registry 先指向它們。
+  - ↳ 實際驗證：暫時在 union 加入 `video-wall` → `TS2741: Property '"video-wall"' is missing ... in type 'SectionRegistry'`；還原後通過。
+  - ↳ feature 只收 `{ title, lead? }`：`catalog/feature-recommendation` 是 `scope:catalog`，不能 import `scope:home` 的型別。registry 用轉接函式從 section 取出。
+- [x] 6 個私有 blocks：`hero`、`banner-carousel`、`banner-grid`、`shortcut-bar`、`notice`、`product-rail`（商品卡連到 `paths.goods(id)`）。
+  - ↳ 商品列載入失敗時自己消失、不拖垮整頁；載入中先保留高度。
+  - ↳ **layout 的 `<main>` 不再決定頁面寬度**：首頁是滿版灰底 + 1220px 白色區帶，放不進原本的「1220px + padding」。寬度與底色改由各頁自己決定（單獨一個 commit，三個既有頁面畫面不變）。
+  - ↳ **`Carousel` 由 region 改為 group**：每個輪播都在一個同名的區塊裡，形成同名的巢狀 landmark。是 app 的整合測試抓到的（「找到多個名為主要活動的 region」），不是讀程式碼看出來的。
+  - ↳ 輪播的測試環境補丁搬到 `@momo/shared-ui/testing`（shared-ui、home-page、app 三處要用）。
+- [x] `HomePage`：`useHomeLayout` → loading / error / `<SectionRenderer>`。
+  - ↳ 載入中 `role=status`、失敗 `role=alert`；4 個 spec 先對 placeholder 全紅。沒有做「重試」按鈕 —— 規格沒要求。
 
 **驗證**：`pnpm nx run-many -t lint test` + `pnpm nx build shop` + dev server 對照截圖由上到下檢查；點降價好貨的商品 → 進到 `/goods/:id`
 **Review 重點**：調換 `home-layout.ts` 兩行順序，畫面順序是否跟著變（證明 config-driven）。
 **Commit**：`feat(home): config-driven section renderer and cms blocks`
+  - ↳ 實際拆成 10 個 commit（商品的促銷文字 → `reportError` → home/data-access → app 注入與錯誤回報 → feature placeholders → `SectionRenderer` → layout 的容器 → 測試環境入口 → `Carousel` 的角色 → blocks 與 `HomePage`），外加文件。
 
 ### Step 9 — 你可能會喜歡
 
@@ -337,6 +358,7 @@ First Commit 至最後 Commit
 | — | **`libs/` → `packages/`，並照 package 的規矩調整（ADR-0008）**。Human 指出每個 lib 都有 `package.json`，應該叫 packages，而且「不能只是改名」。對照 pnpm、Nx、Turborepo 的慣例後找到三個改名解決不了的問題並修正：① 拿掉 package 內部的 `src/lib/`；② 設計 token 的樣式改由 `@momo/shared-ui` 的 `exports` 公開，app 不再以相對路徑伸進去；③ 執行期依賴下放到各 package、版本由 pnpm catalog 統一，以 `@nx/dependency-checks` 強制，`verify-boundaries` 確認這條規則真的在運作。保留依 domain 分組（`packages/<scope>/<name>`） | `1587fbb` `8e18bb0` `aab099c` `e494945` `748d08b` |
 | 6 | **素材 + Catalog 資料層**：`tools/import-assets.mjs`（202 張圖、ASCII slug、以雜湊對帳）；`tools/gen-fixtures.mjs`（122 件商品、決定性、`--check`）；models 與 `CatalogRepository` interface；`createMockCatalogRepository`（注入 `data` / `now` / `latencyMs`）；Context 注入、6 個 query hooks、`query-keys`；次要入口 `@momo/catalog-data-access/testing`；app 的 composition root 注入 mock；`shop/layout` 改讀 `useCategories`。catalog 26 個測試、layout 13 個 | `cb3b680` `c2814e6` `ebb3b5f` `ec89864` `4d511e6` `52b64a0` |
 | 7 | **共用元件**：`formatPrice`（shared/util）；`PriceTag`、`ProductCard`（直式 / 橫式、`outlined` / `plain`、slots `promoText` `footer`）、`Carousel`（embla 的唯一 import 點）、`SectionHeader`；輪播箭頭與圓點的 token。shared-util 11 個測試、shared-ui 33 個 | `f01a941` `3963523` `78d4130` `708324b`（+ 文件的 commit） |
+| 8 | **首頁 config-driven**：`Product.promoText`；`reportError`；`home/data-access`（`HomeSection` 9 種、15 筆版位設定、repository、hook、testing 入口）；app 注入 + `QueryCache` 統一回報 + 素材存在性的 spec；3 個 feature 的 placeholder；`SectionRenderer` + `SectionRegistry`；6 個 blocks；`HomePage` 的三種狀態；layout 不再決定頁面寬度；`Carousel` 改為 group；`@momo/shared-ui/testing` | `61e8d7d` `cbd9321` `62dcdbb` `b6d6dc0` `2197f33` `4130acd` `89d5e1d` `81fdf69` `50e31e2` `0bb5896`（+ 文件的 commit） |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -450,4 +472,12 @@ First Commit 至最後 Commit
 - 紅燈階段發現 5 個「不顯示 X」的 spec 對空元件空洞通過（只斷言不存在）→ 全部補上「該有的東西存在」的斷言。補完當下沒有回頭重跑紅燈，寫這份紀錄時才發現，於是補做：把兩個元件暫時換回空實作重跑，`PriceTag` 5 / 5、`Carousel` 11 / 11 全紅，再用 git 還原。
 - **留給 Step 8 的事**：`home-page` 規格寫橫式商品卡「帶一行促銷文字」，但 `Product` 目前沒有 `promoText`（只有 `FlashSaleItem` 有）。`ProductCard` 的 `promoText` 是 slot，不受影響；Step 8 要決定促銷文字從哪來（建議：`Product` 加選填的 `promoText`，由 fixture 產生器填）。
 
-**下一步：Step 8 ★ — 首頁 config-driven**（`home/data-access` 的 `HomeSection` 與版位設定、`SectionRenderer`、6 個私有 blocks）→ 對應 `tasks.md` 第 8 組
+**Step 8 驗證結果**
+- 全部 11 個專案 `lint / test / typecheck`（無快取、循序）全綠；`nx build shop` 成功；`pnpm verify:boundaries`：11 個專案、12 條規則、**21 條依賴**、0 違規；`pnpm verify:fixtures` 通過；三個 `./testing` 入口都不在 bundle 內。
+- 瀏覽器（1440px）：15 個區塊、灰底 `#f2f2f2` 上的 1220px 白色區帶；各區塊尺寸與真站實測值相符（hero 327×445、圖示 148.5、品牌磚 218.8×365、信用卡 250×125、猜你想搜 186×234 間距 196）。兩個商品列原本寬了 1–2px，已修正 `perView`（8.52 / 3.47）。
+- 行為：8 個 banner 區塊點擊後網址不變（裡面沒有任何連結）；點降價好貨第一張卡 → 同文件導頁到 `/goods/1077163`；console 無錯誤。
+- config-driven：調換版位資料第 5、6 筆 → 降價好貨與品牌折扣在畫面上對調，沒有動任何元件；已還原。
+- **沒有完成的**：用眼睛逐段對照截圖。預覽面板在背景時截圖會錯位或逾時，版面與行為改由 DOM 讀取。需要 Human 在瀏覽器實際看一次。
+- 過程中的錯誤：(1) 搬測試環境補丁時加的 `name in target` 判斷讓補丁被跳過（jsdom 的 `matchMedia` 屬性存在但值是 undefined）；(2) 同名的巢狀 landmark，由整合測試抓到。
+
+**下一步：Step 9 — 你可能會喜歡**（`catalog/feature-recommendation`：3 列後「看更多」，TDD #4）→ 對應 `tasks.md` 第 9 組

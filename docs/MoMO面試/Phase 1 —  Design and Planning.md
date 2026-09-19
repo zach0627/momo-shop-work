@@ -195,7 +195,7 @@ momo-shop-work/
 │  └─ src/
 │     ├─ format-price.ts     使用者：PriceTag / goods-info
 │     ├─ paths.ts            URL 單一來源：paths.home()、paths.goods(id)、pattern 給 router      使用者：app router / 4 個商品區塊
-│     └─ telemetry.ts        reportError / track，sink 可替換（預設 console）                    使用者：home SectionRenderer / app providers
+│     └─ telemetry.ts        reportError，sink 可替換（預設 console）；Step 8 修訂：track 沒有呼叫者，沒做                    使用者：home SectionRenderer / app providers
 │
 ├─ packages/catalog/data-access/               type:data-access  scope:catalog
 │  └─ src/
@@ -273,6 +273,7 @@ type HomeSection =
 - `registry.ts` 以 mapped type 綁定 `type → Component`：**union 新增型別卻沒寫 renderer → 編譯期報錯**。
 - 執行期遇到未知 type（未來 API 先上新區塊）→ 不渲染 + `reportError`，頁面不壞。
 - `SectionRenderer` 是純元件（吃 `sections` props），抓資料只在 `HomePage` → 好測、好搬。
+- **Step 8 修訂（實作後）**：上面的型別是規劃時的樣子，實作時多了版面數值 —— `Banner` 帶原始的 `width` / `height`；標題是 `SectionTitle { lead?, text }`；`banner-carousel` 多了 `label`、`gap`；`banner-grid` 多了 `label`；`product-rail` 多了 `card`（直式 / 橫式）與 `perView`。registry 改由 props 傳入 `SectionRenderer`。錯誤回報集中在 app 的 QueryCache。現況以 `docs/architecture.md` §6 為準。
 - 每個區塊外包 `SectionBoundary`（P1）：單區塊失敗不影響其他區塊。
 
 13 個業務區塊 → 15 筆 section 設定（官方優惠拆 3 筆）：
@@ -284,12 +285,12 @@ type HomeSection =
 | 官方優惠：秒殺/簽到/分次配/領券/看更多 | `shortcut-bar` | 官方優惠（符號圖） |
 | 官方優惠：超大牌 左/中/右 | `banner-grid`(3) | 官方優惠（超大牌） |
 | 降價好貨 | `product-rail` | 降價好貨 |
-| 品牌折扣 | `banner-grid`(6) | 品牌折扣 |
+| 品牌折扣 | `banner-carousel`（**Step 8 修訂**：原寫 `banner-grid`(6)；目標截圖上有箭頭與圓點，是輪播） | 品牌折扣 |
 | 詐騙發票提醒 | `notice` | 發票詐騙提醒 |
 | 官方旗艦名店 | `banner-grid`(4) | 官方旗艦名店 |
 | momo 店取 | `product-rail` | momo店快取 |
 | 信用卡加碼優惠 | `banner-carousel` | 信用卡加碼優惠 |
-| 猜你想搜 | `banner-grid`（caption = 關鍵字） | 猜你想搜 |
+| 猜你想搜 | `banner-carousel`（caption = 關鍵字；**Step 8 修訂**：同上，是輪播不是 grid） | 猜你想搜 |
 | 限時搶購 | `flash-sale` → feature package | 限時搶購 |
 | 今日暢銷榜 | `ranking` → feature package（**對照真站後修正**：橫式商品卡、**沒有名次徽章**；它已經沒有自己的邏輯，Step 12 動工前要決定是否還需要獨立的 package） | 今日暢銷榜 |
 | moPro 會員專屬價 | `banner-carousel`（**Step 6 修正**：素材是整張做好的促銷磚，品牌、品名、價格都印在圖上 → 用圖磚呈現，不是 `product-rail`。**對照真站後補充**：真站上每張圖會連到商品頁；我們的素材沒有商品編號，所以不可點，列入 Known Gaps） | momopro… |

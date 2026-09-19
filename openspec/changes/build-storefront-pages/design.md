@@ -94,6 +94,15 @@
 
 **為什麼**：素材檔名（`bt_7_701_01_e71` = block 701 / element 71）顯示真實網站是 CMS 區塊制。前端與 CMS 分開發版時，未知型別的容錯是必要的。
 
+**實作後的修訂（Step 8）**：
+
+- **`SectionRenderer` 的 registry 由 props 傳入**，不是 import 進來的。它因此是真正的純元件：測試用一行一個的假元件，測的是分派、順序與容錯，不必掛任何 provider。
+- **版面數值進了資料**：`banner-carousel` 帶 `perView` 與 `gap`、`banner-grid` 帶 `columns`、商品列帶 `card`（直式 / 橫式）與 `perView`，`Banner` 帶原始的 `width` / `height`。這是 config-driven 的代價 —— CMS 要懂一點版面 —— 換到的是 5 個業務區塊（官方優惠圖示、品牌折扣、信用卡加碼、猜你想搜、moPro）共用同一個 block。數值都在真站量過，實作後再到瀏覽器對一次。
+- **品牌折扣與猜你想搜是輪播，不是 grid**：目標截圖上兩者都有箭頭與圓點。原規劃憑印象寫成 grid。
+- **錯誤回報不在頁面裡**：規格的「版位資料取得失敗 → 回報一筆錯誤事件」由 app 的 `QueryCache.onError` 負責（每個失敗的查詢一次、帶 query key），頁面只顯示狀態。放在頁面的話，每個用到查詢的地方都要記得報，而且同一個失敗可能被報兩次。
+- **feature 只收 `{ title, lead? }`**，由 registry 的轉接函式從 section 取出。`catalog/feature-recommendation` 是 `scope:catalog`，不能 import `scope:home` 的型別，而且它之後要能放到詳情頁。
+- **沒做 `track()`**：沒有呼叫者。和 Step 7 的商品卡選項同一個原則。
+
 **放棄的方案**：13 個區塊各寫一個元件、在 JSX 裡依序排列 —— 調整版位要改 code，也無法表達「CMS 驅動」這件事。→ `docs/adr/0004-config-driven-home-page.md`
 
 ### 6. Repository interface + Context 注入，而非 MSW

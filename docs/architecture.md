@@ -176,6 +176,7 @@ RouterProvider
 
 - **機制**：`AppLayout` 掛在一條沒有 path 的 layout route 上，`/`、`/goods/:goodsId`、找不到頁面都是它的子路由，頁面內容透過 `<Outlet />` 換進去。路由的概念只存在於 `apps/shop`；`packages/shop/layout` 只拿到 `children`，不知道 router 的存在。
 - **驗證**：`router.spec.tsx` 對三條路由都檢查 `banner`、`main`、`contentinfo` 三個 landmark 都在（規格 `app-layout`「每個頁面都有共用外框」）。
+- **layout 只決定頁面放哪裡，不決定頁面多寬**：`<main>` 沒有寬度與留白。首頁是滿版的灰底、上面疊 1220px 的白色區帶；詳情頁是 1220px 的單欄 —— 這是各頁自己的事。原本 `<main>` 替每一頁套上 1220px + padding，做首頁時才發現放不下滿版的底色，於是把容器的責任移到頁面（Step 8）。
 - **層級**：layout 是 `type:layout`，與 `page` 同層（§3）。只有 `apps/shop` 的 router 能 import 它；page 與 feature import 它都是 lint 錯誤。它可以組合 feature，所以日後 header 裡由別的 domain 擁有的互動元件（mini-cart、搜尋自動完成）能以 feature 的形式放進來，而不必把對方的邏輯寫進外框。摘要資料（購物車數量、登入狀態）則直接讀對方的 `data-access`。見 [ADR-0006](./adr/0006-domain-dependency-map.md)。
 - **為什麼整個 layout 放在 package 而不是 `apps/shop/src/layouts`**：Nx 官方的兩個範例都把 layout 外框放在 app、只把可重用的零件抽成 package，所以這是一個需要說明的選擇。比較與理由見 [ADR-0007](./adr/0007-layout-as-a-lib-and-a-tier.md)；簡短地說，app 是唯一不受邊界規則約束的專案，所以只放接線。
 - **加第二種 layout**（例：結帳流程用沒有分類列、精簡 footer 的外框）：新增 `packages/checkout/layout`（`type:layout`），在 router 再掛一條 layout route 指向它，把結帳的路由放到它底下。現有的 `AppLayout` 與頁面都不用改。
@@ -188,8 +189,17 @@ RouterProvider
 ## 6. 首頁：config-driven
 
 ```ts
-type Banner = { id: string; imageUrl: string; alt: string; caption?: string }; // 不可點
+// 不可點。width / height 是圖的原始尺寸，讓瀏覽器在圖到之前先留好位置
+type Banner = {
+  id: string;
+  imageUrl: string;
+  alt: string;
+  width: number;
+  height: number;
+  caption?: string;
+};
 type Shortcut = { id: string; iconUrl: string; label: string };
+type SectionTitle = { lead?: string; text: string }; // lead：標題前半較淺的字（「降價」+「好貨」）
 
 type HomeSection =
   | {
@@ -201,30 +211,54 @@ type HomeSection =
   | {
       id: string;
       type: 'banner-carousel';
-      title?: string;
+      title?: SectionTitle;
+      label: string;
       perView: number;
+      gap: number;
       banners: Banner[];
     }
   | {
       id: string;
       type: 'banner-grid';
-      title?: string;
+      title?: SectionTitle;
+      label: string;
       columns: number;
       banners: Banner[];
     }
   | { id: string; type: 'shortcut-bar'; items: Shortcut[] }
   | { id: string; type: 'notice'; banner: Banner }
-  | { id: string; type: 'product-rail'; title: string; collection: string } // CMS 只給 key，商品由 catalog 提供
-  | { id: string; type: 'flash-sale'; title: string } // ↓ 三個交給 feature package，自己抓資料
-  | { id: string; type: 'ranking'; title: string }
-  | { id: string; type: 'recommendation'; title: string };
+  | {
+      id: string;
+      type: 'product-rail';
+      title: SectionTitle;
+      collection: string; // CMS 只給 key，商品由 catalog 提供
+      card: 'vertical' | 'horizontal';
+      perView: number;
+    }
+  | { id: string; type: 'flash-sale'; title: SectionTitle } // ↓ 三個交給 feature package，自己抓資料
+  | { id: string; type: 'ranking'; title: SectionTitle }
+  | { id: string; type: 'recommendation'; title: SectionTitle };
 ```
 
-- `registry` 以 mapped type 綁定 `type → Component`：union 新增型別卻沒寫 renderer → **編譯期報錯**。
-- 執行期遇到未知 type（未來 API 先上了新區塊）→ 不渲染、不 throw、呼叫 `reportError`，頁面不壞。
-- `SectionRenderer` 是純元件（吃 `sections` props），抓資料只在 `HomePage`。
+```
+HomePage            useHomeLayout() → 載入中 / 載入失敗 / <SectionRenderer>
+└─ SectionRenderer  純元件：sections + registry → 依序渲染；未知 type 略過並回報
+   └─ SECTION_REGISTRY
+      ├─ 6 個 page 私有的 block      hero · banner-carousel · banner-grid · shortcut-bar · notice · product-rail
+      └─ 3 個 feature 的轉接         flash-sale · ranking · recommendation（feature 只收 { title, lead? }）
+```
 
-13 個業務區塊對應 15 筆 section 設定（官方優惠拆成 3 筆），只需要 9 種 renderer。調整區塊順序、上下架區塊都只改資料。對照表見 [設計筆記 §5](./MoMO面試/Phase%201%20—%20%20Design%20and%20Planning.md)。
+- `SectionRegistry` 是對 union 的 mapped type：union 新增型別卻沒註冊元件 → **編譯期報錯**（實際驗證：暫時加入 `video-wall` → `TS2741: Property '"video-wall"' is missing`）。每個元件拿到的正好是自己那一種 section。
+- 執行期遇到未知 type（CMS 先上了新區塊）→ 該區塊略過、其餘照常、呼叫 `reportError`。回報放在 effect 裡並以「未知區塊的清單」為 key，所以是**一次**，不是每次 render 一次。查表用 `Object.hasOwn`：`registry['constructor']` 在每個物件上都存在。
+- `SectionRenderer` 是純元件，registry 由 props 傳入，所以它的測試用「每種 type 一行」的假元件，測的是分派與順序，不牽涉任何 block。抓資料只在 `HomePage`。
+- **錯誤回報集中在 app 的 QueryCache**：每個失敗的查詢由 `createQueryClient()` 回報一次、帶上 query key。頁面只負責顯示狀態，不會漏報也不會重複報。
+- **一個 block 撐起 5 個區塊**：官方優惠圖示、品牌折扣、信用卡加碼、猜你想搜、moPro 都是 `banner-carousel`，差別只在資料（一次幾張、間距、有沒有說明文字）。
+- **版面數值放在資料裡**（`perView`、`gap`、`columns`）：這是 config-driven 的代價之一 —— CMS 要懂一點版面。數值都是在真站 1220px 版面量到的，實作後再到瀏覽器對過一次（hero 327×445、圖示 148.5、品牌磚 218.8×365、信用卡 250×125、猜你想搜 186×234）。
+- 商品列拿到的是 collection key，商品由 catalog 提供，所以卡片與它連到的詳情頁不可能對不起來。商品列載入失敗時自己消失，不拖垮整頁；載入中先保留高度，下面的區塊不會跳動。
+
+13 個業務區塊對應 15 筆 section 設定（官方優惠拆成 3 筆），只需要 9 種 renderer。調整區塊順序、上下架區塊都只改資料（實際驗證：調換 `home-layout.ts` 的兩筆，畫面上兩個區塊跟著對調，沒有動任何元件）。對照表見 [設計筆記 §5](./MoMO面試/Phase%201%20—%20%20Design%20and%20Planning.md)。
+
+`apps/shop` 有一個 spec 檢查版位資料指到的每一張圖都存在於 `public/`（60 多個路徑）：資料和檔案之間沒有別的東西把它們綁在一起，打錯字只會在瀏覽器裡變成破圖。放在 app 是因為檔案由 app 提供。
 
 ## 7. 資料層
 
@@ -247,6 +281,8 @@ interface CatalogRepository {
 - **一份商品表，集合只存 id**：同一個商品 id 會出現在好幾個區塊的素材裡（例：同時在限時搶購、暢銷榜、你可能會喜歡）。所以「首頁與詳情頁的名稱與售價一致」是結構上保證的。
 - **`Category` 只有 `id` 與 `name`**：真站「選擇分類」面板的五種底色是「第幾列」決定的（每列 9 個），那是版面的事，由 `shop/layout` 依位置算出，不進資料層。
 - **測試的兩種資料來源**：邏輯測試注入小而可控的資料（repository 的 `data` 選項，或 UI 測試用的 fake repository），不依賴真 fixture 的內容與筆數；另有一組測試專門對真 fixture 檢查規格寫明的數字（55 件推薦、40 個分類）。
+- **`home/data-access` 是同一個形狀**：`HomeRepository` interface、`createMockHomeRepository({ layout, latencyMs })`、Context、`useHomeLayout`、`./testing` 入口。它和 catalog 刻意分開 —— 正式環境裡版位來自 CMS、商品來自商品服務 —— 兩者只靠一個 collection key 字串相連，互不 import。
+- **測試用的入口有三個**：`@momo/catalog-data-access/testing`、`@momo/home-data-access/testing`（fake repository + provider），以及 `@momo/shared-ui/testing`（`installCarouselTestEnvironment()`：jsdom 缺少輪播套件需要的 `ResizeObserver`、`IntersectionObserver` 與 `matchMedia`；擁有那個套件的 package 也擁有這個補丁）。
 - **`@momo/catalog-data-access/testing`**：`exports` 的第二個入口，提供 `createFakeCatalogRepository`（每個方法都回「沒有東西」，測試只覆寫它在意的）與 `CatalogTestProvider`。獨立成入口，測試工具才不會進到 app 的 bundle（build 後實際檢查過）。
 
 ### 素材與 fixtures 的兩支工具

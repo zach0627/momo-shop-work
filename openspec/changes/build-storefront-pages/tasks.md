@@ -65,13 +65,14 @@
 
 ## 8. 首頁（Step 8）
 
-- [ ] 8.1 `home/data-access`：`HomeSection` union、`home-layout.ts`（15 筆）、`HomeRepository`、Provider、`useHomeLayout`，於 app 注入；驗證：`nx test home-data-access` 通過
-- [ ] 8.2 `shared/util` 的 `telemetry`（`reportError` / `track`，sink 可替換），接到 QueryClient 的 `onError`；驗證：spec 確認 sink 被呼叫
-- [ ] 8.3 TDD：`SectionRenderer` —— 依型別渲染、未知型別不渲染且呼叫 `reportError`；驗證：spec 通過（spec `home-page`「未知的區塊型別不影響頁面」）
-- [ ] 8.4 以 mapped type 定義 registry，3 個 feature 型別先指向 placeholder；驗證：暫時從 union 多加一個型別時 `typecheck` 失敗，還原後通過
-- [ ] 8.5 6 個通用 block（hero、banner-carousel、banner-grid、shortcut-bar、notice、product-rail）；驗證：dev server 依截圖 01–12 由上到下對照；點降價好貨的商品導到 `/goods/:id`；banner 不可點
-- [ ] 8.5a TDD：`HomePage` 的載入中與載入失敗狀態（注入會延遲 / 會失敗的 fake repository）；驗證：spec 通過（spec `home-page`「載入中與載入失敗有明確狀態」）
-- [ ] 8.6 驗證 config-driven：調換 `home-layout.ts` 兩行，畫面順序跟著變；驗證完還原（spec `home-page`「區塊順序由版位資料決定」）
+- [x] 8.0 `Product` 加選填的 `promoText`，由 fixture 產生器為 momo 店取與今日暢銷榜的商品填入（122 件中 18 件）；橫式商品卡顯示它，要不要顯示由商品列決定；驗證：兩個新 spec 先紅燈，`pnpm verify:fixtures` 通過
+- [x] 8.1 `home/data-access`：`HomeSection` union（9 種；`Banner` 帶原始尺寸、`SectionTitle` 有 `lead`、carousel 與 grid 有 `label`、商品列有 `card` 與 `perView`）、`home-layout.ts`（15 筆，順序與 spec 相同；`perView` 與 `gap` 為真站實測值）、`HomeRepository`、mock、Provider、`useHomeLayout`、`./testing` 入口，於 app 注入（延遲 150 ms）；驗證：8 個 spec 先對空實作全紅，實作後 `nx test home-data-access` 通過；app 的 `home-assets.spec` 檢查版位資料指到的 60 多張圖都存在於 `public/`（先故意打錯一個路徑確認它會失敗）
+- [x] 8.2 `shared/util` 的 `reportError`（sink 可替換，`setTelemetrySink` 回傳還原函式；sink 自己 throw 時 `reportError` 也不 throw），接到 app 的 `QueryCache.onError`：每個失敗的查詢回報一次、帶 query key；**沒做 `track`**（沒有呼叫者）；驗證：4 個 spec 對「什麼都不做」的實作全紅後實作；`query-client.spec` 先紅燈（sink 被呼叫 0 次）
+- [x] 8.3 TDD：`SectionRenderer` —— 純元件（registry 由 props 傳入）；依型別渲染、跟著資料的順序；未知型別略過、其餘照常、回報一次（不是每次 render 一次）；以 `Object.hasOwn` 查表，型別名為 `constructor` 也視為未知；驗證：5 個 spec 先全紅，實作後通過（spec `home-page`「未知的區塊型別不影響頁面」「區塊順序由版位資料決定」）
+- [x] 8.4 以 mapped type 定義 `SectionRegistry`；3 個 feature package 各有一個 placeholder container（只收 `{ title, lead? }`，因為 `scope:catalog` 的 feature 不能 import `scope:home` 的型別），registry 以轉接函式指向它們；驗證：暫時在 union 加入 `video-wall` → `typecheck` 失敗（`TS2741: Property '"video-wall"' is missing ... in type 'SectionRegistry'`），還原後通過
+- [x] 8.5 6 個通用 block（hero、banner-carousel、banner-grid、shortcut-bar、notice、product-rail）；layout 的 `<main>` 不再決定頁面寬度（首頁是滿版灰底 + 1220px 白色區帶）；`Carousel` 由 region 改為 group（避免和外層區塊形成同名的巢狀 landmark，由 app 的整合測試抓到）；驗證：瀏覽器 1440px 下 15 個區塊、各區塊的尺寸與真站實測值相符（hero 327×445、圖示 148.5、品牌磚 218.8×365、信用卡 250×125、猜你想搜 186×234 間距 196；兩個商品列原本寬 1–2px，已修正 `perView`）；8 個 banner 區塊點擊後網址不變、裡面沒有連結；點降價好貨第一張卡為同文件導頁到 `/goods/1077163`；console 無錯誤。**截圖比對沒有完成**：預覽面板在背景，截圖不可靠，版面與行為改由 DOM 讀取
+- [x] 8.5a TDD：`HomePage` 的載入中（`role=status`）與載入失敗（`role=alert`）狀態（注入會延遲 / 會失敗的 fake repository）；失敗的回報由 app 的 QueryCache 負責（8.2）；驗證：4 個 spec 先對 placeholder 全紅，實作後通過（spec `home-page`「載入中與載入失敗有明確狀態」「只有商品卡可點擊」）
+- [x] 8.6 驗證 config-driven：調換版位資料的第 5、6 筆（降價好貨 ↔ 品牌折扣），瀏覽器中兩個區塊跟著對調，沒有動任何元件；驗證完還原（spec `home-page`「區塊順序由版位資料決定」）
 
 ## 9. 你可能會喜歡（Step 9）
 

@@ -7,6 +7,7 @@ Presentational components shared by **two or more** projects (Rule of Two), and 
 ```
 src/
 ├─ index.ts            public API
+├─ testing.ts          second entry: '@momo/shared-ui/testing'
 ├─ link/               AppLink + LinkProvider: the app injects its router's link
 ├─ price-tag/          price, struck original price
 ├─ product-card/       vertical / horizontal, outlined / plain, two slots
@@ -20,8 +21,10 @@ src/
 - **Visual options, not business variants.** `layout="horizontal"`, `frame="plain"`, `priceTag={{ tone: 'brand' }}` - never `variant="flash-sale"`. What a feature adds to a card goes into a slot (`promoText`, `footer`).
 - **Options arrive with their first user.** There is no `topBadge`, no "限搶價" label and no red 23px price yet: nothing in the workspace would use them. They belong to the flash sale and are added with it.
 - **`Carousel` is the only importer of `embla-carousel-react`** (an ESLint rule rejects it anywhere else), so replacing the library is a change to one file. Its wiring is tested against a fake embla, because jsdom lays nothing out; a second spec mounts the real library, and real paging is checked in a browser.
+- **A carousel is a `group`, not a `region`.** It always sits inside a section that is already a named landmark; a second landmark of the same name is noise for screen reader users (WAI-ARIA APG).
+- **`@momo/shared-ui/testing`** exports `installCarouselTestEnvironment()`: jsdom lacks what embla reaches for (`ResizeObserver`, `IntersectionObserver`, `matchMedia` on the element's own window). Any spec that mounts a `Carousel`, directly or through a page, calls it. The package that owns the library owns the shim.
 - **Class names are written out in full** (lookup tables, not string building), so Tailwind's scanner sees them. Colours and sizes come from the semantic tokens only.
 
 - **May depend on:** `ui`, `util` (enforced by `@nx/enforce-module-boundaries`)
 - **External dependencies:** `react`, `embla-carousel-react` - declared in this package's own `package.json` as `catalog:`
-- **Public API:** the entries in `exports`: `.` and `./theme.css`. Everything else is private to this package.
+- **Public API:** the entries in `exports`: `.`, `./testing` and `./theme.css`. Everything else is private to this package.

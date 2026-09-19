@@ -30,7 +30,12 @@
 - 驗證關卡 `lint` 與 `typecheck` 都要跑：相對路徑的跨專案引用由 lint 擋，套件名稱加內部路徑的深層引用由型別檢查擋。
 - 新增 package 後確認 `pnpm-lock.yaml` 的 `importers` 有它的條目（`packages/<scope>/<name>: {}`）。pnpm 12 不會自動補，少了的話本機正常、但全新 clone 的 `pnpm install --frozen-lockfile` 會失敗。
 - `*.generated.ts` 不要手改：改 `tools/gen-fixtures.mjs` 後跑 `pnpm gen:fixtures`，提交前 `pnpm verify:fixtures` 要通過。新增素材一律經過 `tools/import-assets.mjs`（把對照加進去），不要手動複製 —— 它會在有檔案沒被交代時失敗。
-- 測試 UI 時用 `@momo/catalog-data-access/testing` 的 `createFakeCatalogRepository` 注入小而可控的資料，不要依賴真 fixture 的內容或筆數。
+- 測試 UI 時用 `@momo/catalog-data-access/testing`、`@momo/home-data-access/testing` 的 fake repository 注入小而可控的資料，不要依賴真 fixture 的內容或筆數。
+- 任何會掛載 `Carousel` 的 spec（直接或透過頁面）都要先呼叫 `@momo/shared-ui/testing` 的 `installCarouselTestEnvironment()`：jsdom 沒有 embla 需要的 API。app 已經放在 `src/test-setup.ts`。
+- 測試優先用角色與名稱查詢（`getByRole('region', { name })`），不要用 `data-testid`：同名的巢狀 landmark 就是這樣被抓到的。
+- **只斷言「某個東西不存在」的測試，要同時斷言一個「存在」**，並且對空實作跑過一次確認它會紅。否則元件整個消失它也會通過。
+- 首頁新增區塊：只是圖 → 在 `home-layout.ts` 加一筆既有 type 的設定；需要新的呈現方式 → 在 `HomeSection` union 加 type，`typecheck` 會指出 registry 少了哪一個；有自己的邏輯或資料 → 新的 feature package。
+- 失敗的查詢由 app 的 `QueryCache` 統一回報（`apps/shop/src/app/query-client.ts`），頁面與 hook 不要自己再呼叫 `reportError` 報同一件事。
 - 每個 commit 都要是綠的，使用 Conventional Commits。
 
 ## 驗證

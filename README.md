@@ -2,7 +2,7 @@
 
 Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情頁。全程使用 Mock Data，不呼叫任何真實 API。
 
-> **狀態：進行中。** 目前完成 workspace、10 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）、共用元件（`PriceTag`、兩種版型的 `ProductCard`、`Carousel`、`SectionHeader`）。首頁的業務區塊與商品詳情頁的內容尚未實作。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
+> **狀態：進行中。** 目前完成 workspace、10 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）、共用元件（`PriceTag`、兩種版型的 `ProductCard`、`Carousel`、`SectionHeader`）、**由版位資料驅動的首頁**（15 筆設定、6 種通用 block；商品卡可點進詳情頁）。限時搶購、今日暢銷榜、你可能會喜歡目前是佔位區塊，商品詳情頁的內容尚未實作。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
 
 ## 先看這幾份
 
@@ -21,7 +21,7 @@ Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情�
 ## 技術選型
 
 Nx（pnpm workspaces）· React 19 · TypeScript strict · Vite · Vitest + Testing Library
-已引入：React Router 8（library mode）· TanStack Query v5 · Tailwind CSS v4（兩層 design token）　預計引入：embla-carousel
+已引入：React Router 8（library mode）· TanStack Query v5 · Tailwind CSS v4（兩層 design token）· embla-carousel 8（只准 `shared/ui` import）
 
 刻意**沒有**安裝全域 store：兩個頁面都是展示用，盤點後全域 client state 為 0（[ADR-0003](./docs/adr/0003-server-state-only-no-global-store.md)）。
 
@@ -80,6 +80,11 @@ app → layout / page → feature → ui / data-access → util
 | Banner、猜你想搜的關鍵字圖不可點；真站會連到活動頁或搜尋頁                                              | 這些頁面不在範圍內                                                                                             |
 | 真站另有 3 個區塊與 2 個廣告 iframe 沒有做（熱搜排行列、一組連到商品的直式圖磚、一排 610×172 的活動圖） | 它們不在提供的素材與目標截圖裡；真站的區塊會隨檔期增減                                                         |
 | 商品名稱、品牌與價格是產生的假資料，品牌是虛構的                                                        | 見 [`architecture.md`](./docs/architecture.md) §7                                                              |
+| 「今日大牌」只有一格；真站是 2×2 共四格                                                                 | 素材只提供了四格中的一格。版位資料支援多格，補上圖就會變成 2×2                                                 |
+| Banner 的 `alt` 是「區塊名稱 + 序號」，不是圖片內容的描述                                               | 這些圖的文字是印在圖上的，沒有逐張抄寫。猜你想搜例外：它的 `alt` 就是關鍵字                                    |
+| 猜你想搜 9 個關鍵字中有 3 個是自己寫的                                                                  | 目標截圖只看得到前 6 個；後 3 個依圖片內容命名（其中「哈利波特」後來發現真站也有）                             |
+| 降價好貨與品牌折扣之間的「訂閱 moPro+」橫幅、官方優惠的熱搜排行、官方優惠的黃色底沒有做                 | 素材裡沒有橫幅與熱搜的資料；黃色底是截圖當天的活動檔期樣式，實測當天真站是白底                                 |
+| 主要活動的圓點在圖的下方；真站疊在圖上                                                                  | `Carousel` 的圓點目前只有一種位置                                                                              |
 | 主 header 右側的三張活動小圖沒有做                                                                      | 素材裡沒有這三張圖                                                                                             |
 
 ## 開發
