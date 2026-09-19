@@ -321,7 +321,7 @@ TDD 只打有邏輯的地方：純函式、repository、分頁與「看更多」
 
 **刻意不測**：純版面區塊（banner 類）、`use-compact-header`（jsdom 沒有 IntersectionObserver，交給 E2E）。
 
-空的 package 目前設了 `passWithNoTests`。**某個 package 加入第一個 spec 時要把它的這行拿掉**，否則日後測試被誤刪不會有人發現。
+每個專案都有測試（10 個專案、163 個），所以沒有任何一個設 `passWithNoTests`：測試被誤刪時那個專案的 `test` 會失敗，而不是悄悄通過。新增的空 package 若暫時需要它，**加入第一個 spec 時就要拿掉**。
 
 ## 9. 決策紀錄與演進方向
 

@@ -1,22 +1,55 @@
 # momo-shop-work
 
+[![CI](https://github.com/zach0627/momo-shop-work/actions/workflows/ci.yml/badge.svg)](https://github.com/zach0627/momo-shop-work/actions/workflows/ci.yml)
+
 Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情頁。全程使用 Mock Data，不呼叫任何真實 API。
 
-> **狀態：進行中。** 目前完成 workspace、9 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）、共用元件（`PriceTag`、兩種版型的 `ProductCard`、`Carousel`、`SectionHeader`）、**由版位資料驅動的首頁**（15 筆設定、6 種通用 block 加 2 個 feature；商品卡可點進詳情頁）。「你可能會喜歡」每次載入 3 列、載完後「看更多」消失。**商品詳情頁**（展示用：主圖、標題、說明、價格與三顆不綁行為的按鈕；商品不存在時顯示提示）。需求要求的兩個頁面都已完成。**限時搶購**（每秒更新的倒數、每頁 2 列 × 5 件可換頁的商品，卡片顯示限搶價、劃線原價與「最後 N 組」）。**今日暢銷榜**（橫式商品卡、粉色區帶與「即時更新」標籤 —— 是一筆版位設定，不是一個元件）。首頁的 15 個區塊都已完成。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
+由一位工程師與 Claude Code 協作完成。這個 repo 想回答的不是「畫面像不像」，而是三個問題：**系統怎麼切、為什麼這樣切；和真實網站差在哪、為什麼；Human 怎麼監督 Agent、效率如何。** 每一個都有對應的文件，而且照實寫。
+
+## 狀態：兩個頁面都已完成
+
+| 路由              | 內容                                                                                                                                                                                                                                                                                    |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`               | 首頁，由版位資料驅動：15 筆設定、8 種區塊型別。主要活動、官方優惠、降價好貨、品牌折扣、旗艦名店、momo 店取、信用卡優惠、猜你想搜、**限時搶購**（每秒更新的倒數、每頁 2 × 5 件可換頁）、今日暢銷榜、moPro、**你可能會喜歡**（每次載入 3 列，載完後「看更多」消失）。商品卡都可點進詳情頁 |
+| `/goods/:goodsId` | 商品詳情頁（**展示用**）：主圖、標題、條列說明、價格、三顆**刻意不綁行為**的按鈕；商品不存在時顯示提示與回首頁的連結                                                                                                                                                                    |
+| 其他路徑          | 找不到頁面                                                                                                                                                                                                                                                                              |
+
+三條路由都包在同一個 layout 裡：捲動後收合的頂部列、搜尋框、可展開的 40 個分類、footer。
+
+沒做的、和真站不一樣的，全部列在 [Known Gaps](#known-gaps)。計畫裡的加分項（Playwright E2E、區塊層級的 error boundary、skeleton、靜態部署）**沒有做**，列在[後續演進](#後續演進)。實作進度逐項記在 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md)：每一項都寫了怎麼驗證的、哪些沒驗到。
+
+## 快速開始
+
+```bash
+pnpm install
+pnpm nx dev shop                           # 開發伺服器 http://localhost:4200
+```
+
+```bash
+pnpm nx run-many -t lint test typecheck    # 全部專案（10 個專案、163 個測試）
+pnpm nx build shop
+pnpm format:check
+pnpm verify:boundaries                     # 依賴規則真的套用到每個專案、依賴圖 0 違規
+pnpm verify:fixtures                       # 商品 fixtures 與素材一致（過期時失敗）；重新產生用 pnpm gen:fixtures
+pnpm nx graph                              # 看依賴圖
+```
+
+需要 Node `>=22.22.0`（React Router 8 的要求；本專案以 Node 24 開發，CI 也用 24）與 pnpm 12。`package.json` 的 `packageManager` 鎖定 `pnpm@12.4.2`，較舊的 pnpm 會自動切換到這個版本。行為規格用 [OpenSpec](https://github.com/Fission-AI/OpenSpec) 撰寫；裝了它的 CLI 才需要跑 `openspec validate --all --strict`。
 
 ## 先看這幾份
 
-| 文件                                                                                    | 內容                                                                                                                                                         |
-| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`openspec/specs/module-boundaries/`](./openspec/specs/module-boundaries)               | **現行規格**（OpenSpec）：已實作並驗證過的工程約束 —— 依賴方向、框架耦合的單點放行、package 的公開入口、可重現的安裝。每一條「會被擋下」都放過違規樣本確認   |
-| [`openspec/changes/build-storefront-pages/`](./openspec/changes/build-storefront-pages) | **待實作的行為規格**：5 個 capability、每個 scenario 都能直接轉成測試；`design.md` 說明專案設置原因與每個設計決策及放棄的方案；`tasks.md` 是可勾選的實作進度 |
-| [`openspec/config.yaml`](./openspec/config.yaml)                                        | 專案脈絡（為什麼存在、為什麼這樣設置、不能破的規則）—— 會被帶進之後每一份規格的撰寫指示                                                                      |
-| [`docs/architecture.md`](./docs/architecture.md)                                        | 系統怎麼切、為什麼這樣切、規模變大時怎麼管                                                                                                                   |
-| [`docs/design-tokens.md`](./docs/design-tokens.md)                                      | 兩層 design token（Primitive / Semantic）；每個顏色、字級、框線的數值都是從真實網站的計算樣式**量出來的**，並記錄在哪裡量到、哪些沒量到                      |
-| [`docs/adr/`](./docs/adr)                                                               | 8 個決策：背景、理由、**代價**、演進觸發條件                                                                                                                 |
-| [`docs/agent-workflow.md`](./docs/agent-workflow.md)                                    | Human ↔ Agent 怎麼協作；Human 糾正了 Agent 什麼；Agent 在哪裡出錯                                                                                            |
-| [`docs/MoMO面試/`](./docs/MoMO面試)                                                     | 原始的需求解析、設計筆記與逐步計畫                                                                                                                           |
-| [`docs/pictures/`](./docs/pictures)                                                     | 目標畫面（真實網站）的截圖，依頁面由上到下編號                                                                                                               |
+| 文件                                                                                    | 內容                                                                                                                                                                    |
+| --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`docs/architecture.md`](./docs/architecture.md)                                        | 系統怎麼切、為什麼這樣切、規模變大時怎麼管                                                                                                                              |
+| [`docs/adr/`](./docs/adr)                                                               | 8 個決策：背景、理由、**代價**、演進觸發條件                                                                                                                            |
+| [`docs/agent-workflow.md`](./docs/agent-workflow.md)                                    | Human ↔ Agent 怎麼協作；Human 糾正 Agent 12 次、Agent 出錯 30 件、偏離計畫 47 項的完整紀錄；**協作效率評估**                                                            |
+| [`docs/design-tokens.md`](./docs/design-tokens.md)                                      | 兩層 design token（Primitive / Semantic）；每個顏色、字級、框線的數值都是從真實網站的計算樣式**量出來的**，並記錄在哪裡量到、哪些沒量到                                 |
+| [`openspec/changes/build-storefront-pages/`](./openspec/changes/build-storefront-pages) | **行為規格**（OpenSpec，已全部實作）：5 個 capability，scenario 直接翻成測試；`design.md` 說明專案設置原因、每個設計決策與放棄的方案；`tasks.md` 是逐項的實作與驗證紀錄 |
+| [`openspec/specs/module-boundaries/`](./openspec/specs/module-boundaries)               | 工程約束的規格：依賴方向、框架耦合的單點放行、package 的公開入口、可重現的安裝。每一條「會被擋下」都放過違規樣本確認                                                    |
+| [`openspec/config.yaml`](./openspec/config.yaml)                                        | 專案脈絡（為什麼存在、為什麼這樣設置、不能破的規則）—— 會被帶進之後每一份規格的撰寫指示                                                                                 |
+| [`CLAUDE.md`](./CLAUDE.md)                                                              | 給 Agent 的規則：不能違反的設計規則，以及「做事的方式」—— 後者多數條目對應到一次實際發生的事故                                                                          |
+| [`docs/MoMO面試/`](./docs/MoMO面試)                                                     | 原始的需求解析、設計筆記與逐步計畫（含每一步的完成紀錄）                                                                                                                |
+| [`docs/pictures/`](./docs/pictures)                                                     | 目標畫面（真實網站）的截圖，依頁面由上到下編號                                                                                                                          |
 
 ## 技術選型
 
@@ -97,17 +130,56 @@ app → layout / page → feature → ui / data-access → util
 | 今日暢銷榜與 momo 店取的商品卡沒有影片播放圖示、「店+」標記                                             | 商品資料模型沒有這些欄位                                                                                                                                          |
 | 主 header 右側的三張活動小圖沒有做                                                                      | 素材裡沒有這三張圖                                                                                                                                                |
 
-## 開發
+## 驗證與可觀測性
 
-```bash
-pnpm install
-pnpm nx dev shop                           # 開發伺服器
-pnpm nx run-many -t lint test typecheck    # 全部專案
-pnpm nx build shop
-pnpm nx graph                              # 看依賴圖
-pnpm verify:boundaries                     # 確認依賴規則套用到每個專案、依賴圖 0 違規
-pnpm verify:fixtures                       # 商品 fixtures 與素材一致（過期時失敗）；重新產生用 pnpm gen:fixtures
-openspec validate build-storefront-pages --strict   # 驗證行為規格的格式
-```
+**「綠燈」本身也要被驗證。** 這個專案裡，回報成功但其實什麼都沒檢查的情況出現過四次：lint 規則的 tags 寫壞而靜默失效、`@nx/dependency-checks` 在預設設定下什麼都不檢查、負向探針因為別的理由失敗卻被當成「被擋下」、CI 第一次執行時 `nx affected` 一個 task 都沒跑。所以：
 
-需要 Node `>=22.22.0`（React Router 8 的要求；本專案以 Node 24 開發與驗證）與 pnpm 12。`package.json` 的 `packageManager` 鎖定 `pnpm@12.4.2`，較舊的 pnpm 會自動切換到這個版本。
+| 做法                                                                                                       | 在哪裡                                                                                     |
+| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| 依賴規則除了 lint，另有一支工具確認「規則真的套用到每個專案、而且專案真的有它要的 target」，並有自我測試   | `pnpm verify:boundaries`（[`tools/verify-boundaries.mjs`](./tools/verify-boundaries.mjs)） |
+| 聲稱「會被工具擋下」的行為，都放過故意違規的樣本；探針的輸出必須出現那條規則的名稱才算數                   | [`module-boundaries` 規格](./openspec/specs/module-boundaries)、[`CLAUDE.md`](./CLAUDE.md) |
+| 產生的資料可以檢查是否過期；版位資料指到的每一張圖都要存在                                                 | `pnpm verify:fixtures`、`apps/shop` 的 `home-assets.spec`                                  |
+| 安裝要可重現：在沒有 `node_modules` 的乾淨複本與 CI 上跑 `--frozen-lockfile`                               | [CI](./.github/workflows/ci.yml)                                                           |
+| TDD 的紅燈要因為正確的理由而紅；只斷言「不存在」的測試要同時斷言一個「存在」；一寫就綠的測試用變異測試補驗 | [`agent-workflow.md`](./docs/agent-workflow.md) §4                                         |
+| main 的 CI 跑全部專案，PR 才跑 affected：main 的綠燈要代表整個 repo 是好的                                 | [CI](./.github/workflows/ci.yml)                                                           |
+| 沒驗到的照實寫，之後補驗到再回頭更新                                                                       | [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 各項的「沒有驗到的」      |
+
+**執行期的可觀測性**只做到接縫，沒有接真的後端：
+
+- `reportError(error, context)`（`shared/util`）是唯一的回報入口，sink 可替換：預設是 `console`，正式環境換成 Sentry 之類只改 composition root。它自己絕不 throw。
+- **每個失敗的查詢由 app 的 `QueryCache.onError` 回報一次、帶上 query key**，頁面與 hook 不重複回報 —— 不會漏報，也不會同一個錯誤報三次。
+- 首頁遇到這個版本不認識的區塊型別（CMS 先上了新區塊）→ 略過那一塊、其餘照常、回報一次。單一區塊的資料載入失敗時自己消失，不拖垮整頁。
+- 沒做的：使用者行為事件（`track` 沒有呼叫者，所以沒做）、效能指標（Web Vitals）、error boundary（單一區塊 render 時 throw 仍會拖垮整頁，見「後續演進」）。
+
+## Human ↔ Agent 協作與效率
+
+完整紀錄與評估在 [`docs/agent-workflow.md`](./docs/agent-workflow.md)。git history 的每個 commit 都帶 `Co-Authored-By`；commit message 寫的是為什麼，以及怎麼驗證的。
+
+**協作方式**：先設計、後實作，設計文件是 source of truth → 行為規格（OpenSpec）的 scenario 直接翻成測試 → 一次一步，每步走「TDD 實作 → 無快取驗證 → 回報（含沒驗到的）→ Human review → commit」→ 每次事故的教訓寫回 `CLAUDE.md`，成為下一次的規則。決定權在 Human 的事（架構取捨、範圍、要不要公開某個檔案），Agent 提出建議與理由後停下來等。
+
+**數字**（時間紀錄依 Human 的要求拿掉了，所以用數得出來的東西評估）：約 80 個 commit、163 個測試；Human 糾正 Agent 12 次；Agent 出錯 30 件；偏離原計畫 47 項。
+
+**三個結論**：
+
+1. **Human 的 review 和自動化檢查抓到的是不同種類的錯，互相取代不了。** 30 件事故裡，Human 抓到的 7 件全部是方向或事實層級（規格寫了沒驗證過的行為、需求其實不存在、架構的說法站不住）；測試與工具抓到的 12 件全部是實作層級。
+2. **最貴的是重工，而重工幾乎都來自「沒先查證就提案」。** layout 改了三輪、`libs/` → `packages/`、design token 重量一次、一條規格與一個 package 寫了又刪 —— 起因都是沒有先對照真實網站或業界慣例。12 次糾正裡有 3 次的內容就是「去看真實網站」。如果重來，最大的效率改善不是寫得更快，而是把查證放在提案之前。
+3. **Agent 擅長把一個方向做完整，不擅長質疑方向本身。** 它明顯加速的是機械性的大範圍修改（資料夾改制、118 個檔案的註解改寫，逐 commit 保持綠燈）、到真站量測數值、scenario → 測試 → 實作的迴圈，以及文件；Human 的糾正則多半來自「這樣以後會怎樣」這種問題。
+
+下次會改的做法：CI 第一天就加（它排在最後才做，而 lockfile 過期的假綠燈第一天就會被它抓到）；每個區塊動工前先讀真站的 DOM，不只看截圖；package 等有邏輯了再開。
+
+## 後續演進
+
+每個 ADR 都寫了自己的演進觸發條件（彙整在 [`architecture.md` §9](./docs/architecture.md)）。下表依「現在的結構已經為它準備了什麼」整理：
+
+| 方向                                                | 觸發條件                             | 要改的地方                                                                                       | 現在的結構幫了什麼                                                                                                                                                                                                     |
+| --------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 接真實的商品 API / CMS API                          | 有後端                               | 在 composition root 換掉 repository 的實作；`HomeSection` 就是和 CMS 的契約                      | UI 只認 hooks，hooks 只認 interface；執行期遇到未知的區塊型別已經有容錯                                                                                                                                                |
+| 網路層的模擬與 contract test（MSW）                 | 接了真的 API 之後                    | 在 HTTP 版的 repository 底下加 MSW；現有的 fake repository 留給元件測試                          | 兩者不衝突：接縫在 interface，MSW 在更下面一層（[ADR-0005](./docs/adr/0005-repository-seam-with-context-injection.md)）                                                                                                |
+| 購物車、結帳、會員                                  | 出現需要跨頁保留的 client state      | 新增 `cart`、`checkout` scope；這時才引入全域 store（Zustand 或 RTK），而且只放在擁有它的 domain | 成長方式是新增 scope；依賴方向已有地圖（[ADR-0006](./docs/adr/0006-domain-dependency-map.md)）；詳情頁的三顆按鈕有 spec 守著，接上行為必須是刻意的（[ADR-0003](./docs/adr/0003-server-state-only-no-global-store.md)） |
+| SSR / SEO（Next.js 或 React Router framework mode） | 要上正式環境、需要 SEO 與 LCP        | 換掉 `apps/shop`；page 與 layout 以下不動                                                        | `react-router` 只准出現在 app；page 收 props 而不自己讀網址；連結走注入的 `AppLink`（[ADR-0001](./docs/adr/0001-spa-over-next.md)）                                                                                    |
+| 第二個 app（活動頁、App 內嵌頁、後台）              | 不同團隊負責，或需要獨立部署         | 新增 `apps/*`，重用既有的 package                                                                | package 不依賴 app；外框是 package，不是 app 裡的資料夾（[ADR-0007](./docs/adr/0007-layout-as-a-lib-and-a-tier.md)）                                                                                                   |
+| 單一區塊失敗不拖垮整頁                              | 區塊變多、來源變多                   | `SectionRenderer` 替每個區塊包一層 error boundary，接到 `reportError`                            | 分派集中在一個純元件；回報入口已經有了                                                                                                                                                                                 |
+| E2E（Playwright）                                   | 互動變多                             | 首頁 → 點商品卡 → 詳情頁的 smoke test；收合的頂部列與輪播的實際捲動目前只有手動驗證              | 測試用角色與名稱查詢，selector 可以沿用                                                                                                                                                                                |
+| 載入體驗（skeleton、圖片格式、Web Vitals）          | 接了真的、會慢的 API                 | 區塊層級的 skeleton；`reportError` 旁邊加效能指標的 sink                                         | 版位資料已帶圖片原始尺寸，載入時不會跳動                                                                                                                                                                               |
+| 部署                                                | 任何時候                             | 靜態檔放 CDN（Cloudflare Pages / GitHub Pages）；CI 已經有 build                                 | SPA，沒有 server                                                                                                                                                                                                       |
+| `shared/ui` 拆成元件家族；Nx remote cache           | 元件超過約 15 個，或 CI 時間變成問題 | 依 [`architecture.md` §5](./docs/architecture.md) 的觸發條件                                     | —                                                                                                                                                                                                                      |
