@@ -4,3 +4,10 @@
 /.nx/cache
 /.nx/workspace-data
 .nx/self-healing
+
+# 由工具產生，格式由工具決定
+pnpm-lock.yaml
+/.claude
+
+# Obsidian 筆記的複本：要和 vault 裡的原檔逐字相同，不重新排版
+/docs/MoMO面試

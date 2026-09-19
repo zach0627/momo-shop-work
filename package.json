@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "format:check": "prettier --check .",
     "gen:fixtures": "node tools/gen-fixtures.mjs",
     "verify:boundaries": "node tools/verify-boundaries.mjs",
     "verify:fixtures": "node tools/gen-fixtures.mjs --check"
