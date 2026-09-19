@@ -100,11 +100,13 @@
 
 ## 13. 交付（Step 13）
 
-- [ ] 13.1 README 更新為完成狀態：啟動方式、與真實網站的差異（Known Gaps，沒做完的照實寫）、後續演進；驗證：依 README 的指令在乾淨環境從零跑一次
-- [ ] 13.2 `.github/workflows/ci.yml`：`pnpm install --frozen-lockfile`、`pnpm verify:boundaries`、`nx affected -t lint test build`（可砍）；驗證：push 後 CI 綠燈
-- [ ] 13.3 最終驗證：`nx run-many -t lint test typecheck` 與 `nx build shop` 全綠、`pnpm verify:boundaries` 0 違規、`openspec validate --strict` 通過
+- [x] 13.1 README 更新為完成狀態，依這個 repo 要回答的三件事重排：狀態（依路由）、快速開始、架構與 Tradeoffs、Known Gaps（沿用）、新增「驗證與可觀測性」「Human ↔ Agent 協作與效率」「後續演進」（每個方向：觸發條件、要改哪裡、現在的結構已經幫了什麼）；加分項沒做，照實寫明；`agent-workflow.md` 新增 §7 協作效率評估（不用工時，用數得出來的：commit、測試、12 次糾正、31 件事故依「誰抓到的」分類、47 項偏離）；`.prettierignore` 讓 `prettier --check .` 對整個 repo 通過（lockfile、`.claude/`、Obsidian 筆記複本不重新排版）；驗證：從 GitHub 全新 clone 到另一顆磁碟的空資料夾，照 README 的指令從零跑：`pnpm install` → `nx run-many -t lint test typecheck`（10 個專案）→ `nx build shop` → `format:check` → `verify:boundaries`（10 個專案、26 條依賴、0 違規）→ `verify:fixtures`，全部通過。**過程中 Agent 的背景指令掛了 20 分鐘**：`run-many` 約 2 分鐘就成功了，但 Nx 的常駐 daemon 繼承了 Agent 擷取輸出用的管線，管線不結束；Human 問「為什麼跑這麼久」才去查。停掉 daemon 後結果立刻出來，其餘步驟改用 `NX_DAEMON=false` 跑完。README 的指令本身沒有問題（一般終端機會正常返回）
+- [x] 13.2 `.github/workflows/ci.yml`：`pnpm install --frozen-lockfile` → `format:check` → `verify:boundaries` → `verify:fixtures` → **push 到 main 跑全部專案**的 `lint test typecheck build`，PR 才跑 `nx affected`；驗證：push 後 CI 綠燈，而且 log 裡是 `Successfully ran targets lint, test, typecheck, build for 10 projects`（Linux、Node 24、約 1 分鐘）。**第一版照計畫用 `nx affected`，第一次執行 29 秒就綠了 —— log 是 `No tasks were run`**：沒有上一次成功的 CI 可比，退回 `HEAD~1`，而那個 commit 只加了 workflow 檔。那個空的綠燈還會成為之後每次比較的基準，所以改為 main 全跑。**沒有驗到的**：PR 的路徑（`nx affected`）與「CI 真的會紅」—— 兩者都需要開一個故意違規的 PR，這是公開的動作，留給 Human 決定
+- [x] 13.3 最終驗證：`nx run-many -t lint test typecheck`（10 個專案、163 個測試）與 `nx build shop` 全綠、`pnpm verify:boundaries` 0 違規、`pnpm verify:fixtures` 通過、`openspec validate --all --strict` 通過 —— 在開發機、另一顆磁碟的全新 clone、以及 CI（Linux）三個環境。收尾時另外找到並移除 `home/page` 早該拿掉的 `passWithNoTests`
 
 ## 14. 加分項（P2）
+
+沒有做。已在 README 的狀態與「後續演進」照實寫明。
 
 - [ ] 14.1 Playwright smoke：首頁 → 點商品卡 → 詳情頁標題可見；驗證：`nx e2e shop-e2e` 通過
 - [ ] 14.2 `SectionBoundary`（error boundary）：單一區塊拋錯時其餘區塊仍顯示並回報；驗證：spec 讓一個 block 拋錯

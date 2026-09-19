@@ -42,7 +42,7 @@ pnpm nx graph                              # 看依賴圖
 | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`docs/architecture.md`](./docs/architecture.md)                                        | 系統怎麼切、為什麼這樣切、規模變大時怎麼管                                                                                                                              |
 | [`docs/adr/`](./docs/adr)                                                               | 8 個決策：背景、理由、**代價**、演進觸發條件                                                                                                                            |
-| [`docs/agent-workflow.md`](./docs/agent-workflow.md)                                    | Human ↔ Agent 怎麼協作；Human 糾正 Agent 12 次、Agent 出錯 30 件、偏離計畫 47 項的完整紀錄；**協作效率評估**                                                            |
+| [`docs/agent-workflow.md`](./docs/agent-workflow.md)                                    | Human ↔ Agent 怎麼協作；Human 糾正 Agent 12 次、Agent 出錯 31 件、偏離計畫 47 項的完整紀錄；**協作效率評估**                                                            |
 | [`docs/design-tokens.md`](./docs/design-tokens.md)                                      | 兩層 design token（Primitive / Semantic）；每個顏色、字級、框線的數值都是從真實網站的計算樣式**量出來的**，並記錄在哪裡量到、哪些沒量到                                 |
 | [`openspec/changes/build-storefront-pages/`](./openspec/changes/build-storefront-pages) | **行為規格**（OpenSpec，已全部實作）：5 個 capability，scenario 直接翻成測試；`design.md` 說明專案設置原因、每個設計決策與放棄的方案；`tasks.md` 是逐項的實作與驗證紀錄 |
 | [`openspec/specs/module-boundaries/`](./openspec/specs/module-boundaries)               | 工程約束的規格：依賴方向、框架耦合的單點放行、package 的公開入口、可重現的安裝。每一條「會被擋下」都放過違規樣本確認                                                    |
@@ -157,11 +157,11 @@ app → layout / page → feature → ui / data-access → util
 
 **協作方式**：先設計、後實作，設計文件是 source of truth → 行為規格（OpenSpec）的 scenario 直接翻成測試 → 一次一步，每步走「TDD 實作 → 無快取驗證 → 回報（含沒驗到的）→ Human review → commit」→ 每次事故的教訓寫回 `CLAUDE.md`，成為下一次的規則。決定權在 Human 的事（架構取捨、範圍、要不要公開某個檔案），Agent 提出建議與理由後停下來等。
 
-**數字**（時間紀錄依 Human 的要求拿掉了，所以用數得出來的東西評估）：約 80 個 commit、163 個測試；Human 糾正 Agent 12 次；Agent 出錯 30 件；偏離原計畫 47 項。
+**數字**（時間紀錄依 Human 的要求拿掉了，所以用數得出來的東西評估）：約 80 個 commit、163 個測試；Human 糾正 Agent 12 次；Agent 出錯 31 件；偏離原計畫 47 項。
 
 **三個結論**：
 
-1. **Human 的 review 和自動化檢查抓到的是不同種類的錯，互相取代不了。** 30 件事故裡，Human 抓到的 7 件全部是方向或事實層級（規格寫了沒驗證過的行為、需求其實不存在、架構的說法站不住）；測試與工具抓到的 12 件全部是實作層級。
+1. **Human 的 review 和自動化檢查抓到的是不同種類的錯，互相取代不了。** 31 件事故裡，Human 抓到 8 件，其中 7 件是方向或事實層級（規格寫了沒驗證過的行為、需求其實不存在、架構的說法站不住）；測試與工具抓到的 12 件全部是實作層級。（第 8 件是 Agent 的一個驗證指令掛了 20 分鐘沒發現，Human 等得不耐煩才問出來的。）
 2. **最貴的是重工，而重工幾乎都來自「沒先查證就提案」。** layout 改了三輪、`libs/` → `packages/`、design token 重量一次、一條規格與一個 package 寫了又刪 —— 起因都是沒有先對照真實網站或業界慣例。12 次糾正裡有 3 次的內容就是「去看真實網站」。如果重來，最大的效率改善不是寫得更快，而是把查證放在提案之前。
 3. **Agent 擅長把一個方向做完整，不擅長質疑方向本身。** 它明顯加速的是機械性的大範圍修改（資料夾改制、118 個檔案的註解改寫，逐 commit 保持綠燈）、到真站量測數值、scenario → 測試 → 實作的迴圈，以及文件；Human 的糾正則多半來自「這樣以後會怎樣」這種問題。
 

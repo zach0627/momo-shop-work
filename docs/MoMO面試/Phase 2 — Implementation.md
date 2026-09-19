@@ -48,7 +48,7 @@ First Commit 至最後 Commit
 | ✅ | 10 ★ | 商品詳情頁（純展示） | `feat(goods): display-only goods detail page` | #8 | ✗ |
 | ✅ | 11 | 限時搶購：倒數 + 2 列輪播 | `feat(flash-sale): countdown and two-row carousel` | #7 | ✓ |
 | ✅ | 12 | 今日暢銷榜（橫式商品卡，沒有名次）—— 是 `product-rail` 的一筆設定，不是 package | `feat(home): best sellers as one more product rail` | — | ✓ |
-| ⬜ | 13 ★ | README + CI | `docs: readme with tradeoffs and roadmap` / `ci: nx affected` | — | README ✗ / CI ✓ |
+| ✅ | 13 ★ | README + CI | `docs: readme with tradeoffs and roadmap` / `ci: nx affected` | — | README ✗ / CI ✓ |
 | ⬜ | P2 | Playwright / SectionBoundary / Skeleton / 部署 | 各自一個 commit | — | ✓ |
 
 > ★ = 里程碑，建議至少在這四步停下來看畫面。不可砍的路徑是 Step 1–10 + 13；Step 11 / 12 若最後沒做，要在 README 的 Known Gaps 照實寫明。
@@ -349,15 +349,24 @@ First Commit 至最後 Commit
 **Commit**：~~`feat(ranking): best sellers as horizontal cards`~~
   - ↳ 5 個 commit：`shared/ui` 的兩個選項 → 今日暢銷榜成為一筆設定 → 移除 `ranking` 型別與 package → 移除 `getRanking` → 間距修正；外加文件。
 
-### Step 13 ★ — README + CI
+### Step 13 ★ — README + CI ✅
 
 **目標**：把自己當成這個系統的長期維護者來寫。
-- [ ] `README.md`：如何啟動 / 測試；架構一頁摘要（連到 `docs/`）；**Tradeoffs**；**與真實網站的差異（Known Gaps）**；**後續演進**（multi-app、SSR、RTK、CMS API、MSW）；Agent 協作方式與效率分析（連到 `agent-workflow.md`）。
-- [ ] 沒做完的步驟照實寫進 Known Gaps（不假裝有做）。
-- [ ] `.github/workflows/ci.yml`：`pnpm nx affected -t lint test build`（可砍）。
+- [x] `README.md`：如何啟動 / 測試；架構一頁摘要（連到 `docs/`）；**Tradeoffs**；**與真實網站的差異（Known Gaps）**；**後續演進**（multi-app、SSR、RTK、CMS API、MSW）；Agent 協作方式與效率分析（連到 `agent-workflow.md`）。
+  - ↳ 依考核要點重排：狀態（依路由）→ 快速開始 → 先看這幾份 → 架構 → Tradeoffs → Known Gaps → **驗證與可觀測性**（對應 Bonus 的 Validation / Observability）→ **Human ↔ Agent 協作與效率**（對應「Agent 協作效率評估 / 分析」與 Bonus 的 Iteration Architecture）→ **後續演進**（每個方向：觸發條件、要改哪裡、現在的結構已經幫了什麼）。
+  - ↳ **效率評估不用工時**（時間紀錄依你的要求拿掉了），用數得出來的：約 80 個 commit、163 個測試、12 次糾正、31 件事故（依「誰抓到的」分類：Agent 自己檢查 11、Human 8、設計成會失敗的工具 7、測試 5）、47 項偏離。三個結論寫在 README，完整版在 `agent-workflow.md` §7。
+  - ↳ 寫評估時發現並修正：上一步把第 12 次糾正插到了表格外面、還少一欄。
+- [x] 沒做完的步驟照實寫進 Known Gaps（不假裝有做）。
+  - ↳ Step 1–13 都做了；**P2 加分項沒有做**，寫在 README 的狀態與「後續演進」。
+- [x] `.github/workflows/ci.yml`：`pnpm nx affected -t lint test build`（可砍）。
+  - ↳ **第一版照計畫用 `nx affected`，第一次執行 29 秒就綠了 —— 太快，去讀 log：`No tasks were run`。** 沒有上一次成功的 CI 可比就退回 `HEAD~1`，而那個 commit 只加了 workflow 檔；這個空的綠燈還會成為之後的比較基準，等於之前的程式碼永遠不會在 CI 上跑到。改為 push 到 main 跑全部、PR 才跑 affected。這是「回報成功卻什麼都沒檢查」第四次出現，已記入 `agent-workflow.md` §4 並寫進 `CLAUDE.md`。
+  - ↳ CI 另外多跑 `format:check`、`verify:boundaries`、`verify:fixtures`；`.prettierignore` 讓整個 repo 的 `prettier --check .` 通過。
+  - ↳ 收尾時找到 `home/page` 早該拿掉的 `passWithNoTests`（它從 Step 8 起就有測試），已移除。
+  - ↳ **全新 clone 的驗證掛了 20 分鐘，是你問了才發現的。** `run-many` 約 2 分鐘就成功，但我照 README 原樣跑、沒加 `NX_DAEMON=false`，Nx 的常駐 daemon 繼承了我擷取輸出的管線，背景工作就一直不結束，而我只是在等完成通知。已記入 `agent-workflow.md` §4（第 31 件），並在 `CLAUDE.md` 加了一條：背景指令要有預期的完成時間，超過就去查。
 
 **驗證**：`pnpm nx run-many -t lint test build` 全綠；照 README 的指令從零跑一次
 **Commit**：`docs: readme with tradeoffs, known gaps and roadmap`、`ci: run nx affected on push`
+  - ↳ 實際是 5 個 commit：`.prettierignore` → CI → CI 改為 main 全跑 → `passWithNoTests` → README 與效率評估；外加這份紀錄。
 
 ### P2 — 加分項（各自獨立 commit）
 
@@ -403,6 +412,7 @@ First Commit 至最後 Commit
 | 11 | **限時搶購**：`get-remaining`、`chunk`、`use-countdown`（重新讀時鐘、到零停止）；私有的 `flash-sale-header`、`countdown`、`card-footer`；每頁 2 × 5 的輪播；`shared/ui` 補上 `PriceTag` 的 `sale` / `lg` / `label` 與 `ProductCard` 的 `raised`、token `surface-sale` `surface-stock`。feature 20 個測試 | `41cbf92` `8e51f22`（+ 文件的 commit） |
 | 11+ | 逐項核對 Step 11 時找到的收尾：`feature-flash-sale` 有了明寫的 `import react`，eslint 對 react 的放行與註解已不成立 → 移除；ADR-0008 過期的放行清單更新 | `935da30` `0e2fc15` |
 | 12 | **今日暢銷榜**：對照真站後成為 `product-rail` 的一筆設定（`background`、標題的 `badge`）；`SectionHeader` 的 `badge`、`ProductCard` 的 `frame="bordered"`；移除 `ranking` 型別、`home/feature-ranking`（package 10 → 9）、`getRanking` / `useRanking`；有標題區塊的間距修正。home-data-access 9 個測試、home-page 11 個、app 12 個、shared-ui 35 個 | `3181acf` `37c5e0a` `e2de477` `ee99a32` `ab38102`（+ 文件的 commit） |
+| 13 | **README + CI**：README 依考核要點重排（狀態、快速開始、驗證與可觀測性、協作與效率、後續演進）；`agent-workflow.md` §7 協作效率評估；CI（frozen install、format、兩個 verify、main 全跑 / PR affected）；`.prettierignore`；移除最後一個 `passWithNoTests`；`CLAUDE.md` 加兩條規則 | `3a65994` `e53d164` `8c109a0` `e695ed4` `cf6214c`（+ 這份紀錄的 commit） |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -562,4 +572,11 @@ First Commit 至最後 Commit
 
 > **檢查點：首頁 15 個區塊與商品詳情頁都已完成。** 剩下 Step 13（README 總整理 + CI + `.prettierignore`）與 P2 加分項。
 
-**下一步：Step 13 ★ — README + CI** → 對應 `tasks.md` 第 13 組
+**Step 13 驗證結果**
+- **三個環境都綠**：開發機（無快取、循序）；另一顆磁碟上從 GitHub 全新 clone 的空資料夾，照 README 的指令從零跑；CI（Linux、Node 24）。內容都是：10 個專案的 `lint / test / typecheck`（163 個測試）、`nx build shop`、`format:check`、`verify:boundaries`（10 個專案、26 條依賴、0 違規）、`verify:fixtures`。開發機另跑 `openspec validate --all --strict`。
+- CI 的 log 確認真的跑了：`Successfully ran targets lint, test, typecheck, build for 10 projects`，約 1 分鐘。
+- **沒有驗到的**：PR 的路徑（`nx affected`）與「CI 真的會紅」。兩者都要開一個故意違規的 PR，那是公開的動作，留給你決定。
+
+> **Step 1–13 全部完成。** P2 加分項（Playwright、error boundary、skeleton、部署）沒有做，已在 README 照實寫明。
+
+**下一步：由 Human 決定** —— (a) 用眼睛把兩個頁面對照截圖看一次；(b) 要不要開一個探針 PR 驗證 CI 會紅；(c) 要不要把 OpenSpec 的 change 歸檔（`openspec archive`，會搬動 `openspec/changes/…` 的路徑，README 與文件的連結要跟著改）；(d) 做不做 P2。
