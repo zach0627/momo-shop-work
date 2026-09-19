@@ -5,6 +5,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
+  // 部署在子路徑時（GitHub Pages 的 /momo-shop-work/）由環境變數給；平常是 /
+  base: process.env.BASE_PATH ?? '/',
   cacheDir: '../../node_modules/.vite/apps/shop',
   server: {
     port: 4200,

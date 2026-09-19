@@ -63,3 +63,44 @@ jobs:
         uses: nrwl/nx-set-shas@v4
       - if: github.event_name == 'pull_request'
         run: pnpm exec nx affected -t lint test typecheck build
+
+  # Demo 站：GitHub Pages。只在 main 的 verify 通過之後才部署
+  deploy:
+    needs: verify
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      # 專案頁掛在 /<repo 名稱>/ 底下。build、router 的 basename、index.html 的 <base>、e2e 都讀這個變數；
+      # 它也是 Nx 快取 key 的一部分（nx.json 的 sharedGlobals），否則會拿到根路徑版的產物
+      BASE_PATH: /${{ github.event.repository.name }}/
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm exec nx build shop
+
+      # 部署出去的就是這一份：先用真的瀏覽器對它走一次
+      - run: pnpm exec nx e2e shop
+
+      # Pages 沒有 SPA 的 fallback：直接開或重新整理 /goods/… 會 404。
+      # 404.html 和 index.html 相同，router 會依網址渲染出正確的頁面
+      - run: cp apps/shop/dist/index.html apps/shop/dist/404.html
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: apps/shop/dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

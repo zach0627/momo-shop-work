@@ -3,7 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <title>momo 購物網（Mock）</title>
-    <base href="/" />
+    <!-- 這是練習用的仿作，會公開掛在 demo 站上：不要讓搜尋引擎收錄 -->
+    <meta name="robots" content="noindex, nofollow" />
+    <!-- 版位資料裡的圖是相對路徑（assets/…），靠這一行接到部署的子路徑 -->
+    <base href="%BASE_URL%" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- 向量版優先（任何解析度都清晰）；不支援 SVG 圖示的瀏覽器用 .ico（16 / 32 / 48） -->

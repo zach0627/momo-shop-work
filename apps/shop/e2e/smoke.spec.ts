@@ -1,18 +1,23 @@
 import { expect, test } from '@playwright/test';
 
 // 單元與整合測試在 jsdom 裡跑，沒有排版、沒有真的導頁。這裡用真的瀏覽器走一次主要路徑。
+// 路徑一律相對於 baseURL（./）：同一份測試也要能對部署在子路徑的 build 跑。
+// 首頁的網址：在 basename 底下 router 會導到「/momo-shop-work」（沒有結尾斜線），兩種都算
+const HOME_PATH = (process.env.BASE_PATH ?? '/').replace(/\/$/, '');
+const isHome = (url: URL) => url.pathname.replace(/\/$/, '') === HOME_PATH;
+
 test.describe('storefront smoke', () => {
   // 規格 home-page：點擊商品卡；規格 goods-detail：與首頁卡片為同一件商品
   test('goes from a home page card to its detail page and back', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('./');
 
     const rail = page.getByRole('region', { name: '降價好貨' });
     const card = rail.getByRole('article').first();
     const name = await card.getByRole('heading').innerText();
     const href = await card.getByRole('link').getAttribute('href');
-    expect(href).toMatch(/^\/goods\/\w+$/);
+    expect(href).toMatch(/\/goods\/\w+$/);
 
     await card.getByRole('link').click();
 
@@ -30,13 +35,13 @@ test.describe('storefront smoke', () => {
       .getByRole('link', { name: /momo/ })
       .first()
       .click();
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(isHome);
     await expect(page.getByRole('region', { name: '主要活動' })).toBeVisible();
   });
 
   // jsdom 測不到的：輪播真的會捲
   test('pages a product rail forward', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('./');
 
     const rail = page.getByRole('region', { name: '降價好貨' });
     const first = rail.getByRole('article').first();
@@ -54,7 +59,7 @@ test.describe('storefront smoke', () => {
   test('shows a way home for a product that does not exist', async ({
     page,
   }) => {
-    await page.goto('/goods/no-such-goods');
+    await page.goto('./goods/no-such-goods');
 
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       '找不到商品',
@@ -62,6 +67,6 @@ test.describe('storefront smoke', () => {
     // 外框的搜尋與分類按鈕還在；頁面本身沒有任何按鈕
     await expect(page.getByRole('main').getByRole('button')).toHaveCount(0);
     await page.getByRole('main').getByRole('link', { name: '回首頁' }).click();
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(isHome);
   });
 });
