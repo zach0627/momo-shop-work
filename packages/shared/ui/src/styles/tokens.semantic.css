@@ -105,6 +105,10 @@
   --color-surface: var(--momo-white);
   /* 猜你想搜說明列的漸層終點（由 surface 漸變到這個顏色） */
   --color-surface-caption: var(--momo-blush-100);
+  /* 限時搶購的標題列（取樣自目標截圖：真站的標題列是一張圖） */
+  --color-surface-sale: var(--momo-pink-100);
+  /* 限時搶購「最後 N 組」的底色 */
+  --color-surface-stock: var(--momo-blush-50);
   /* 頂部列、首頁的頁面底色 */
   --color-surface-muted: var(--momo-gray-100);
   /* 分類列的展開按鈕 */

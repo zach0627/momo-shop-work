@@ -8,6 +8,8 @@
   --momo-pink-600: #db2777;
   --momo-rose-500: #ff4c76;
   --momo-red-600: #dd2222;
+  --momo-pink-100: #ffd9e5; /* 限時搶購的標題列 */
+  --momo-blush-50: #fdf2f2; /* 「最後 N 組」的底色 */
 
   /* 藍 */
   --momo-blue-600: #1c6fbc;

@@ -1,18 +1,22 @@
+import type { ReactNode } from 'react';
+
 import { formatPrice } from '@momo/shared-util';
 
-/** 價格的顏色：text-price 或 text-brand。 */
-export type PriceTone = 'price' | 'brand';
-/** sm：19px（格狀）；md：21px（商品列）。 */
-export type PriceSize = 'sm' | 'md';
+/** 價格的顏色：price（一般）、brand（降價好貨）、sale（限時搶購）。 */
+export type PriceTone = 'price' | 'brand' | 'sale';
+/** sm：19px（格狀）；md：21px（商品列）；lg：23px（限時搶購）。 */
+export type PriceSize = 'sm' | 'md' | 'lg';
 
 // class 要寫完整字串，Tailwind 才掃得到
 const TONES: Record<PriceTone, string> = {
   price: 'text-price',
   brand: 'text-brand',
+  sale: 'text-sale',
 };
 const SIZES: Record<PriceSize, string> = {
   sm: 'text-ec-xl',
   md: 'text-ec-2xl',
+  lg: 'text-ec-3xl',
 };
 
 export interface PriceTagProps {
@@ -23,6 +27,8 @@ export interface PriceTagProps {
   size?: PriceSize;
   /** 原價放在售價下面，而不是旁邊。 */
   stacked?: boolean;
+  /** 價格前面的小字，例：「限搶價」。有它的時候 $ 也跟著用同樣的小字。 */
+  label?: ReactNode;
 }
 
 export function PriceTag({
@@ -31,6 +37,7 @@ export function PriceTag({
   tone = 'price',
   size = 'md',
   stacked = false,
+  label,
 }: PriceTagProps) {
   const isDiscounted = originalPrice !== undefined && originalPrice > price;
 
@@ -41,7 +48,12 @@ export function PriceTag({
       }
     >
       <span className={`${TONES[tone]} whitespace-nowrap`}>
-        <span className="text-ec-sm font-medium">$</span>
+        {label && <span className="text-ec-2xs font-bold">{label}</span>}
+        <span
+          className={label ? 'text-ec-2xs font-bold' : 'text-ec-sm font-medium'}
+        >
+          $
+        </span>
         <span className={`${SIZES[size]} font-bold`}>{formatPrice(price)}</span>
       </span>
       {isDiscounted && (

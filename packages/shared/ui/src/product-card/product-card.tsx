@@ -13,12 +13,13 @@ export interface ProductCardItem {
 
 /** vertical：圖在上；horizontal：140px 的圖在左。 */
 export type ProductCardLayout = 'vertical' | 'horizontal';
-/** outlined：框線 + 8px 圓角 + 淡陰影；plain：只有 4px 圓角。 */
-export type ProductCardFrame = 'outlined' | 'plain';
+/** outlined：框線 + 8px 圓角 + 淡陰影；plain：只有 4px 圓角；raised：淺框線 + 較深陰影 + 內距 10px（限時搶購）。 */
+export type ProductCardFrame = 'outlined' | 'plain' | 'raised';
 
 const FRAMES: Record<ProductCardFrame, string> = {
   outlined: 'rounded-card border border-line shadow-card',
   plain: 'rounded-tile',
+  raised: 'rounded-card border border-line-soft shadow-card-raised p-2.5',
 };
 
 export interface ProductCardProps {
@@ -45,6 +46,8 @@ export function ProductCard({
   footer,
 }: ProductCardProps) {
   const isHorizontal = layout === 'horizontal';
+  // raised 的內距在整張卡片上，文字區就不再另外加左右內距
+  const isPadded = frame === 'raised';
 
   return (
     <article className={`${FRAMES[frame]} bg-surface h-full overflow-hidden`}>
@@ -66,7 +69,13 @@ export function ProductCard({
           }
         />
         <div
-          className={isHorizontal ? 'flex min-w-0 flex-1 flex-col' : 'p-2.5'}
+          className={
+            isHorizontal
+              ? 'flex min-w-0 flex-1 flex-col'
+              : isPadded
+                ? 'pt-2'
+                : 'p-2.5'
+          }
         >
           {isHorizontal ? (
             // 沒有促銷文字也保留這一行的高度，同一列卡片的名稱才會對齊
@@ -92,7 +101,9 @@ export function ProductCard({
           </div>
         </div>
       </AppLink>
-      {footer && <div className="px-2.5 pb-2.5">{footer}</div>}
+      {footer && (
+        <div className={isPadded ? 'pt-1' : 'px-2.5 pb-2.5'}>{footer}</div>
+      )}
     </article>
   );
 }

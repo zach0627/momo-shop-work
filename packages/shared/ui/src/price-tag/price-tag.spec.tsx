@@ -9,6 +9,16 @@ describe('PriceTag', () => {
     expect(screen.getByText('49,900')).toBeTruthy();
   });
 
+  it('puts a label before the price when one is given, e.g. 限搶價', () => {
+    const { container, rerender } = render(
+      <PriceTag price={2998} label="限搶價" />,
+    );
+    expect(container.textContent).toBe('限搶價$2,998');
+
+    rerender(<PriceTag price={2998} />);
+    expect(container.textContent).toBe('$2,998');
+  });
+
   it('strikes the original price through when there is one', () => {
     const { container } = render(
       <PriceTag price={49900} originalPrice={49999} />,
