@@ -1,15 +1,11 @@
-// Secondary entry point: '@momo/catalog-data-access/testing'.
-// Kept out of the main entry so test helpers never reach the app bundle.
+// 第二個入口 '@momo/catalog-data-access/testing'：測試工具不會進到 app 的 bundle
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
 
 import type { CatalogRepository } from './repository/catalog-repository';
 import { CatalogRepositoryProvider } from './repository/catalog-repository-context';
 
-/**
- * A repository that answers "nothing" everywhere. A test overrides only the
- * methods it cares about, with data small enough to read in the test itself.
- */
+/** 每個方法都回「沒有東西」的 repository；測試只覆寫自己在意的方法。 */
 export function createFakeCatalogRepository(
   overrides: Partial<CatalogRepository> = {},
 ): CatalogRepository {
@@ -27,7 +23,7 @@ export function createFakeCatalogRepository(
   };
 }
 
-/** A fresh query cache per mount and no retries, so a failure fails at once. */
+/** 每次掛載都是新的 query cache，而且不重試。 */
 export function CatalogTestProvider({
   repository = createFakeCatalogRepository(),
   children,

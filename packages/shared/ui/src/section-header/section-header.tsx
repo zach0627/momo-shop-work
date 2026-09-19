@@ -2,17 +2,13 @@ import type { ReactNode } from 'react';
 
 export interface SectionHeaderProps {
   title: string;
-  /** The first words of the title, painted lighter: "降價" + "好貨". */
+  /** 標題前半較淺的字：「降價」+「好貨」。 */
   lead?: string;
-  /** Sits before the title, e.g. a logo. */
+  /** 放在標題前面，例：logo。 */
   icon?: ReactNode;
 }
 
-/**
- * The title of a home page section. On the live site each title is a
- * 1220x70 image; that artwork was not supplied, so it is text here, in the
- * same 70px band. The size is an estimate (`text-ec-title`).
- */
+/** 首頁區塊的標題。真站的標題是 1220×70 的圖，素材沒有提供，所以用文字；字級是估計值。 */
 export function SectionHeader({ title, lead, icon }: SectionHeaderProps) {
   return (
     <h2 className="text-ec-title text-ink flex h-17.5 items-center gap-2 px-4 font-medium">

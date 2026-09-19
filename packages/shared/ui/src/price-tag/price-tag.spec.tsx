@@ -14,8 +14,7 @@ describe('PriceTag', () => {
       <PriceTag price={49900} originalPrice={49999} />,
     );
 
-    // <del> is what makes it a struck price, to a browser and to a screen
-    // reader alike; a class name could not be asserted as meaning anything.
+    // 用 <del> 判斷劃線價：class 名稱沒辦法斷言它的意義
     const struck = container.querySelector('del');
     expect(struck?.textContent).toBe('$49,999');
   });
@@ -27,9 +26,7 @@ describe('PriceTag', () => {
     expect(container.querySelector('del')).toBeNull();
   });
 
-  // The domain promises originalPrice > price, but this component does not
-  // know the domain. A struck price that is not higher would read as a
-  // price increase.
+  // 這個元件不認識 domain：不高於售價的「原價」不能顯示，否則會被讀成漲價
   it.each([
     ['equal to', 590],
     ['below', 500],

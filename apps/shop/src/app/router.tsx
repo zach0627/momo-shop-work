@@ -11,13 +11,7 @@ function LayoutRoute() {
   );
 }
 
-/**
- * The route table. Paths come from ROUTE_PATTERNS so they cannot drift from
- * the links packages build with `paths`. Each page is a lazy chunk.
- *
- * apps/shop is the only project allowed to import the router (enforced by
- * lint), which keeps a move to another router or to SSR a one-project change.
- */
+/** 路由表。path 來自 ROUTE_PATTERNS，和 packages 用 paths 組出的連結不會對不起來；每頁是 lazy chunk。 */
 export const routes: RouteObject[] = [
   {
     Component: LayoutRoute,

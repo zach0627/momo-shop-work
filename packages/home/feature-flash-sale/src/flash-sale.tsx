@@ -2,16 +2,11 @@ import { SectionHeader } from '@momo/shared-ui';
 
 export interface FlashSaleProps {
   title: string;
-  /** The lighter first part of the title. */
+  /** 標題前半較淺的字。 */
   lead?: string;
 }
 
-/**
- * The flash sale: a countdown and pages of 10 products.
- *
- * PLACEHOLDER until step 11: it holds the section's place on the home
- * page, so the page's registry points at the real package from the start.
- */
+/** 限時搶購：倒數計時 + 每頁 10 件商品。目前是佔位，Step 11 實作。 */
 export function FlashSale({ title, lead }: FlashSaleProps) {
   return (
     <section aria-label={`${lead ?? ''}${title}`} className="bg-surface">

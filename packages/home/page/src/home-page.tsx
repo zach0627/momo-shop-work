@@ -5,11 +5,7 @@ import { useHomeLayout } from '@momo/home-data-access';
 import { SECTION_REGISTRY } from './section-renderer/section-registry';
 import { SectionRenderer } from './section-renderer/section-renderer';
 
-/**
- * The page is a full-width grey surface with white 1220px bands on it, as on
- * the live site. The layout around it (top bar, header, footer) stays up in
- * every state below.
- */
+/** 滿版灰底 + 1220px 的白色區帶；三種狀態共用。 */
 function PageSurface({ children }: { children: ReactNode }) {
   return (
     <div className="bg-surface-muted pb-4">
@@ -21,10 +17,7 @@ function PageSurface({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * The home page fetches one thing - its layout - and hands it to the
- * renderer. Which sections there are, and in which order, is data.
- */
+/** 首頁只抓一樣東西：版位資料，然後交給 SectionRenderer。 */
 export function HomePage() {
   const { data: sections, isPending, isError } = useHomeLayout();
 
@@ -41,7 +34,7 @@ export function HomePage() {
     );
   }
 
-  // The failure itself is reported by the app's query cache.
+  // 失敗由 app 的 QueryCache 統一回報
   if (isError) {
     return (
       <PageSurface>

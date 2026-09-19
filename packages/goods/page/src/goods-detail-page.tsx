@@ -8,23 +8,16 @@ import { GoodsInfo } from './ui/goods-info';
 import { GoodsNotFound } from './ui/goods-not-found';
 
 export interface GoodsDetailPageProps {
-  /** Comes from the route. Reading the URL is the app's job, not this package's. */
+  /** 來自路由；讀網址是 app 的事。 */
   goodsId: string;
 }
 
-/** The page owns its width; the layout around it only says where it goes. */
+/** 頁面自己決定寬度，layout 不管。 */
 function PageContainer({ children }: { children: ReactNode }) {
   return <div className="max-w-shop mx-auto w-full px-4 py-8">{children}</div>;
 }
 
-/**
- * The goods detail page: the picture on the left; title, description and
- * price on the right; three action buttons below them. Display-only - see
- * ui/goods-actions.tsx.
- *
- * It reads the same product table as the home page, through the same hook,
- * so a card and the page it leads to cannot disagree on name or price.
- */
+/** 商品詳情頁（展示用）：左邊主圖，右邊標題、說明與價格，下方三顆不綁行為的按鈕。 */
 export function GoodsDetailPage({ goodsId }: GoodsDetailPageProps) {
   const { data: product, isPending, isError } = useProduct(goodsId);
 
@@ -41,7 +34,7 @@ export function GoodsDetailPage({ goodsId }: GoodsDetailPageProps) {
     );
   }
 
-  // The failure itself is reported by the app's query cache.
+  // 失敗由 app 的 QueryCache 統一回報
   if (isError) {
     return (
       <PageContainer>

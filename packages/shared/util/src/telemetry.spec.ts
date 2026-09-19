@@ -33,8 +33,7 @@ describe('reportError', () => {
     restoreFirst();
   });
 
-  // Reporting is what runs when something has already gone wrong. It must
-  // not be the thing that takes the page down.
+  // 回報是在「已經出錯」時執行的，它自己不能再把頁面弄壞
   it('never throws, even when the sink does', () => {
     const failing = vi.fn(() => {
       throw new Error('the sink is down');
@@ -42,7 +41,7 @@ describe('reportError', () => {
     const restore = setTelemetrySink({ error: failing });
 
     expect(() => reportError(new Error('boom'))).not.toThrow();
-    // Without this, a reportError that does nothing at all would pass.
+    // 少了這行，什麼都不做的 reportError 也會通過
     expect(failing).toHaveBeenCalledTimes(1);
     restore();
   });

@@ -2,13 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import { Carousel } from './carousel';
 
-/**
- * jsdom lays nothing out, so the real embla always reports one page and
- * nowhere to scroll. What this component owns is the wiring between embla's
- * API and the buttons and dots, so embla is replaced here by a fake that
- * pages like the real one. The real library is mounted in
- * carousel.embla.spec.tsx, and the real scrolling is checked in a browser.
- */
+// jsdom 不做排版，真的 embla 永遠只有一頁；這裡用「會換頁的假 embla」測包裝邏輯（箭頭、圓點）
 const embla = vi.hoisted(() => ({
   api: undefined as unknown,
   options: undefined as unknown,
@@ -21,6 +15,7 @@ vi.mock('embla-carousel-react', () => ({
   },
 }));
 
+/** 假的 embla API：有 pageCount 頁，換頁時像真的一樣發出 select 事件。 */
 function createFakeEmbla(pageCount: number) {
   const listeners = new Map<string, Set<() => void>>();
   let selected = 0;
@@ -53,7 +48,7 @@ function createFakeEmbla(pageCount: number) {
   return api;
 }
 
-/** The carousel itself is a group too; slides are the groups inside it. */
+/** 輪播本身也是 group；slide 是 aria-roledescription="slide" 的那些。 */
 const getSlides = () =>
   screen
     .getAllByRole('group')

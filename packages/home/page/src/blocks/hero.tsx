@@ -3,14 +3,13 @@ import { Carousel } from '@momo/shared-ui';
 
 import { BannerImage } from '../ui/banner-image';
 
-// Measured on the live site: 327px banners 12px apart in a 859px viewport,
-// beside a 316px panel.
+// 真站實測：banner 327px、間距 12px，右側面板 316px
 const BANNERS_PER_VIEW = 2.57;
 const BANNER_GAP = 12;
-// Banners visible before anything scrolls; they are part of first paint.
+// 一開始就看得到的 banner 不延遲載入
 const EAGER_BANNERS = 3;
 
-/** The main events carousel with the 今日大牌 panel beside it. */
+/** 主要活動輪播 + 右側「今日大牌」面板。 */
 export function Hero({ section }: { section: HeroSection }) {
   const { aside } = section;
 
@@ -36,8 +35,7 @@ export function Hero({ section }: { section: HeroSection }) {
       </div>
 
       <aside aria-label={aside.title} className="w-79 shrink-0">
-        {/* The panel is two tiles wide. With a single tile - all that was
-            supplied - the tile takes the panel's full width instead. */}
+        {/* 面板是兩欄；素材只有一格時讓它佔滿整個面板 */}
         <div
           className={`grid ${aside.items.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}
         >

@@ -1,4 +1,4 @@
-/** Every cache key of this package, in one place so they cannot collide. */
+/** 這個 package 所有的 query key。 */
 export const catalogKeys = {
   all: ['catalog'] as const,
   product: (id: string) => ['catalog', 'product', id] as const,

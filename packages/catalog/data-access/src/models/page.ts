@@ -1,6 +1,6 @@
-/** One page of an offset-paginated list. */
+/** offset 分頁的一頁。 */
 export interface Page<T> {
   items: T[];
-  /** Offset to ask for next, or `null` when this was the last page. */
+  /** 下一頁的 offset；最後一頁為 null。 */
   nextOffset: number | null;
 }

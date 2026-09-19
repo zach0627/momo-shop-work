@@ -24,8 +24,7 @@ function renderLayout(children: ReactNode = 'x') {
   );
 }
 
-// jsdom has no IntersectionObserver. The stub keeps the callback so a test can
-// say "the main header left the viewport" without a real scroll.
+// jsdom 沒有 IntersectionObserver。這個 stub 留住 callback，測試才能模擬「主 header 捲出視窗」
 let notify: (isIntersecting: boolean) => void;
 
 beforeEach(() => {
@@ -64,7 +63,7 @@ function topBar() {
 }
 
 describe('AppLayout', () => {
-  // spec: app-layout / 每個頁面都有共用外框
+  // 規格 app-layout：每個頁面都有共用外框
   it('wraps the page in a banner, a main region and a footer', () => {
     renderLayout(<p>page content</p>);
 
@@ -75,7 +74,7 @@ describe('AppLayout', () => {
     expect(screen.getByRole('contentinfo')).toBeTruthy();
   });
 
-  // spec: app-layout / Logo 連回首頁
+  // 規格 app-layout：Logo 連回首頁
   it('links the logo to the home page', () => {
     renderLayout();
 
@@ -86,7 +85,7 @@ describe('AppLayout', () => {
     expect(logo.getAttribute('href')).toBe('/');
   });
 
-  // spec: app-layout / 頂部列在捲動時保留並轉為 compact
+  // 規格 app-layout：頂部列在捲動時保留並轉為 compact
   it('shows a search box in the top bar only while the main header is out of view', () => {
     renderLayout();
     expect(within(topBar()).queryByRole('search')).toBeNull();
@@ -98,7 +97,7 @@ describe('AppLayout', () => {
     expect(within(topBar()).queryByRole('search')).toBeNull();
   });
 
-  // spec: product-catalog / 查詢分類清單 - the layout owns no list of its own
+  // 規格 product-catalog：查詢分類清單（layout 自己不存清單）
   it('lists the categories it gets from the catalog', async () => {
     renderLayout();
     const nav = screen.getByRole('navigation', { name: '商品分類' });

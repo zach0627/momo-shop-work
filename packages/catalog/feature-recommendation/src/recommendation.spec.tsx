@@ -21,7 +21,7 @@ const makeProducts = (count: number): Product[] =>
     };
   });
 
-/** Pages through `all` the way a real API would. */
+/** 像真的 API 一樣依 offset / limit 分頁。 */
 function pagingRepository(all: Product[]) {
   const getRecommendations = vi.fn<CatalogRepository['getRecommendations']>(
     async ({ offset, limit }) => {
@@ -53,7 +53,7 @@ const clickLoadMore = () =>
   fireEvent.click(screen.getByRole('button', { name: /看更多|載入中/ }));
 
 describe('Recommendation', () => {
-  // spec product-recommendation: 初始顯示 3 列 / 推薦商品足夠
+  // 規格 product-recommendation：初始顯示 3 列
   it('shows the first 3 rows of 5 and offers more when there is more', async () => {
     const all = makeProducts(55);
     const { repository, getRecommendations } = pagingRepository(all);
@@ -66,7 +66,7 @@ describe('Recommendation', () => {
     expect(getRecommendations).toHaveBeenCalledWith({ offset: 0, limit: 15 });
   });
 
-  // spec: 推薦商品不足一頁 / 推薦商品恰好一頁
+  // 規格：不足一頁 / 恰好一頁
   it.each([10, 15])(
     'shows all %d products and no button when that is all there is',
     async (count) => {
@@ -80,7 +80,7 @@ describe('Recommendation', () => {
     },
   );
 
-  // spec: 看更多會再載入 3 列 / 載入下一批
+  // 規格：看更多會再載入 3 列
   it('appends the next 3 rows and leaves the first ones where they were', async () => {
     const all = makeProducts(55);
     const { repository } = pagingRepository(all);
@@ -93,7 +93,7 @@ describe('Recommendation', () => {
     expect(shownNames()).toEqual(all.slice(0, 30).map((p) => p.name));
   });
 
-  // spec: 全部載完後按鈕消失 / 載入最後一批 (55 = 15 + 15 + 15 + 10)
+  // 規格：全部載完後按鈕消失（55 = 15 + 15 + 15 + 10）
   it('removes the button once the last, shorter batch is shown', async () => {
     const { repository } = pagingRepository(makeProducts(55));
     renderWith(repository);
@@ -108,7 +108,7 @@ describe('Recommendation', () => {
     expect(loadMoreButton()).toBeNull();
   });
 
-  // spec: 載入中重複點擊
+  // 規格：載入中重複點擊
   it('loads one batch when the button is clicked again while loading', async () => {
     const all = makeProducts(55);
     let releaseSecondBatch: () => void = () => undefined;
@@ -134,11 +134,11 @@ describe('Recommendation', () => {
     await screen.findByText('推薦商品 30');
     expect(shownNames()).toHaveLength(30);
     expect(new Set(shownNames()).size).toBe(30);
-    // The first batch and one second batch - not three.
+    // 第一批 + 一次第二批，不是三次
     expect(getRecommendations).toHaveBeenCalledTimes(2);
   });
 
-  // spec: 推薦商品可點擊
+  // 規格：推薦商品可點擊
   it('links every product to its detail page', async () => {
     const { repository } = pagingRepository(makeProducts(3));
 
@@ -163,8 +163,7 @@ describe('Recommendation', () => {
     ).toBeTruthy();
   });
 
-  // Not in the spec, but a button that fails must not cost the user what is
-  // already on screen - and asking again is the obvious way to retry.
+  // 規格以外：後面的批次失敗時，已顯示的要保留，再按一次就是重試
   it('keeps what is shown when a later batch fails, and can be asked again', async () => {
     const all = makeProducts(30);
     let failNext = true;

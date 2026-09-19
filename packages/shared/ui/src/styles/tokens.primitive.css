@@ -1,45 +1,36 @@
 /*
- * PRIMITIVE TOKENS - "which colours exist".
- *
- * A raw palette with no meaning attached. Components must NEVER use these
- * directly; they are deliberately plain custom properties (not inside
- * `@theme`), so Tailwind generates no utility for them - there is no
- * `text-momo-magenta-600` to reach for. Meaning is added one layer up, in
- * tokens.semantic.css.
- *
- * Every value was read from the computed styles of the live site
- * (www.momoshop.com.tw home page and a goods detail page, desktop layout,
- * 2026-09-18). See docs/design-tokens.md for where each one was found.
+ * PRIMITIVE：有哪些顏色。元件不可以直接用（刻意不放進 @theme，所以沒有對應的 utility）。
+ * 數值來自真站的計算樣式，出處見 docs/design-tokens.md。
  */
 :root {
-  /* magenta / pink / red */
-  --momo-magenta-600: #d62872; /* the brand colour */
+  /* 洋紅 / 粉紅 / 紅 */
+  --momo-magenta-600: #d62872; /* 品牌色 */
   --momo-pink-600: #db2777;
   --momo-rose-500: #ff4c76;
   --momo-red-600: #dd2222;
 
-  /* blue */
+  /* 藍 */
   --momo-blue-600: #1c6fbc;
 
-  /* navy / cyan (footer) */
+  /* 深藍 / 青（footer） */
   --momo-navy-900: #09355d;
   --momo-cyan-400: #53d6df;
   --momo-cyan-200: #a9eaef;
 
-  /* pastels - category pill backgrounds (used at 40-50% opacity) */
+  /* 粉彩：分類膠囊的底色（以 40–50% 透明度使用） */
   --momo-sky-100: #e1eff6;
   --momo-lavender-100: #e6e6f9;
   --momo-rose-100: #f2d7de;
   --momo-mint-100: #e2f8e2;
   --momo-peach-100: #ffe9cc;
-  --momo-blush-100: #fce9e9; /* the caption under a search suggestion */
+  --momo-blush-100: #fce9e9; /* 猜你想搜的說明列 */
 
-  /* slate - category panel title and icons */
+  /* 石板灰：分類面板的標題與圖示 */
   --momo-slate-800: #1f2937;
   --momo-slate-600: #4b5563;
 
-  /* neutrals, dark to light */
-  --momo-black: #000000; /* only ever used translucent: carousel arrows */
+  /* 中性色，由深到淺 */
+  --momo-black: #000000; /* 只以半透明使用：輪播箭頭 */
   --momo-gray-950: #222222;
   --momo-gray-900: #262626;
   --momo-gray-800: #404040;

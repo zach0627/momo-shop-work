@@ -1,11 +1,6 @@
 import type { Category } from '../models/category';
 
-/**
- * The 40 categories of the live site, in the order of its "選擇分類" panel.
- *
- * Written by hand, not generated: the list was read off the real site, there
- * is no artwork it could be derived from.
- */
+/** 真站「選擇分類」面板的 40 個分類。手寫：沒有素材可以產生它。 */
 export const CATEGORIES = (
   [
     ['home', '首頁'],

@@ -4,10 +4,7 @@ import type { CatalogRepository } from './catalog-repository';
 
 const CatalogRepositoryContext = createContext<CatalogRepository | null>(null);
 
-/**
- * Which implementation the hooks talk to is decided once, at the composition
- * root (the app's providers). Tests mount this with a fake.
- */
+/** 由 app 的 providers 注入 repository；測試則注入 fake。 */
 export function CatalogRepositoryProvider({
   repository,
   children,

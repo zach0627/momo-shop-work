@@ -36,6 +36,12 @@
 - **只斷言「某個東西不存在」的測試，要同時斷言一個「存在」**，並且對空實作跑過一次確認它會紅。否則元件整個消失它也會通過。
 - 首頁新增區塊：只是圖 → 在 `home-layout.ts` 加一筆既有 type 的設定；需要新的呈現方式 → 在 `HomeSection` union 加 type，`typecheck` 會指出 registry 少了哪一個；有自己的邏輯或資料 → 新的 feature package。
 - 失敗的查詢由 app 的 `QueryCache` 統一回報（`apps/shop/src/app/query-client.ts`），頁面與 hook 不要自己再呼叫 `reportError` 報同一件事。
+- **程式碼註解：繁體中文、簡短（以一行為主，最多兩三行）。** 只在這些情況寫：
+  - 對照資訊：registry、設定表、token 用在哪裡（例：`section-registry.tsx` 每一項是首頁的哪一塊）。
+  - 不直覺的流程或陷阱：為什麼用 `hasOwn`、`cancelRefetch: false`、`aria-disabled`。
+  - 重要或難懂的函式：一句話說它做什麼。
+  - spec 裡對應到哪一條規格：`// 規格 home-page：…`。
+  - **不要寫**：設計沿革、取捨的論述、誰在用它、怎麼驗證的 —— 那些屬於 `docs/`、ADR 與 commit message。看程式碼就知道的事也不要寫。
 - 每個 commit 都要是綠的，使用 Conventional Commits。
 
 ## 驗證

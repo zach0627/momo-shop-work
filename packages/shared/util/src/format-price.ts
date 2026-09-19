@@ -1,10 +1,7 @@
-// The locale is pinned: the separator must not follow the machine's locale.
+// 固定 locale：千分位符號不能跟著機器的語系變
 const formatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
-/**
- * 49900 -> "49,900". Prices are whole TWD; the currency sign is left to the
- * caller, because where it sits and how big it is belongs to the design.
- */
+/** 49900 → "49,900"。不含貨幣符號：$ 放哪裡、多大由畫面決定。 */
 export function formatPrice(amount: number): string {
   return formatter.format(amount);
 }

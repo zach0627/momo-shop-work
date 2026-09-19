@@ -5,11 +5,7 @@ export interface RecommendationGridItem extends ProductCardItem {
   href: string;
 }
 
-/**
- * Five products to a row (see model/page-size.ts). New products are appended
- * to the same list, keyed by id, so the ones already on screen do not move
- * or re-mount when more arrive.
- */
+/** 一列 5 件。新商品接在同一個清單後面（key 為 id），已顯示的不會移動或重新掛載。 */
 export function RecommendationGrid({
   items,
 }: {

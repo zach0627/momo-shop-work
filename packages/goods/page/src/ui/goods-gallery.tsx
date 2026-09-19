@@ -1,7 +1,4 @@
-/**
- * The main picture of the product. Just that: the live site's thumbnail
- * strip and zoom are interactions, and this page is display-only.
- */
+/** 商品主圖。縮圖列與放大鏡屬於互動，這一頁不做。 */
 export function GoodsGallery({
   imageUrl,
   name,
@@ -12,7 +9,7 @@ export function GoodsGallery({
   return (
     <img
       src={imageUrl}
-      // Unlike on a product card, this picture is content, not decoration.
+      // 這張圖是內容不是裝飾，所以 alt 用商品名稱
       alt={name}
       width={440}
       height={440}

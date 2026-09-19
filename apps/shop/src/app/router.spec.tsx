@@ -8,7 +8,7 @@ import { formatPrice } from '@momo/shared-util';
 import { Providers } from './providers';
 import { routes } from './router';
 
-// Same route table as production, mounted on a memory history.
+// 和正式環境同一份路由表，掛在 memory history 上
 function renderAt(path: string) {
   const router = createMemoryRouter(routes, { initialEntries: [path] });
   render(
@@ -25,14 +25,14 @@ function expectLayout() {
   expect(screen.getByRole('contentinfo')).toBeTruthy();
 }
 
-/** A product that really is in the catalog the app injects. */
+/** 取一件真的存在於 mock catalog 的商品。 */
 async function aRealProduct() {
   const [product] =
     await createMockCatalogRepository().getCollection('price-drop');
   return product;
 }
 
-// spec: app-layout / 每個頁面都有共用外框
+// 規格 app-layout：每個頁面都有共用外框
 describe('routes', () => {
   it('shows the home page inside the layout at /', async () => {
     renderAt('/');
@@ -43,9 +43,7 @@ describe('routes', () => {
     expectLayout();
   });
 
-  // The whole chain with the real mock repositories: layout data -> section
-  // renderer -> product rail -> catalog -> a card that links to its page.
-  // spec: home-page / 點擊商品卡
+  // 整條鏈路：版位資料 → renderer → 商品列 → catalog → 可點的商品卡（規格 home-page：點擊商品卡）
   it('renders the home sections and links a product card to its detail page', async () => {
     renderAt('/');
 
@@ -53,13 +51,13 @@ describe('routes', () => {
     const [card] = await within(rail).findAllByRole('link');
     expect(card.getAttribute('href')).toMatch(/^\/goods\/\w+$/);
 
-    // Banners are images, not links (spec: home-page / 點擊活動 banner).
+    // banner 是圖不是連結（規格 home-page：點擊活動 banner）
     const hero = screen.getByRole('region', { name: '主要活動' });
     expect(within(hero).getAllByRole('img').length).toBeGreaterThan(0);
     expect(within(hero).queryAllByRole('link')).toHaveLength(0);
   });
 
-  // spec: goods-detail / 與首頁卡片為同一件商品
+  // 規格 goods-detail：與首頁卡片為同一件商品
   it('leads from a home page card to a detail page with the same name and price', async () => {
     const router = renderAt('/');
     const rail = await screen.findByRole('region', { name: '降價好貨' });
@@ -96,7 +94,7 @@ describe('routes', () => {
     expectLayout();
   });
 
-  // spec: goods-detail / 開啟不存在的商品
+  // 規格 goods-detail：開啟不存在的商品
   it('keeps the layout and the way home when the goods id has no product', async () => {
     renderAt('/goods/no-such-goods');
 
@@ -119,7 +117,7 @@ describe('routes', () => {
     expectLayout();
   });
 
-  // spec: app-layout / Logo 連回首頁
+  // 規格 app-layout：Logo 連回首頁
   it('links the logo back to the home page', async () => {
     renderAt('/goods/no-such-goods');
     await screen.findByRole('heading', { level: 1 });

@@ -2,16 +2,9 @@ import nx from '@nx/eslint-plugin';
 import * as jsoncParser from 'jsonc-eslint-parser';
 
 /**
- * Layering rules (see docs/MoMO面試/Phase 1 §3).
- *
- *   app -> layout / page -> feature -> ui / data-access -> util
- *
- * A project must satisfy BOTH its `type:` and its `scope:` constraint.
- * `layout` and `page` are the two layers that may compose several features,
- * so feature -> feature (and data-access -> data-access) is an error.
- *
- * `layout` and `page` are siblings: the router nests a page inside a layout,
- * neither imports the other. Only the app may depend on a layout.
+ * 依賴方向：app → layout / page → feature → ui / data-access → util
+ * 每個專案要同時符合自己的 type 與 scope 規則。
+ * layout 與 page 同層、互不 import；只有它們能組合多個 feature。
  */
 const typeConstraints = [
   {
@@ -61,7 +54,7 @@ const scopeConstraints = [
     sourceTag: 'scope:goods',
     onlyDependOnLibsWithTags: ['scope:goods', 'scope:catalog', 'scope:shared'],
   },
-  // what the whole storefront shares: the chrome around every page
+  // shop：全站共用的外框
   {
     sourceTag: 'scope:shop',
     onlyDependOnLibsWithTags: ['scope:shop', 'scope:catalog', 'scope:shared'],
@@ -73,12 +66,7 @@ const scopeConstraints = [
   { sourceTag: 'scope:shared', onlyDependOnLibsWithTags: ['scope:shared'] },
 ];
 
-/**
- * Framework coupling is confined to one place each, so swapping the router
- * (e.g. for Next) or the carousel library is a single-project change.
- * Restricted everywhere by default; the one project allowed to use a package
- * opts in from its own eslint config via `restrictedImports([...])`.
- */
+/** 框架耦合各只准一個專案使用。預設全禁，允許的專案在自己的 eslint 設定用 restrictedImports([...]) 放行。 */
 const RESTRICTED_PACKAGES = {
   'react-router': {
     group: [
@@ -113,25 +101,10 @@ export function restrictedImports(allowed = []) {
 }
 
 /**
- * A package declares what its `src/` imports (pnpm gives it access to nothing
- * else once the root stops providing it). Versions come from the catalog in
- * pnpm-workspace.yaml.
- *
- * `buildTargets` matters twice over. The rule silently checks NOTHING for a
- * project that has none of the listed targets, and the default is ['build'],
- * which only the app has. And a workspace package only counts as a dependency
- * if it has the same target as the project being checked - so everything is
- * matched through `typecheck`, the one target every project has.
- *
- * Out of scope on purpose: spec files and tool configs. Test and build
- * tooling is shared and lives in the root package.json.
- *
- * Always ignored: tslib. tsconfig.base.json sets `importHelpers`, so the rule
- * assumes compiled output needs it; these packages only emit declarations and
- * Vite transpiles the source, so nothing ever imports it.
- *
- * A project may pass more names to ignore from its own eslint config - the
- * exception is written where it applies, like `restrictedImports`.
+ * 每個 package 要宣告自己 src/ 裡 import 的依賴。
+ * 注意 buildTargets：專案若沒有清單裡的 target，這條規則會「靜默地什麼都不檢查」；
+ * 預設的 ['build'] 只有 app 有，所以改用每個專案都有的 typecheck。
+ * tslib 一律忽略：packages 只輸出型別宣告，不會真的 import 它。
  */
 export function dependencyChecks(ignoredDependencies = []) {
   return {

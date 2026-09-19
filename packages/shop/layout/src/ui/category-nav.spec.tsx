@@ -14,7 +14,7 @@ function renderNav() {
   return screen.getByRole('button', { name: /分類/ });
 }
 
-// spec: app-layout / 分類導覽可展開與收合
+// 規格 app-layout：分類導覽可展開與收合
 describe('CategoryNav', () => {
   it('starts collapsed: the row of categories is shown, the panel is not', () => {
     const toggle = renderNav();
@@ -68,8 +68,7 @@ describe('CategoryNav', () => {
     ).toBeNull();
   });
 
-  // The live panel tints each row of nine. The data does not carry a colour,
-  // so it has to come from the position.
+  // 資料不帶顏色；底色由「第幾列」決定，每列 9 個
   it('tints the pills by the row they land on, nine to a row', () => {
     const many = Array.from({ length: 20 }, (_, index) => ({
       id: `c${index}`,

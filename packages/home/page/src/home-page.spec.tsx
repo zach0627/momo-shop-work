@@ -81,7 +81,7 @@ describe('HomePage', () => {
     uninstall();
   });
 
-  // spec home-page: 版位資料載入中
+  // 規格 home-page：版位資料載入中
   it('says it is loading until the layout arrives, never a blank page', async () => {
     let deliver: (sections: HomeSection[]) => void = () => undefined;
     const home = createFakeHomeRepository({
@@ -101,8 +101,7 @@ describe('HomePage', () => {
     expect(screen.queryByRole('status')).toBeNull();
   });
 
-  // spec home-page: 版位資料取得失敗. (Reporting the failure is the app's
-  // query cache - see apps/shop query-client.spec.)
+  // 規格 home-page：版位資料取得失敗（回報由 app 的 QueryCache 負責）
   it('shows an error message when the layout cannot be loaded', async () => {
     const home = createFakeHomeRepository({
       getLayout: async () => {
@@ -136,7 +135,7 @@ describe('HomePage', () => {
     ]);
   });
 
-  // spec home-page: 只有商品卡可點擊
+  // 規格 home-page：只有商品卡可點擊
   it('links product cards to their detail page, and nothing else', async () => {
     const home = createFakeHomeRepository({
       getLayout: async () => [flagship, notice, priceDrop],

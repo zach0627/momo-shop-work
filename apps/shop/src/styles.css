@@ -1,19 +1,12 @@
 @import 'tailwindcss';
 
-/*
- * Design tokens belong to the design system; the app only imports them.
- * Through the package's `exports`, like any other import across packages -
- * never by a relative path into its folder.
- */
+/* design token 透過 package 的 exports 引入，不用相對路徑 */
 @import '@momo/shared-ui/theme.css';
 
-/* Class names live in the packages, so Tailwind has to scan them too. */
+/* class 寫在 packages 裡，Tailwind 也要掃那裡 */
 @source '../../../packages';
 
-/*
- * The font family is a token too (--font-sans in tokens.semantic.css), so
- * nothing is set here. Base text is 16px / 24px, as on the real site.
- */
+/* 字體是 token（--font-sans）；基礎字級 16px / 24px，同真站 */
 @layer base {
   body {
     background-color: var(--color-surface);

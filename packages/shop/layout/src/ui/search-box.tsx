@@ -3,14 +3,11 @@ import { useId, useState, type FormEvent } from 'react';
 import { SEARCH_PLACEHOLDER } from '../model/layout-content';
 
 interface SearchBoxProps {
-  /** `compact` is the smaller box shown inside the top bar after scrolling. */
+  /** compact：捲動後顯示在頂部列裡的小搜尋框。 */
   variant?: 'header' | 'compact';
 }
 
-/**
- * Display only. Searching is out of scope for this project, so submitting is
- * cancelled: the page and the URL stay as they are.
- */
+/** 展示用：送出會被取消，頁面與網址都不變。 */
 export function SearchBox({ variant = 'header' }: SearchBoxProps) {
   const [keyword, setKeyword] = useState('');
   const inputId = useId();

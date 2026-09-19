@@ -1,5 +1,4 @@
-// Static text of the chrome. None of it links anywhere: only product cards
-// are clickable in this project (see openspec, capability home-page).
+// 外框上的靜態文字。都不是連結：這個專案只有商品卡可點
 
 export const TOP_BAR_SHORTCUTS = [
   'momo富立保險',
@@ -72,10 +71,9 @@ export const FOOTER_COLUMNS: { heading: string; items: string[] }[] = [
 
 export const APP_COLUMN_HEADING = '行動購物APP';
 
-/** "首頁" stays highlighted on every page, as it does on the live site. */
+/** 「首頁」在每一頁都維持作用中，同真站。 */
 export const ACTIVE_CATEGORY_ID = 'home';
 
-// Relative to the document base (<base href> in index.html), so the packages do
-// not need to know under which sub-path the app is deployed.
+// 相對於 <base href>，packages 不需要知道 app 部署在哪個子路徑
 export const LOGO_SRC = 'assets/brand/momo-logo.png';
 export const APP_QR_SRC = 'assets/footer/app-qr.jpg';

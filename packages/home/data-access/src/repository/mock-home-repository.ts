@@ -3,9 +3,9 @@ import type { HomeSection } from '../models/home-section';
 import type { HomeRepository } from './home-repository';
 
 export interface MockHomeOptions {
-  /** Defaults to the real home page. Tests pass a few sections of their own. */
+  /** 預設為真的首頁；測試可傳入自己的幾個區塊。 */
   layout?: HomeSection[];
-  /** Simulated network delay, so the loading state is visible in the app. */
+  /** 模擬網路延遲（ms）。 */
   latencyMs?: number;
 }
 

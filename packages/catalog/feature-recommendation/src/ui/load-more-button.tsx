@@ -1,15 +1,10 @@
 export interface LoadMoreButtonProps {
-  /** A batch is on its way. */
+  /** 正在載入下一批。 */
   busy: boolean;
   onClick: () => void;
 }
 
-/**
- * "看更多". While a batch is loading it says so and is `aria-disabled` rather
- * than `disabled`: a disabled button drops keyboard focus, and the user
- * would have to find their place again after every batch. Repeated clicks
- * are harmless - `loadMore` ignores them while a batch is in flight.
- */
+/** 載入中用 aria-disabled 而不是 disabled：disabled 會讓鍵盤焦點消失。重複點擊由 loadMore 擋掉。 */
 export function LoadMoreButton({ busy, onClick }: LoadMoreButtonProps) {
   return (
     <button

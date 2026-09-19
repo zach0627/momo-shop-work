@@ -9,15 +9,11 @@ import {
 import { SearchBox } from './search-box';
 
 interface TopBarProps {
-  /** True once the main header has scrolled out of view. */
+  /** 主 header 捲出視窗後為 true。 */
   compact: boolean;
 }
 
-/**
- * The strip that stays on screen while the page scrolls. It is `fixed`, as on
- * the live site, so the layout reserves its height above the page. Once the
- * main header is out of view it trades its shortcut links for a search box.
- */
+/** 捲動時留在畫面上的頂部列（fixed，同真站）。主 header 捲走後，捷徑連結換成搜尋框。 */
 export function TopBar({ compact }: TopBarProps) {
   return (
     <nav

@@ -1,6 +1,6 @@
 export type TelemetryContext = Record<string, unknown>;
 
-/** Where reports go. A real app installs a sink that ships them somewhere. */
+/** 回報的去處；app 可以換成真的監控服務。 */
 export interface TelemetrySink {
   error(error: unknown, context?: TelemetryContext): void;
 }
@@ -11,10 +11,7 @@ const consoleSink: TelemetrySink = {
 
 let sink: TelemetrySink = consoleSink;
 
-/**
- * Installs a sink and returns a function that puts the previous one back.
- * Called once by the app at start-up; tests use the returned function.
- */
+/** 換上新的 sink，回傳「還原成上一個」的函式（測試用）。 */
 export function setTelemetrySink(next: TelemetrySink): () => void {
   const previous = sink;
   sink = next;
@@ -23,15 +20,11 @@ export function setTelemetrySink(next: TelemetrySink): () => void {
   };
 }
 
-/**
- * Reports something that went wrong without interrupting the user. Never
- * throws: it runs when something has already failed, and must not be what
- * takes the page down.
- */
+/** 回報錯誤但不打斷使用者。絕不 throw：它是在已經出錯時執行的。 */
 export function reportError(error: unknown, context?: TelemetryContext): void {
   try {
     sink.error(error, context);
   } catch {
-    // A failing sink has nowhere left to report to.
+    // sink 自己壞了，也沒有別的地方可以回報
   }
 }

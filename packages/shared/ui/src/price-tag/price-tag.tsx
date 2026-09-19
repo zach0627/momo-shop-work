@@ -1,11 +1,11 @@
 import { formatPrice } from '@momo/shared-util';
 
-/** Which colour token the price takes: `text-price` or `text-brand`. */
+/** 價格的顏色：text-price 或 text-brand。 */
 export type PriceTone = 'price' | 'brand';
-/** sm: 19px, a product grid. md: 21px, a product rail. */
+/** sm：19px（格狀）；md：21px（商品列）。 */
 export type PriceSize = 'sm' | 'md';
 
-// Complete class names, so Tailwind's scanner can see them.
+// class 要寫完整字串，Tailwind 才掃得到
 const TONES: Record<PriceTone, string> = {
   price: 'text-price',
   brand: 'text-brand',
@@ -17,11 +17,11 @@ const SIZES: Record<PriceSize, string> = {
 
 export interface PriceTagProps {
   price: number;
-  /** Shown struck through - only when it is higher than `price`. */
+  /** 劃線顯示；只有高於 price 時才顯示。 */
   originalPrice?: number;
   tone?: PriceTone;
   size?: PriceSize;
-  /** Puts the original price under the price instead of beside it. */
+  /** 原價放在售價下面，而不是旁邊。 */
   stacked?: boolean;
 }
 
@@ -46,7 +46,7 @@ export function PriceTag({
       </span>
       {isDiscounted && (
         <>
-          {/* Few screen readers announce <del>, so the meaning is spelled out. */}
+          {/* 多數螢幕閱讀器不會念出 <del>，所以補上文字 */}
           <span className="sr-only">原價</span>
           <del className="text-ec-sm text-ink-muted whitespace-nowrap">
             ${formatPrice(originalPrice)}

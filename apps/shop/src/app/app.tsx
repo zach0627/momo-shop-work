@@ -4,7 +4,7 @@ import { RouterProvider } from 'react-router/dom';
 import { Providers } from './providers';
 import { routes } from './router';
 
-// Vite's BASE_URL ends with a slash; the router's basename must not (except "/").
+// BASE_URL 結尾有斜線，router 的 basename 不能有（"/" 除外）
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/';
 
 const router = createBrowserRouter(routes, { basename });

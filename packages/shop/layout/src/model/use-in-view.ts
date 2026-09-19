@@ -1,11 +1,6 @@
 import { useEffect, useState, type RefObject } from 'react';
 
-/**
- * Whether the referenced element intersects the viewport.
- *
- * Starts as `true` and stays `true` where IntersectionObserver does not exist,
- * so server rendering and old environments get the normal, non-compact layout.
- */
+/** 元素是否在視窗內。沒有 IntersectionObserver 的環境一律回傳 true（維持一般版面）。 */
 export function useInView(ref: RefObject<Element | null>): boolean {
   const [inView, setInView] = useState(true);
 

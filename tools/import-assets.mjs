@@ -1,17 +1,7 @@
-// Copies the supplied artwork into the app's public folder.
-//
-//   node tools/import-assets.mjs <path to the artwork root>
-//
-// The source folders and a few files have Chinese names. Those would have to
-// be percent-encoded in every URL, so each one gets an ASCII slug here. The
-// mapping is the record of where every asset came from.
-//
-// Every source file has to be accounted for: copied, or skipped for a stated
-// reason. Anything else (a folder without a slug, a name that is not ASCII)
-// makes the script exit with 1 - that is how a nested folder that had been
-// overlooked was found.
-//
-// Safe to re-run: same input, same output. Files are copied, never deleted.
+// 把素材複製到 app 的 public 資料夾，中文資料夾與檔名改成 ASCII slug。
+//   node tools/import-assets.mjs <素材根目錄>
+// 每個來源檔案都必須有交代（複製，或有理由地略過），否則以 exit 1 結束。
+// 可重複執行：只複製，不刪除。
 import { copyFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -24,7 +14,7 @@ if (!source) {
   process.exit(1);
 }
 
-// source folder (relative to the artwork root) -> folder under public/assets
+// 來源資料夾（相對於素材根目錄）→ public/assets 底下的資料夾
 const FOLDERS = {
   logo: 'brand',
   Footer: 'footer',
@@ -58,7 +48,7 @@ const RENAMES = {
   '1112.gif': 'fraud-notice.gif',
 };
 
-// "10019468_OR_m (1).webp": a second download of a file that is already there
+// "10019468_OR_m (1).webp"：重複下載的檔案
 const isDuplicateDownload = (name) => / \(\d+\)\.[a-z]+$/i.test(name);
 const isAscii = (name) => /^[\x20-\x7e]+$/.test(name);
 
@@ -66,7 +56,7 @@ function* walk(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) =>
     a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
   )) {
-    if (entry.name.startsWith('.')) continue; // tool folders such as .claude
+    if (entry.name.startsWith('.')) continue; // 工具資料夾，例如 .claude
     const path = join(dir, entry.name);
     if (entry.isDirectory()) yield* walk(path);
     else yield path;

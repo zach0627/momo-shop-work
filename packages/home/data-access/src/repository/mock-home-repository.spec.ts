@@ -38,9 +38,7 @@ describe('createMockHomeRepository', () => {
   });
 });
 
-// What the specification states about the real layout (spec home-page:
-// 預設順序). The images it points at are checked by the app's spec, because
-// the app is what serves them.
+// 規格 home-page：預設順序。圖檔是否存在由 app 的 spec 檢查
 describe('the home layout fixture', () => {
   const real = createMockHomeRepository();
 

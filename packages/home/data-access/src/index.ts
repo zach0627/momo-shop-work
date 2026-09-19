@@ -1,4 +1,4 @@
-// Models
+// 型別
 export type {
   Banner,
   BannerCarouselSection,
@@ -16,7 +16,7 @@ export type {
   ShortcutBarSection,
 } from './models/home-section';
 
-// The seam: an interface, the mock behind it, and the context that injects it
+// Repository：介面、mock、注入用的 Context
 export type { HomeRepository } from './repository/home-repository';
 export {
   createMockHomeRepository,
@@ -27,6 +27,6 @@ export {
   useHomeRepository,
 } from './repository/home-repository-context';
 
-// What UI code uses
+// 給 UI 用的 hook
 export { useHomeLayout } from './hooks/use-home-layout';
 export { homeKeys } from './query-keys';

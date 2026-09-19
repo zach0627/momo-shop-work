@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 
 import { App } from './app';
 
-// Smoke test of the real browser router; route behaviour is covered in router.spec.tsx.
+// 用真的 browser router 做煙霧測試；路由行為見 router.spec.tsx
 describe('App', () => {
   it('boots at / and renders the home page inside the layout', async () => {
     render(<App />);

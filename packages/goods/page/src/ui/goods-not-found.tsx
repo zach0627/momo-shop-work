@@ -1,11 +1,7 @@
 import { AppLink } from '@momo/shared-ui';
 import { paths } from '@momo/shared-util';
 
-/**
- * A goods id without a product. "Not found" is an answer of the catalog
- * (`null`), not a failure - so this is a page, not an error. The layout
- * stays up around it, and there is a way back.
- */
+/** 查無此商品：這是 catalog 的答案（null），不是錯誤；外框照常，並提供回首頁的連結。 */
 export function GoodsNotFound({ goodsId }: { goodsId: string }) {
   return (
     <section className="py-16 text-center">

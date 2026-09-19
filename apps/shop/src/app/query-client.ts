@@ -2,11 +2,7 @@ import { QueryCache, QueryClient } from '@tanstack/react-query';
 
 import { reportError } from '@momo/shared-util';
 
-/**
- * The app's query client. Every failed query is reported here, once, with
- * the key that failed - so no page or hook has to remember to do it, and
- * none can report the same failure twice.
- */
+/** 所有失敗的查詢在這裡統一回報一次（帶 query key），頁面與 hook 不用自己報。 */
 export function createQueryClient(): QueryClient {
   return new QueryClient({
     queryCache: new QueryCache({
@@ -15,7 +11,7 @@ export function createQueryClient(): QueryClient {
     }),
     defaultOptions: {
       queries: {
-        // Mock data never changes underneath us and never fails transiently.
+        // mock 資料不會變，也不會暫時性失敗
         staleTime: Infinity,
         retry: false,
         refetchOnWindowFocus: false,

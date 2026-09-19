@@ -5,14 +5,10 @@ import { paths } from '@momo/shared-util';
 
 import { SectionFrame } from '../ui/section-frame';
 
-// Measured on the live site, the same for both card layouts.
+// 真站實測，兩種卡片版型相同
 const CARD_GAP = 10;
 
-/**
- * A titled rail of product cards. The layout names a collection; the
- * products come from the catalog - so a product shown here has the same
- * name and price as on its detail page, which every card links to.
- */
+/** 有標題的商品列。版位資料只給 collection key，商品由 catalog 提供，每張卡片連到詳情頁。 */
 export function ProductRail({ section }: { section: ProductRailSection }) {
   const { data: products = [], isError } = useProductCollection(
     section.collection,
@@ -20,14 +16,12 @@ export function ProductRail({ section }: { section: ProductRailSection }) {
   const label = `${section.title.lead ?? ''}${section.title.text}`;
   const isHorizontal = section.card === 'horizontal';
 
-  // The failure is already reported by the app's query cache. A rail that
-  // cannot load leaves the page; it does not take the page with it.
+  // 載入失敗就不顯示這一列，不拖垮整頁（失敗由 app 的 QueryCache 回報）
   if (isError) return null;
 
   return (
     <SectionFrame label={label} title={section.title}>
-      {/* The height is reserved while the products load, so the sections
-          below do not jump when they arrive. */}
+      {/* 載入中先保留高度，下面的區塊才不會跳動 */}
       <div className={isHorizontal ? 'min-h-44' : 'min-h-60'}>
         {products.length > 0 && (
           <Carousel label={label} perView={section.perView} gap={CARD_GAP} dots>
@@ -37,9 +31,7 @@ export function ProductRail({ section }: { section: ProductRailSection }) {
                 item={product}
                 href={paths.goods(product.id)}
                 layout={section.card}
-                // Vertical rails stack the struck price under a brand-coloured
-                // price; horizontal cards keep it beside the price and carry
-                // the product's promo line. Both as measured on the live site.
+                // 直式：品牌色價格、原價放下面；橫式：原價放旁邊，並顯示促銷文字
                 priceTag={
                   isHorizontal ? undefined : { tone: 'brand', stacked: true }
                 }

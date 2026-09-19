@@ -1,19 +1,11 @@
-// Complete class names, so Tailwind's scanner can see them.
+// class 要寫完整字串，Tailwind 才掃得到
 const ACTIONS = [
   { label: '直接購買', className: 'bg-action-primary' },
   { label: '放入購物車', className: 'bg-action-cart' },
   { label: '加入追蹤', className: 'bg-action-neutral' },
 ];
 
-/**
- * The three action buttons - and deliberately nothing behind them.
- *
- * This page is display-only BY DECISION (see spec goods-detail and the
- * requirement notes): no onClick, no navigation, no state, no request. Cart
- * and checkout are future domains (ADR-0006). A spec clicks each button and
- * checks that the page, the URL and the request count are untouched, so
- * wiring one up is a change that has to be made on purpose.
- */
+/** 三顆按鈕刻意不綁任何行為（展示用頁面）。有 spec 守著：要接上行為得先改測試。 */
 export function GoodsActions() {
   return (
     <div className="flex gap-3">

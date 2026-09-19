@@ -3,7 +3,7 @@ import { useId, useState } from 'react';
 import { AppLink } from '@momo/shared-ui';
 import { paths } from '@momo/shared-util';
 
-/** All the navigation needs to know about a category. */
+/** 分類列需要的欄位。 */
 interface NavCategory {
   id: string;
   name: string;
@@ -14,9 +14,7 @@ interface CategoryNavProps {
   activeId: string;
 }
 
-// The live panel gives each row of pills its own tint. A category carries no
-// colour: the tint follows the row it lands on. Written out in full so
-// Tailwind can see every class name; `grid-cols-9` below is the same nine.
+// 面板每一列一種底色，由位置決定（資料不帶顏色）。class 要寫完整字串；下面的 grid-cols-9 是同一個 9
 const PILLS_PER_ROW = 9;
 const ROW_TINTS = [
   'bg-category-sky',
@@ -25,14 +23,11 @@ const ROW_TINTS = [
   'bg-category-mint',
   'bg-category-peach',
 ];
+// 第 index 個膠囊在第幾列 → 那一列的底色（超過五列就從頭輪）
 const tintOfRow = (index: number) =>
   ROW_TINTS[Math.floor(index / PILLS_PER_ROW) % ROW_TINTS.length];
 
-/**
- * The row of categories under the header, and the "選擇分類" panel it expands
- * into. Categories have no pages of their own in this project, so only the
- * home entry is a link; the rest is text.
- */
+/** 分類列，以及展開後的「選擇分類」面板。分類沒有自己的頁面，所以只有「首頁」是連結。 */
 export function CategoryNav({ categories, activeId }: CategoryNavProps) {
   const [expanded, setExpanded] = useState(false);
   const panelId = useId();

@@ -10,22 +10,14 @@ export interface SectionRendererProps {
   registry: SectionRegistry;
 }
 
-/** `hasOwn`, not `in`: `registry['constructor']` exists on every object. */
+/** 用 hasOwn 不用 in：registry['constructor'] 在每個物件上都存在。 */
 const isKnown = (registry: SectionRegistry, section: HomeSection) =>
   Object.hasOwn(registry, section.type);
 
-/**
- * Renders the home page from data, top to bottom. Pure: it fetches nothing,
- * so the order of the page is exactly the order of `sections`.
- *
- * The union of section types is closed at compile time, but the data comes
- * from outside: a CMS can ship a new type before this build knows about it.
- * Such a section is skipped and reported, and the rest of the page renders.
- */
+/** 依資料由上到下渲染首頁（自己不抓資料）。遇到不認識的 type：略過、回報一次，其餘照常。 */
 export function SectionRenderer({ sections, registry }: SectionRendererProps) {
   const unknown = sections.filter((section) => !isKnown(registry, section));
-  // A string, so the effect re-runs when the unknown sections change and
-  // not whenever the parent passes a new array with the same content.
+  // 用字串當 effect 的依賴：內容相同的新陣列不會重複回報
   const unknownKey = JSON.stringify(
     unknown.map((section) => [section.id, section.type]),
   );
@@ -44,9 +36,7 @@ export function SectionRenderer({ sections, registry }: SectionRendererProps) {
     <>
       {sections.map((section) => {
         if (!isKnown(registry, section)) return null;
-        // The registry maps each type to a component of exactly that
-        // variant; indexing by a union loses that pairing, so it is
-        // restated here, once.
+        // 以 union 當索引會遺失「type ↔ 元件」的對應，所以在這裡轉型一次
         const Section = registry[section.type] as ComponentType<{
           section: HomeSection;
         }>;

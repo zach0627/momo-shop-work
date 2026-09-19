@@ -1,10 +1,7 @@
 import type { HomeSection } from '../models/home-section';
 
-/**
- * The seam between the home page and wherever its layout comes from. Today
- * that is a fixture; a CMS API would be another implementation of this.
- */
+/** 首頁版位資料的來源。現在是 fixture，之後可以換成 CMS API。 */
 export interface HomeRepository {
-  /** The sections of the home page, top to bottom. */
+  /** 首頁由上到下的區塊。 */
   getLayout(): Promise<HomeSection[]>;
 }

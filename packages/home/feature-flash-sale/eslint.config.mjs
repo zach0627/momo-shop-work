@@ -6,14 +6,11 @@ export default [
   ...baseConfig,
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
-    // Override or add rules here
     rules: {},
   },
   {
     ignores: ['**/out-tsc'],
   },
-  // This package writes JSX but never imports from 'react', and the rule only
-  // sees explicit imports. JSX still needs react at runtime (react/jsx-runtime),
-  // so the declaration stays. Remove this once the package imports react.
+  // 這個 package 只寫 JSX、沒有明寫 import react，規則看不到；執行期仍需要 react，所以保留宣告
   dependencyChecks(['react']),
 ];

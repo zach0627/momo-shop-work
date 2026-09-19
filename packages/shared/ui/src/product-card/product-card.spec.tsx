@@ -35,8 +35,7 @@ describe('ProductCard', () => {
     expect(within(link).getByText('【Apple】iPhone 18 Pro Max')).toBeTruthy();
   });
 
-  // The name is right under the image, inside the same link. An alt text
-  // would make a screen reader say the name twice.
+  // 名稱就在同一個連結裡，圖再寫 alt 會被念兩次
   it('treats the image as decoration', () => {
     const { container } = render(<ProductCard item={iphone} href="/" />);
 
@@ -61,7 +60,7 @@ describe('ProductCard', () => {
     expect(screen.getByRole('link').getAttribute('data-injected')).toBe('true');
   });
 
-  // spec home-page: 商品卡顯示售價與原價
+  // 規格 home-page：商品卡顯示售價與原價
   it('strikes the original price through when the product has one', () => {
     const { container } = render(<ProductCard item={iphone} href="/" />);
 
@@ -90,7 +89,7 @@ describe('ProductCard', () => {
     expect(screen.queryByText('APP購機加保2年')).toBeNull();
   });
 
-  // A footer may hold a button, and a button inside a link is invalid HTML.
+  // footer 可能放按鈕，而按鈕放在連結裡是無效的 HTML
   it('renders the footer outside the link', () => {
     render(
       <ProductCard
@@ -104,8 +103,7 @@ describe('ProductCard', () => {
     expect(screen.getByRole('link').contains(button)).toBe(false);
   });
 
-  // Compile-time: a richer domain object is accepted as it is, so callers
-  // never map their model into a view model. Checked by `nx typecheck`.
+  // 編譯期檢查：欄位更多的 domain 物件可以直接傳入（由 typecheck 把關）
   it('accepts any object that has at least the fields of ProductCardItem', () => {
     const product = {
       id: '15687497',

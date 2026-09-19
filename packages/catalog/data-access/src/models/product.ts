@@ -1,16 +1,16 @@
 export interface Product {
-  /** Taken from the artwork file name: 15642257_OL_m.webp -> "15642257". */
+  /** 取自素材檔名：15642257_OL_m.webp → "15642257"。 */
   id: string;
   name: string;
-  /** Relative to the document base, like every asset path in this project. */
+  /** 相對於網站根目錄的路徑。 */
   imageUrl: string;
-  /** Gallery for the detail page. Always contains `imageUrl`. */
+  /** 詳情頁的圖；一定包含 imageUrl。 */
   images: string[];
   price: number;
-  /** Present only when the product is discounted; always above `price`. */
+  /** 有折扣才有，且一定高於 price。 */
   originalPrice?: number;
-  /** One short promotion line, e.g. "滿1件折100". Shown by horizontal cards. */
+  /** 一行促銷文字，例：「滿1件折100」。橫式商品卡會顯示。 */
   promoText?: string;
-  /** Bullet lines shown on the detail page. */
+  /** 詳情頁的條列說明。 */
   description: string[];
 }

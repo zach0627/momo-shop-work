@@ -1,6 +1,6 @@
 import { formatPrice } from '@momo/shared-util';
 
-/** The least this component needs; a catalog `Product` has all of it. */
+/** 這個元件需要的欄位；catalog 的 Product 都有。 */
 export interface GoodsInfoProduct {
   id: string;
   name: string;
@@ -10,11 +10,7 @@ export interface GoodsInfoProduct {
   description: string[];
 }
 
-/**
- * Title, description lines, goods code and price. The price is written the
- * way the detail page of the live site writes it - "促銷價 50,200 元", no "$"
- * - which is why it does not reuse the PriceTag of the product cards.
- */
+/** 標題、條列說明、品號與價格。價格照真站詳情頁的寫法（「促銷價 50,200 元」，沒有 $）。 */
 export function GoodsInfo({ product }: { product: GoodsInfoProduct }) {
   const { originalPrice } = product;
   const isDiscounted =
@@ -30,7 +26,7 @@ export function GoodsInfo({ product }: { product: GoodsInfoProduct }) {
       <div className="mt-3 flex items-start justify-between gap-4">
         <ul className="text-ec-base text-ink-emphasis list-disc space-y-0.5 pl-9 font-medium">
           {product.description.map((line, index) => (
-            // Lines never reorder, and two of them may read the same.
+            // 說明不會重新排序，而且可能有兩行文字相同
             <li key={`${index}-${line}`}>{line}</li>
           ))}
         </ul>

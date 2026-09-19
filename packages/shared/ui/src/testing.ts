@@ -1,5 +1,4 @@
-// Secondary entry point: '@momo/shared-ui/testing'.
-// Kept out of the main entry so test helpers never reach the app bundle.
+// 第二個入口 '@momo/shared-ui/testing'：測試工具不會進到 app 的 bundle
 
 class ObserverStub {
   observe() {
@@ -14,17 +13,10 @@ class ObserverStub {
 }
 
 /**
- * Gives jsdom what the carousel library reaches for. Any spec that mounts a
- * `Carousel` - directly or through a page - needs it; this package owns the
- * library, so it owns the shim too.
- *
- * embla constructs ResizeObserver and IntersectionObserver without checking
- * that they exist, and calls `matchMedia` on the element's own window
- * (`ownerDocument.defaultView`, which is not `globalThis` under Vitest) even
- * when no breakpoints are set.
- *
- * Returns a function that removes whatever was added. Call it from
- * `beforeAll`, or once from a Vitest setup file.
+ * 補上 jsdom 缺少、但 embla 會用到的 API；任何會掛載 Carousel 的 spec 都要先呼叫。
+ * embla 不檢查就直接 new ResizeObserver / IntersectionObserver，
+ * 並從元素自己的 window（不是 globalThis）呼叫 matchMedia。
+ * 回傳的函式會移除這次補上的東西。
  */
 export function installCarouselTestEnvironment(): () => void {
   const ownerWindow = document.defaultView as unknown as Record<
@@ -48,7 +40,7 @@ export function installCarouselTestEnvironment(): () => void {
 
   const added: Array<[Record<string, unknown>, string]> = [];
   for (const [target, name, value] of additions) {
-    // Not `name in target`: the property can exist and still be undefined.
+    // 不能用 name in target：屬性可能存在但值是 undefined
     if (typeof target[name] === 'function') continue;
     Object.defineProperty(target, name, { configurable: true, value });
     added.push([target, name]);

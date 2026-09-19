@@ -11,8 +11,7 @@ describe('SectionHeader', () => {
     ).toBeTruthy();
   });
 
-  // On the live site the first words of a title are lighter ("降價" + "好貨").
-  // That is styling: the heading must still read as one title.
+  // 前半較淺只是樣式，念出來仍然要是一個完整的標題
   it('reads as one title when it has a lighter lead', () => {
     render(<SectionHeader lead="降價" title="好貨" />);
 

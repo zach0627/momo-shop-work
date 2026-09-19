@@ -1,17 +1,8 @@
-// Proves the module boundary rules are (1) applied to every project and
-// (2) respected by every edge of the real project graph.
-//
+// 確認邊界規則 (1) 每個專案都有套用、(2) 專案依賴圖的每一條邊都符合。
 //   node tools/verify-boundaries.mjs
-//
-// Lint already enforces the rules per file. This script answers the questions
-// lint cannot: "is the rule actually switched on in every project?" and "are
-// the tags well-formed?". A package whose tags are malformed is silently exempt
-// from every constraint, and lint stays green. The same goes for the rule that
-// makes packages declare their dependencies: it silently skips a project that
-// lacks the target it is matched through.
-//
-// The constraints are read from the *effective* ESLint config, so there is no
-// second copy of the rules to keep in sync.
+// lint 只逐檔檢查；這支腳本檢查 lint 看不到的事：規則是否真的開著、tags 格式對不對。
+// tags 寫壞的 package 會靜默地不受任何規則約束，而 lint 仍然是綠的。
+// 規則內容讀自「實際生效的」ESLint 設定，不另外維護一份。
 import { execSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -25,13 +16,13 @@ const { ESLint } = createRequire(join(root, 'package.json'))('eslint');
 const BOUNDARIES = '@nx/enforce-module-boundaries';
 const RESTRICTED = 'no-restricted-imports';
 const DEPENDENCY_CHECKS = '@nx/dependency-checks';
-// package -> the only project allowed to import it
+// 套件 → 唯一可以 import 它的專案
 const SINGLE_OWNER = { 'react-router': 'shop', 'embla-carousel': 'shared-ui' };
 
 const failures = [];
 const fail = (msg) => failures.push(msg);
 
-// --- project graph ---------------------------------------------------------
+// --- 專案依賴圖 ---
 const graphFile = join(mkdtempSync(join(tmpdir(), 'nx-graph-')), 'graph.json');
 execSync(`pnpm nx graph --file="${graphFile}"`, { cwd: root, stdio: 'pipe' });
 const { nodes, dependencies } = JSON.parse(
@@ -41,10 +32,10 @@ const projects = Object.values(nodes).sort((a, b) =>
   a.name.localeCompare(b.name),
 );
 
-// --- 1. tags ---------------------------------------------------------------
+// --- 1. tags ---
 console.log('\n1. Tags');
 for (const p of projects) {
-  // Nx adds implicit npm:public / npm:private tags derived from package.json.
+  // Nx 會依 package.json 自動加上 npm:public / npm:private
   const implicit = (p.data.tags ?? []).filter((t) => t.startsWith('npm:'));
   const tags = (p.data.tags ?? []).filter((t) => !t.startsWith('npm:'));
   const types = tags.filter((t) => t.startsWith('type:'));
@@ -65,7 +56,7 @@ for (const p of projects) {
   console.log(`   ${p.name.padEnd(32)} ${tags.join('  ')}`);
 }
 
-// --- 2. effective ESLint config per project --------------------------------
+// --- 2. 每個專案實際生效的 ESLint 設定 ---
 console.log('\n2. Effective ESLint config');
 let constraints;
 for (const p of projects) {
@@ -107,9 +98,8 @@ for (const p of projects) {
       fail(`${p.name}: must not be allowed to import ${pkg}`);
   }
 
-  // @nx/dependency-checks does nothing, without a word, for a project that has
-  // none of the targets listed in `buildTargets`. So "the rule is on" has to
-  // mean: severity error AND the project really has one of those targets.
+  // @nx/dependency-checks 對「沒有 buildTargets 所列 target」的專案會靜默地不檢查，
+  // 所以「規則開著」的意思是：嚴重度為 error，而且專案真的有那個 target
   const { rules: manifestRules = {} } = await new ESLint({
     cwd: dir,
   }).calculateConfigForFile(join(dir, 'package.json'));
@@ -132,7 +122,7 @@ for (const p of projects) {
   );
 }
 
-// --- 3. every workspace edge against the constraints -----------------------
+// --- 3. 依賴圖的每一條邊 ---
 console.log('\n3. Project graph edges');
 const allowedFor = new Map(
   (constraints ?? []).map((c) => [c.sourceTag, c.onlyDependOnLibsWithTags]),
@@ -140,7 +130,7 @@ const allowedFor = new Map(
 let edges = 0;
 for (const deps of Object.values(dependencies)) {
   for (const { source, target } of deps) {
-    if (!nodes[source] || !nodes[target]) continue; // npm packages
+    if (!nodes[source] || !nodes[target]) continue; // npm 套件
     edges++;
     const targetTags = nodes[target].data.tags ?? [];
     const broken = (nodes[source].data.tags ?? []).filter(
@@ -157,7 +147,7 @@ for (const deps of Object.values(dependencies)) {
 }
 if (!edges) console.log('   (no dependencies between workspace projects yet)');
 
-// --- result ----------------------------------------------------------------
+// --- 結果 ---
 console.log(
   `\n${projects.length} projects, ${constraints?.length ?? 0} constraints, ${edges} workspace edges, ${failures.length} problem(s)`,
 );

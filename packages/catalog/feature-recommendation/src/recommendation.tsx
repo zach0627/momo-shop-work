@@ -8,26 +8,16 @@ import { RecommendationGrid } from './ui/recommendation-grid';
 
 export interface RecommendationProps {
   title: string;
-  /** The lighter first part of the title. */
+  /** 標題前半較淺的字。 */
   lead?: string;
 }
 
-/**
- * "你可能會喜歡": three rows of products, and three more each time the user
- * asks, until there are none left - then the button goes away.
- *
- * It lives in the catalog scope, not in home, because the goods detail page
- * is meant to show it too; that is also why it takes a plain title instead
- * of a home layout section.
- */
+/** 「你可能會喜歡」：先顯示 3 列，每按一次「看更多」再加 3 列，載完後按鈕消失。 */
 export function Recommendation({ title, lead }: RecommendationProps) {
   const { items, hasMore, isPending, isLoadingMore, isError, loadMore } =
     useRecommendations(PAGE_SIZE);
 
-  // Nothing could be loaded at all: leave the page rather than show an empty
-  // frame. (The failure is reported by the app's query cache.) When a LATER
-  // batch fails, what is on screen stays, and so does the button: asking
-  // again is the retry.
+  // 完全載不到 → 區塊不顯示；後面的批次失敗 → 保留已顯示的，按鈕留著當重試
   if (isError && items.length === 0) return null;
 
   return (

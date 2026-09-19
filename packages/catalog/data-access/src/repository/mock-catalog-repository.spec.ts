@@ -16,7 +16,7 @@ function product(id: string, overrides: Partial<Product> = {}): Product {
   };
 }
 
-// 7 recommendations: two full pages of 3 and a last page of 1
+// 7 筆推薦：兩頁各 3 筆，最後一頁 1 筆
 const data: CatalogData = {
   products: [
     ...['r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7'].map((id) => product(id)),
@@ -152,7 +152,7 @@ describe('createMockCatalogRepository', () => {
   });
 });
 
-// The numbers the specification states about the real data.
+// 規格對真實資料寫明的數字
 describe('the generated fixtures', () => {
   const real = createMockCatalogRepository({ latencyMs: 0, now: () => NOW });
 
@@ -195,7 +195,7 @@ describe('the generated fixtures', () => {
     });
   });
 
-  // spec home-page: horizontal cards carry a promo line above the name.
+  // 規格 home-page：橫式商品卡帶一行促銷文字
   it.each(['store-pickup', 'best-sellers'])(
     'gives every product of the %s rail a promo line',
     async (key) => {

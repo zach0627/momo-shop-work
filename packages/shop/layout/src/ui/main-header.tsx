@@ -4,7 +4,7 @@ import { paths } from '@momo/shared-util';
 import { HOT_KEYWORDS, LOGO_SRC } from '../model/layout-content';
 import { SearchBox } from './search-box';
 
-/** Logo, search box and the hot-keyword line. Scrolls away with the page. */
+/** logo、搜尋框與熱搜關鍵字；會隨頁面捲走。 */
 export function MainHeader() {
   return (
     <div className="mx-auto flex w-full max-w-shop items-center gap-16 px-4 py-5">

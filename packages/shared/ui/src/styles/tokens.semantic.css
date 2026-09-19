@@ -1,68 +1,54 @@
 /*
- * SEMANTIC TOKENS - "what a colour is for".
- *
- * The only layer components may use. Each token names a purpose and points
- * at a primitive; Tailwind turns it into utilities:
- *   --color-brand     -> text-brand / bg-brand / border-brand
- *   --text-ec-sm      -> text-ec-sm (with its measured line-height)
- *   --container-shop  -> max-w-shop
- *
- * Why two layers: a rebrand edits one primitive; a theme (dark mode, a
- * campaign skin) overrides semantic tokens - and no component changes in
- * either case.
- *
- * The default Tailwind colour palette and type scale are switched off
- * below, so `text-pink-600` or `text-sm` do not exist in this workspace.
- * A colour or size that is not a token cannot be used by accident.
+ * SEMANTIC：顏色「用在哪裡」。元件只能用這一層。
+ * 每個 token 指向一個 primitive，Tailwind 會產生對應的 utility：
+ *   --color-brand → text-brand / bg-brand；--text-ec-sm → text-ec-sm；--container-shop → max-w-shop
+ * Tailwind 預設的色盤與字級在下面被關掉，所以不是 token 的顏色與字級用不了。
  */
 @theme {
   --color-*: initial;
   --text-*: initial;
 
-  /* ---- Brand and actions ------------------------------------------------ */
+  /* ---- 品牌與動作 ---- */
 
-  /* logo, active nav item + its underline, hot keywords, price-drop price */
+  /* logo、分類列作用中項目與底線、熱搜關鍵字、降價好貨的價格 */
   --color-brand: var(--momo-magenta-600);
-  /* "直接購買" */
+  /* 「直接購買」 */
   --color-action-primary: var(--momo-magenta-600);
-  /* "放入購物車" */
+  /* 「放入購物車」 */
   --color-action-cart: var(--momo-blue-600);
-  /* "加入追蹤" */
+  /* 「加入追蹤」 */
   --color-action-neutral: var(--momo-gray-300);
-  /* text on any filled button or dark surface */
+  /* 實心按鈕或深色底上的文字 */
   --color-on-action: var(--momo-white);
 
-  /* ---- Prices and promotion -------------------------------------------- */
+  /* ---- 價格與促銷 ---- */
 
-  /* store pickup, best sellers, moPro, recommendations */
+  /* 店取、暢銷榜、moPro、你可能會喜歡的價格 */
   --color-price: var(--momo-pink-600);
-  /* flash sale price, "限搶價", promo line */
+  /* 限時搶購的價格、「限搶價」、促銷文字 */
   --color-sale: var(--momo-red-600);
-  /* countdown digit chip */
+  /* 倒數計時的數字底色 */
   --color-countdown: var(--momo-rose-500);
 
-  /* ---- Ink (text) ------------------------------------------------------- */
+  /* ---- 文字 ---- */
 
-  /* flash sale header */
+  /* 限時搶購的標題列 */
   --color-ink-strong: var(--momo-gray-950);
-  /* goods description lines */
+  /* 詳情頁的條列說明 */
   --color-ink-emphasis: var(--momo-gray-900);
-  /* the default: product names, titles, nav items, field labels */
+  /* 預設文字：商品名稱、標題、分類列、欄位標籤 */
   --color-ink: var(--momo-gray-800);
-  /* "促銷價", struck price on the detail page */
+  /* 「促銷價」、詳情頁的劃線價 */
   --color-ink-label: var(--momo-gray-500);
-  /* struck original price, goods code */
+  /* 商品卡的劃線原價、品號 */
   --color-ink-muted: var(--momo-gray-450);
 
-  /* "選擇分類", the title of the expanded category panel */
+  /* 「選擇分類」面板的標題 */
   --color-ink-title: var(--momo-slate-800);
-  /* the chevron of the category toggle */
+  /* 分類列展開按鈕的箭頭 */
   --color-ink-icon: var(--momo-slate-600);
 
-  /* ---- Category pills ---------------------------------------------------
-     Each row of the "選擇分類" panel has its own tint. The live site paints
-     them semi-transparent (measured: 0.5, rose 0.4) over the white panel, so
-     the opacity is part of the token rather than baked into a new hex. */
+  /* ---- 分類膠囊：每一列一種底色。真站是半透明（0.5，rose 為 0.4），所以透明度寫在 token 裡 ---- */
   --color-category-sky: color-mix(
     in srgb,
     var(--momo-sky-100) 50%,
@@ -89,11 +75,7 @@
     transparent
   );
 
-  /* ---- Carousel ---------------------------------------------------------
-     Measured on the price-drop rail. The arrows are black at 30% (40% on
-     hover) over whatever slides underneath, so the opacity is part of the
-     token, like the category pills. A disabled arrow is the same colour at
-     25% opacity: `disabled:opacity-25`. The current dot is `brand`. */
+  /* ---- 輪播：箭頭是黑色 30%（hover 40%），停用時另加 disabled:opacity-25；目前頁的圓點用 brand ---- */
   --color-carousel-arrow: color-mix(
     in srgb,
     var(--momo-black) 30%,
@@ -104,113 +86,103 @@
     var(--momo-black) 40%,
     transparent
   );
-  /* a dot that is not the current page */
+  /* 不是目前頁的圓點 */
   --color-carousel-dot: var(--momo-gray-175);
 
-  /* ---- Lines ------------------------------------------------------------ */
+  /* ---- 線條 ---- */
 
-  /* product card border */
+  /* 商品卡框線 */
   --color-line: var(--momo-gray-200);
-  /* flash sale card border */
+  /* 限時搶購商品卡框線 */
   --color-line-soft: var(--momo-gray-150);
-  /* bottom border of the top bar */
+  /* 頂部列的底線 */
   --color-line-strong: var(--momo-gray-300);
-  /* search field border and search button */
+  /* 搜尋框的邊框與搜尋按鈕 */
   --color-control: var(--momo-gray-700);
 
-  /* ---- Surfaces --------------------------------------------------------- */
+  /* ---- 表面（底色） ---- */
 
   --color-surface: var(--momo-white);
-  /* the caption bar under a search suggestion fades from `surface` to this */
+  /* 猜你想搜說明列的漸層終點（由 surface 漸變到這個顏色） */
   --color-surface-caption: var(--momo-blush-100);
-  /* top bar */
+  /* 頂部列、首頁的頁面底色 */
   --color-surface-muted: var(--momo-gray-100);
-  /* the category toggle button */
+  /* 分類列的展開按鈕 */
   --color-surface-control: var(--momo-gray-50);
   --color-footer: var(--momo-navy-900);
-  /* footer headings, fraud notice text */
+  /* footer 欄位標題、防詐騙提醒的文字 */
   --color-footer-accent: var(--momo-cyan-400);
-  /* fraud notice border (3px) */
+  /* 防詐騙提醒的框線（3px） */
   --color-footer-accent-line: var(--momo-cyan-200);
 
-  /* ---- Font family ------------------------------------------------------
-     Measured on the live site. It is the sans stack of the Tailwind version
-     the site was built with; Tailwind 4.3 changed its own default, so the
-     value is pinned here instead of inherited. Resolves to the platform's
-     CJK UI font (Microsoft JhengHei UI on Windows, PingFang TC on macOS). */
+  /* ---- 字體：真站實測。Tailwind 4.3 改了自己的預設值，所以把量到的值固定在這裡 ---- */
   --font-sans:
     ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol', 'Noto Color Emoji';
 
-  /* ---- Type scale -------------------------------------------------------
-     The real site uses an odd-numbered scale it calls `ec-*`; the names are
-     kept so the two can be compared. Each size carries its measured
-     line-height. */
+  /* ---- 字級：真站用奇數階梯並稱為 ec-*，沿用名稱以便對照；每一階都帶實測的行高 ---- */
 
-  /* "限搶價", sales count */
+  /* 「限搶價」、銷量 */
   --text-ec-2xs: 11px;
   --text-ec-2xs--line-height: 16px;
-  /* top bar, hot keywords, original price, field labels, goods code */
+  /* 頂部列、熱搜關鍵字、劃線原價、欄位標籤、品號 */
   --text-ec-sm: 13px;
   --text-ec-sm--line-height: 18px;
-  /* product name, promo line, search button, goods description */
+  /* 商品名稱、促銷文字、搜尋按鈕、詳情頁說明 */
   --text-ec-base: 15px;
   --text-ec-base--line-height: 20px;
-  /* action buttons, search input */
+  /* 動作按鈕、搜尋輸入框 */
   --text-ec-md: 16px;
   --text-ec-md--line-height: 24px;
-  /* category nav item (weight 600) */
+  /* 分類列項目（weight 600） */
   --text-ec-lg: 17px;
   --text-ec-lg--line-height: 25.5px;
-  /* goods title (weight 700), recommendation price, footer heading */
+  /* 詳情頁標題（weight 700）、推薦區價格、footer 標題 */
   --text-ec-xl: 19px;
   --text-ec-xl--line-height: 25px;
-  /* price in rails */
+  /* 商品列的價格 */
   --text-ec-2xl: 21px;
   --text-ec-2xl--line-height: 26px;
-  /* flash sale price */
+  /* 限時搶購的價格 */
   --text-ec-3xl: 23px;
   --text-ec-3xl--line-height: 28.75px;
-  /* price on the goods detail page */
+  /* 詳情頁的價格 */
   --text-ec-4xl: 25px;
   --text-ec-4xl--line-height: 37.5px;
-  /* "選擇分類": the one even size on the site, so it is named by role */
+  /* 「選擇分類」：全站唯一的偶數字級，所以依用途命名 */
   --text-panel-title: 18px;
   --text-panel-title--line-height: 28px;
-  /* An estimate. On the live site a section title ("降價好貨" ...) is not text
-     but a 1220x70 background image, and that artwork was not supplied, so the
-     titles are rendered as text here. Sized from the screenshots. */
+  /* 估計值：真站的區塊標題是 1220×70 的圖，素材沒有提供，這裡改用文字 */
   --text-ec-title: 24px;
   --text-ec-title--line-height: 32px;
 
-  /* ---- Radius ----------------------------------------------------------- */
+  /* ---- 圓角 ---- */
 
-  /* product cards, fraud notice */
+  /* 商品卡、防詐騙提醒 */
   --radius-card: 8px;
-  /* recommendation tile, countdown digit */
+  /* 推薦商品卡、倒數數字 */
   --radius-tile: 4px;
-  /* category pill (44px tall, fully rounded ends) */
+  /* 分類膠囊（高 44px，兩端全圓） */
   --radius-pill: 22px;
-  /* bottom corners of the expanded category panel */
+  /* 展開的分類面板下方兩角 */
   --radius-panel: 12px;
-  /* Action buttons on the detail page are square (0px): use `rounded-none`. */
+  /* 詳情頁的動作按鈕是直角（0px）：用 rounded-none */
 
-  /* ---- Shadow ----------------------------------------------------------- */
+  /* ---- 陰影 ---- */
 
-  /* price-drop card */
+  /* 降價好貨商品卡 */
   --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  /* flash sale card */
+  /* 限時搶購商品卡 */
   --shadow-card-raised: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-  /* expanded category panel */
+  /* 展開的分類面板 */
   --shadow-panel: 0 2px 8px 0 rgb(0 0 0 / 0.08);
 
-  /* ---- Layout ----------------------------------------------------------- */
+  /* ---- 版面 ---- */
 
-  /* Desktop-first: the real desktop site uses a fixed 1220px content width. */
+  /* 桌機優先：真站的內容寬度固定 1220px */
   --container-shop: 1220px;
-  /* the fixed top bar: 40px of content + its 1px bottom border. The layout
-     reserves exactly this much space above the page. */
+  /* 固定的頂部列：內容 40px + 底線 1px；layout 在頁面上方保留這個高度 */
   --spacing-topbar: 41px;
-  /* action button height (buttons are 160px wide) */
+  /* 動作按鈕的高度（寬 160px） */
   --spacing-action: 40px;
 }

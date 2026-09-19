@@ -4,19 +4,15 @@ import type { SectionTitle } from '@momo/home-data-access';
 import { SectionHeader } from '@momo/shared-ui';
 
 export interface SectionFrameProps {
-  /** Names the section for assistive technology. */
+  /** 給螢幕閱讀器念的區塊名稱。 */
   label: string;
   title?: SectionTitle;
-  /** false: the content runs edge to edge (it brings its own margins). */
+  /** false：內容貼齊左右邊緣（素材自己帶留白）。 */
   padded?: boolean;
   children: ReactNode;
 }
 
-/**
- * What every block of the home page sits in: a white band, 1220px wide, on
- * the grey page, with 16px of padding around its content - measured on the
- * live site.
- */
+/** 首頁每個區塊的外框：1220px 的白色區帶、內容四周 16px（真站實測）。 */
 export function SectionFrame({
   label,
   title,

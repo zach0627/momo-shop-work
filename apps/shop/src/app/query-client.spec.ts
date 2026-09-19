@@ -2,7 +2,7 @@ import { setTelemetrySink, type TelemetrySink } from '@momo/shared-util';
 
 import { createQueryClient } from './query-client';
 
-// spec home-page: a failed query is reported once, wherever it was made.
+// 規格 home-page：失敗的查詢只回報一次
 describe('createQueryClient', () => {
   let sink: TelemetrySink;
   let restore: () => void;

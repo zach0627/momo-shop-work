@@ -3,13 +3,9 @@ import { render, screen } from '@testing-library/react';
 import { installCarouselTestEnvironment } from '../testing';
 import { Carousel } from './carousel';
 
-/**
- * The real embla, mounted. carousel.spec.tsx replaces the library with a
- * fake, which would keep passing if an upgrade renamed an option or a
- * method; this spec is what would notice.
- */
+// 用真的 embla 掛載一次：套件升級改了 API 時，這份會先發現（carousel.spec 用的是假的 embla）
 
-/** The carousel itself is a group too; slides are the groups inside it. */
+/** 輪播本身也是 group；slide 是 aria-roledescription="slide" 的那些。 */
 const getSlides = () =>
   screen
     .getAllByRole('group')
@@ -40,7 +36,7 @@ describe('Carousel with the real embla', () => {
     expect(() => unmount()).not.toThrow();
   });
 
-  // jsdom measures everything as 0, so embla sees a single page.
+  // jsdom 量到的尺寸都是 0，embla 只會看到一頁
   it('has nowhere to scroll when nothing overflows', () => {
     render(
       <Carousel label="限時搶購">

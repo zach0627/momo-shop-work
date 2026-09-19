@@ -6,7 +6,7 @@ import { setTelemetrySink, type TelemetrySink } from '@momo/shared-util';
 import type { SectionRegistry } from './registry';
 import { SectionRenderer } from './section-renderer';
 
-/** One tiny component per type: the test is about dispatch, not about blocks. */
+/** 每種 type 一個極小的元件：這份測試測的是分派，不是 block。 */
 const label =
   (name: string) =>
   ({ section }: { section: HomeSection }) => (
@@ -44,7 +44,7 @@ const rail: HomeSection = {
   perView: 8,
 };
 
-/** What a newer CMS might send before this build knows about it. */
+/** 模擬 CMS 送來這個版本還不認識的 type。 */
 const unknown = (id: string, type: string) =>
   ({ id, type }) as unknown as HomeSection;
 
@@ -73,7 +73,7 @@ describe('SectionRenderer', () => {
     expect(sink.error).not.toHaveBeenCalled();
   });
 
-  // spec home-page: 區塊順序由版位資料決定
+  // 規格 home-page：區塊順序由版位資料決定
   it('follows the order of the data, and follows it again when it changes', () => {
     const { rerender } = render(
       <SectionRenderer
@@ -105,7 +105,7 @@ describe('SectionRenderer', () => {
     expect(rendered()).toEqual(['ranking:rk', 'product-rail:pd']);
   });
 
-  // spec home-page: 未知的區塊型別不影響頁面
+  // 規格 home-page：未知的區塊型別不影響頁面
   it('skips a section of an unknown type, keeps the rest, and reports it', () => {
     render(
       <SectionRenderer
@@ -134,8 +134,7 @@ describe('SectionRenderer', () => {
     expect(sink.error).toHaveBeenCalledTimes(1);
   });
 
-  // `registry['constructor']` is a function on every object. A type that
-  // happens to be named like one must not be "found".
+  // registry['constructor'] 在每個物件上都存在，不能因此被當成「有註冊」
   it('treats a type named like an Object.prototype member as unknown', () => {
     render(
       <SectionRenderer

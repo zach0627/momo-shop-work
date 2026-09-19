@@ -2,16 +2,11 @@ import { SectionHeader } from '@momo/shared-ui';
 
 export interface RankingProps {
   title: string;
-  /** The lighter first part of the title. */
+  /** 標題前半較淺的字。 */
   lead?: string;
 }
 
-/**
- * Today's best sellers, as horizontal product cards.
- *
- * PLACEHOLDER until step 12: it holds the section's place on the home
- * page, so the page's registry points at the real package from the start.
- */
+/** 今日暢銷榜：橫式商品卡。目前是佔位，Step 12 實作。 */
 export function Ranking({ title, lead }: RankingProps) {
   return (
     <section aria-label={`${lead ?? ''}${title}`} className="bg-surface">

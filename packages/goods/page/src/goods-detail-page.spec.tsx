@@ -48,7 +48,7 @@ function renderPage(goodsId: string, repository: CatalogRepository) {
 const ACTIONS = ['直接購買', '放入購物車', '加入追蹤'];
 
 describe('GoodsDetailPage', () => {
-  // spec goods-detail: 顯示商品內容 / 商品存在
+  // 規格 goods-detail：顯示商品內容
   it('shows the image, the title, the description lines and the price', async () => {
     const { repository, getProduct } = repositoryWith([iphone]);
 
@@ -84,7 +84,7 @@ describe('GoodsDetailPage', () => {
     expect(second.container.querySelector('del')).toBeNull();
   });
 
-  // spec: 顯示三顆動作按鈕
+  // 規格：顯示三顆動作按鈕
   it('has the three action buttons, in order', async () => {
     const { repository } = repositoryWith([iphone]);
 
@@ -96,8 +96,7 @@ describe('GoodsDetailPage', () => {
     ).toEqual(ACTIONS);
   });
 
-  // spec: 動作按鈕不綁任何行為. A display page by decision, not by omission:
-  // nothing navigates, nothing on the page changes, nothing is requested.
+  // 規格：動作按鈕不綁任何行為 —— 不導頁、不改畫面、不發請求
   it.each(ACTIONS)(
     'does nothing at all when 「%s」 is clicked',
     async (name) => {
@@ -124,7 +123,7 @@ describe('GoodsDetailPage', () => {
     },
   );
 
-  // spec: 商品不存在時顯示提示
+  // 規格：商品不存在時顯示提示
   it('says the product was not found, without buttons, with a way home', async () => {
     const { repository } = repositoryWith([iphone]);
 
@@ -171,8 +170,7 @@ describe('GoodsDetailPage', () => {
     expect(screen.queryAllByRole('button')).toHaveLength(0);
   });
 
-  // The id arrives as a prop; the page must follow it, e.g. when the user
-  // goes from one product to another without the page unmounting.
+  // id 由 props 傳入：從一件商品換到另一件時頁面不會重新掛載，內容要跟著變
   it('follows its goodsId prop', async () => {
     const { repository } = repositoryWith([iphone, water]);
     const { rerender } = renderPage('15687497', repository);

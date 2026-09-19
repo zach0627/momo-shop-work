@@ -1,8 +1,3 @@
-/*
- * Design system entry point. The app imports this one file.
- *
- *   tokens.primitive.css  which colours exist      (never used by components)
- *   tokens.semantic.css   what each one is for     (the only layer components use)
- */
+/* Design system 的入口：primitive（有哪些顏色，元件不可用）→ semantic（用在哪裡，元件只用這一層） */
 @import './tokens.primitive.css';
 @import './tokens.semantic.css';

@@ -2,11 +2,7 @@ import type { ShortcutBarSection } from '@momo/home-data-access';
 
 import { SectionFrame } from '../ui/section-frame';
 
-/**
- * The round shortcut icons (秒殺, 簽到 ...). The label is part of the artwork,
- * so it is the image's alt rather than text beside it. Not links: where
- * they lead is out of scope.
- */
+/** 圓形捷徑（秒殺、簽到…）。文字印在圖上，所以 alt 就是標籤；不可點。 */
 export function ShortcutBar({ section }: { section: ShortcutBarSection }) {
   return (
     <SectionFrame label="快捷入口">

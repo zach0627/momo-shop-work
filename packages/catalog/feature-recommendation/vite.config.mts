@@ -5,10 +5,6 @@ export default defineConfig(() => ({
   cacheDir:
     '../../../node_modules/.vite/packages/catalog/feature-recommendation',
   plugins: [react()],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [],
-  // },
   test: {
     name: 'catalog-feature-recommendation',
     watch: false,

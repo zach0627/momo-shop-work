@@ -4,7 +4,7 @@ import baseConfig, { restrictedImports } from '../../../eslint.config.mjs';
 export default [
   ...nx.configs['flat/react'],
   ...baseConfig,
-  // The Carousel wrapper lives here: the only project allowed to import embla.
+  // Carousel 在這裡：唯一可以 import embla 的專案
   restrictedImports(['embla-carousel-react']),
   {
     ignores: ['**/out-tsc'],

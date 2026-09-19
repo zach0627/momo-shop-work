@@ -1,17 +1,13 @@
-/**
- * What a CMS would send to describe the home page. A section says WHAT goes
- * where; how each type looks is the page's business. Nothing in here is a
- * link: banners are not clickable in this project (spec home-page).
- */
+/** CMS 會送來的首頁版位資料：只說「哪裡放什麼」，長相由頁面決定。banner 都不可點。 */
 
-/** An image with its intrinsic size, so the page can reserve its space. */
+/** 帶原始尺寸的圖，讓瀏覽器先留好位置。 */
 export interface Banner {
   id: string;
   imageUrl: string;
   alt: string;
   width: number;
   height: number;
-  /** Text under the image, e.g. the keyword of a search suggestion. */
+  /** 圖下方的文字，例：猜你想搜的關鍵字。 */
   caption?: string;
 }
 
@@ -21,14 +17,14 @@ export interface Shortcut {
   label: string;
 }
 
-/** `lead` is the lighter first part of a title: "降價" + "好貨". */
+/** lead 是標題前半較淺的字：「降價」+「好貨」。 */
 export interface SectionTitle {
   lead?: string;
   text: string;
 }
 
 interface SectionBase {
-  /** Unique within a layout; the React key of the section. */
+  /** 版位內唯一；也是 React 的 key。 */
   id: string;
 }
 
@@ -41,10 +37,10 @@ export interface HeroSection extends SectionBase {
 export interface BannerCarouselSection extends SectionBase {
   type: 'banner-carousel';
   title?: SectionTitle;
-  /** Names the carousel for assistive technology when there is no title. */
+  /** 沒有標題時給螢幕閱讀器念的名稱。 */
   label: string;
   perView: number;
-  /** Space between banners, in px. */
+  /** 圖與圖的間距（px）。 */
   gap: number;
   banners: Banner[];
 }
@@ -52,7 +48,7 @@ export interface BannerCarouselSection extends SectionBase {
 export interface BannerGridSection extends SectionBase {
   type: 'banner-grid';
   title?: SectionTitle;
-  /** Names the section for assistive technology when there is no title. */
+  /** 沒有標題時給螢幕閱讀器念的名稱。 */
   label: string;
   columns: number;
   banners: Banner[];
@@ -71,14 +67,13 @@ export interface NoticeSection extends SectionBase {
 export interface ProductRailSection extends SectionBase {
   type: 'product-rail';
   title: SectionTitle;
-  /** A key of the product catalog. The CMS names the collection; the
-      products themselves come from the catalog. */
+  /** 商品目錄的 collection key；商品本身由 catalog 提供。 */
   collection: string;
   card: 'vertical' | 'horizontal';
   perView: number;
 }
 
-/** Sections with logic of their own: a feature package fetches for itself. */
+/** 以下三種有自己的邏輯，由各自的 feature package 抓資料。 */
 export interface FlashSaleSection extends SectionBase {
   type: 'flash-sale';
   title: SectionTitle;

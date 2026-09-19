@@ -4,11 +4,7 @@ import { Carousel } from '@momo/shared-ui';
 import { BannerImage } from '../ui/banner-image';
 import { SectionFrame } from '../ui/section-frame';
 
-/**
- * A row of banners that pages sideways: the deal icons, brand discounts,
- * card offers, search suggestions and moPro tiles are all this one block,
- * told apart only by data (how many per view, the gap, captions).
- */
+/** 可左右翻頁的一排圖。首頁有 5 個區塊共用它，差別只在資料（一次幾張、間距、有沒有說明文字）。 */
 export function BannerCarousel({
   section,
 }: {

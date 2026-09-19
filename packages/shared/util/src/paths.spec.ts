@@ -1,6 +1,6 @@
 import { paths, ROUTE_PATTERNS } from './paths.js';
 
-/** Turns a route pattern such as `/goods/:goodsId` into a matcher. */
+/** 把 /goods/:goodsId 這類 pattern 轉成 RegExp。 */
 function toMatcher(pattern: string): RegExp {
   const source = pattern
     .split('/')
@@ -22,14 +22,13 @@ describe('paths', () => {
     expect(paths.goods('TP000/1 x')).toBe('/goods/TP000%2F1%20x');
   });
 
-  // The router registers ROUTE_PATTERNS while every link is built with `paths`.
-  // If the two drift apart, links silently lead to the not-found page.
+  // router 註冊的是 ROUTE_PATTERNS，連結用的是 paths；兩者對不起來時，連結會靜靜地導到 not-found
   it.each([
     ['home', paths.home(), ROUTE_PATTERNS.home],
     ['goods', paths.goods('15687497'), ROUTE_PATTERNS.goods],
     ['goods with an encoded id', paths.goods('TP000/1'), ROUTE_PATTERNS.goods],
   ])('%s path matches its route pattern', (_name, path, pattern) => {
-    // Guards against the vacuous case where both sides are empty.
+    // 防止兩邊都是空字串時的空洞通過
     expect(pattern.startsWith('/')).toBe(true);
     expect(path).toMatch(toMatcher(pattern));
   });

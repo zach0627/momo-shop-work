@@ -4,10 +4,6 @@ export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../../node_modules/.vite/packages/home/feature-flash-sale',
   plugins: [react()],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [],
-  // },
   test: {
     name: 'home-feature-flash-sale',
     watch: false,

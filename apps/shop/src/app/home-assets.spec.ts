@@ -26,9 +26,7 @@ function imageUrlsOf(section: HomeSection): string[] {
   }
 }
 
-// The layout is data and the artwork is files; nothing else ties the two
-// together. A typo in a path would only show up as a broken image in a
-// browser. It is checked here because the app is what serves the files.
+// 版位資料指到的圖檔都要存在於 public/，否則只會在瀏覽器裡變成破圖
 describe('the artwork of the home layout', () => {
   it('exists in public/ for every image the layout points at', async () => {
     const sections = await createMockHomeRepository().getLayout();

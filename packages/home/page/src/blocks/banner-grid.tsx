@@ -3,15 +3,11 @@ import type { BannerGridSection } from '@momo/home-data-access';
 import { BannerImage } from '../ui/banner-image';
 import { SectionFrame } from '../ui/section-frame';
 
-/**
- * Banners side by side, all visible at once. Edge to edge and without a
- * gap, as on the live site: this artwork carries its own margins (three
- * 406px tiles and four 305px tiles both add up to the 1220px column).
- */
+/** 一次全部攤開的一排圖：貼齊容器、沒有間距（素材自己帶留白）。 */
 export function BannerGrid({ section }: { section: BannerGridSection }) {
   return (
     <SectionFrame label={section.label} title={section.title} padded={false}>
-      {/* The column count is data, so it cannot be a Tailwind class. */}
+      {/* 欄數來自資料，沒辦法寫成 Tailwind class */}
       <div
         className="grid"
         style={{

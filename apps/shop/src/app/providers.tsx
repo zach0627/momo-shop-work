@@ -14,15 +14,10 @@ import { LinkProvider } from '@momo/shared-ui';
 import { createQueryClient } from './query-client';
 import { RouterLink } from './router-link';
 
-// Long enough for loading states to be seen, short enough not to get in the way.
+// mock 的延遲：讓載入狀態看得到
 const MOCK_LATENCY_MS = 150;
 
-/**
- * Composition root. Everything a package needs but must not choose for itself
- * is decided here: how links navigate, and which repository implementations
- * the data hooks talk to. Moving from mock data to a real API means replacing
- * the two `createMock...Repository` calls below - nothing else changes.
- */
+/** Composition root：決定連結怎麼導頁、資料 hook 用哪個 repository。換成真 API 只改這裡。 */
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(createQueryClient);
   const [catalogRepository] = useState(() =>

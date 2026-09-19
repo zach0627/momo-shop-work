@@ -18,8 +18,7 @@ describe('AppLink', () => {
   });
 
   it('renders through the component injected by LinkProvider', () => {
-    // Stands in for the router's Link, which the app injects at the
-    // composition root. This package must never import a router itself.
+    // 代替 app 注入的 router Link；這個 package 不能自己 import router
     function InjectedLink({ href, children, ...rest }: AppLinkProps) {
       return (
         <a href={href} data-injected="true" {...rest}>

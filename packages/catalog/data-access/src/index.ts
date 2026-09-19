@@ -1,10 +1,10 @@
-// Models
+// 型別
 export type { Category } from './models/category';
 export type { FlashSale, FlashSaleItem } from './models/flash-sale';
 export type { Page } from './models/page';
 export type { Product } from './models/product';
 
-// The seam: an interface, the mock behind it, and the context that injects it
+// Repository：介面、mock、注入用的 Context
 export type { CatalogRepository } from './repository/catalog-repository';
 export {
   createMockCatalogRepository,
@@ -16,7 +16,7 @@ export {
   useCatalogRepository,
 } from './repository/catalog-repository-context';
 
-// What UI code uses
+// 給 UI 用的 hooks
 export { useCategories } from './hooks/use-categories';
 export { useFlashSale } from './hooks/use-flash-sale';
 export { useProduct } from './hooks/use-product';

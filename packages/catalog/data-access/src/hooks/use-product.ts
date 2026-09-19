@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { catalogKeys } from '../query-keys';
 import { useCatalogRepository } from '../repository/catalog-repository-context';
 
-/** `data` is `null` when the product does not exist - that is a success. */
+/** 商品不存在時 data 是 null：這是成功，不是錯誤。 */
 export function useProduct(id: string) {
   const repository = useCatalogRepository();
   return useQuery({

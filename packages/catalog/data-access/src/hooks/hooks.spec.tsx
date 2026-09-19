@@ -41,7 +41,7 @@ describe('useCatalogRepository', () => {
   });
 
   it('says what is missing when there is no provider', () => {
-    // React logs the render error; keep the test output clean.
+    // React 會印出 render 錯誤，讓測試輸出保持乾淨
     const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     try {
       expect(() => renderHook(() => useCatalogRepository())).toThrow(
@@ -126,8 +126,7 @@ describe('useRecommendations', () => {
     }),
   );
 
-  // Braces matter: Vitest runs whatever beforeEach returns as a cleanup, and
-  // mockClear() returns the mock itself.
+  // 大括號不能省：Vitest 會把 beforeEach 的回傳值當清理函式執行，而 mockClear() 回傳 mock 本身
   beforeEach(() => {
     getRecommendations.mockClear();
   });
@@ -160,8 +159,7 @@ describe('useRecommendations', () => {
     expect(result.current.hasMore).toBe(false);
   });
 
-  // A double click lands before React has re-rendered, so the `loadMore` of
-  // the same render is called again: its view of "already loading" is stale.
+  // 連點發生在 React 重新 render 之前，同一個 loadMore 會被再呼叫一次
   it('asks for a page once when loadMore is called again before it arrives', async () => {
     const { wrapper } = wrapperFor({ getRecommendations });
     const { result } = renderHook(() => useRecommendations(2), { wrapper });
@@ -175,7 +173,7 @@ describe('useRecommendations', () => {
     });
 
     await waitFor(() => expect(result.current.items).toEqual(all.slice(0, 4)));
-    // The first page, and ONE second page.
+    // 第一頁 + 一次第二頁
     expect(getRecommendations).toHaveBeenCalledTimes(2);
   });
 

@@ -1,14 +1,6 @@
 import type { Banner, HomeSection, Shortcut } from '../models/home-section';
 
-/**
- * The home page, top to bottom: 13 business blocks as 15 sections (官方優惠 is
- * three). Reordering or removing a block is an edit to this list and nothing
- * else. Sizes and gaps were measured on the live site at its 1220px layout.
- *
- * File order is display order, written out rather than sorted: the numbers
- * in the artwork's file names (e12, e22, e102 ...) are positions, and a plain
- * sort would put e102 before e12.
- */
+/** 首頁的版位資料。檔名裡的數字（e12、e22、e102…）是位置，所以檔案順序用寫的、不用排序（字串排序會把 e102 排在 e12 前面）。 */
 
 const ASSETS = 'assets/home';
 
@@ -22,8 +14,7 @@ function banners(
   return files.map((file, index) => ({
     id: `${folder}/${file}`,
     imageUrl: `${ASSETS}/${folder}/${file}`,
-    // The artwork has its text baked in and was not transcribed: the alt
-    // names the block and the position, not what the image says.
+    // 圖上的文字沒有逐張抄寫，alt 用「區塊名 + 序號」
     alt: captions[index] ?? `${label} ${index + 1}`,
     width,
     height,
@@ -60,9 +51,7 @@ const SHORTCUTS: Shortcut[] = [
   label,
 }));
 
-// The first six keywords are the ones in the target screenshot. The last
-// three tiles are cut off there, so their keywords were written to match
-// what each image shows.
+// 前 6 個關鍵字來自目標截圖；後 3 個截圖上被切掉，依圖片內容命名
 const SEARCH_SUGGESTIONS: Array<[file: string, keyword: string]> = [
   ['13341932_O_m.webp', '即期促銷品'],
   ['10029312_O_m.webp', '內褲 女'],
@@ -86,7 +75,6 @@ export const HOME_LAYOUT: HomeSection[] = [
     banners: banners('main-events', '主要活動', [466, 634], MAIN_EVENTS),
     aside: {
       title: '今日大牌',
-      // Only one of the four tiles of this panel was supplied.
       items: banners(
         'main-events/today-brand',
         '今日大牌',

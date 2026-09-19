@@ -8,14 +8,13 @@ import {
 } from 'react';
 
 export interface CarouselProps {
-  /** Names the carousel for assistive technology, e.g. "降價好貨". */
+  /** 給螢幕閱讀器念的名稱，例：「降價好貨」。 */
   label: string;
-  /** Every child becomes one slide. */
+  /** 每個 child 是一張 slide。 */
   children: ReactNode;
-  /** How many slides are visible at once. A fraction (8.5) lets the next
-      slide peek in, which is how the live site hints that there is more. */
+  /** 一次看得到幾張。小數（8.5）會讓下一張露出一部分，提示後面還有。 */
   perView?: number;
-  /** Space between slides, in px. */
+  /** slide 之間的間距（px）。 */
   gap?: number;
   loop?: boolean;
   arrows?: boolean;
@@ -56,11 +55,7 @@ function Chevron({ direction }: { direction: 'left' | 'right' }) {
   );
 }
 
-/**
- * The one place in the workspace that knows the carousel library (an ESLint
- * rule keeps it that way). Everything else sees slides, arrows and dots, so
- * replacing embla is a change to this file.
- */
+/** 輪播。整個 workspace 只有這個檔案認識 embla（由 ESLint 保證），要換套件只改這裡。 */
 export function Carousel({
   label,
   children,
@@ -73,7 +68,7 @@ export function Carousel({
   const [viewportRef, embla] = useEmblaCarousel({
     align: 'start',
     loop,
-    // An arrow moves by as many slides as fit, not by one.
+    // 一次翻一整頁，不是一張
     slidesToScroll: 'auto',
   });
   const [paging, setPaging] = useState(NOT_READY);
@@ -81,6 +76,7 @@ export function Carousel({
   useEffect(() => {
     if (!embla) return;
 
+    // 把 embla 的狀態（幾頁、目前第幾頁、能不能往前後翻）同步到 React state
     const sync = () =>
       setPaging({
         pageCount: embla.scrollSnapList().length,
@@ -90,7 +86,7 @@ export function Carousel({
       });
 
     sync();
-    // reInit: embla re-measures when the slides or the viewport change.
+    // reInit：slide 或容器尺寸改變時 embla 會重新量測
     embla.on('select', sync).on('reInit', sync);
     return () => {
       embla.off('select', sync).off('reInit', sync);
@@ -100,9 +96,7 @@ export function Carousel({
   const slides = Children.toArray(children);
 
   return (
-    // A group, not a region: a carousel sits inside a section that is already
-    // a named landmark, and a second landmark of the same name is noise for
-    // screen reader users (WAI-ARIA APG, carousel pattern).
+    // 用 group 不用 region：輪播外層的區塊已經是同名的 landmark
     <div
       role="group"
       aria-roledescription="carousel"
@@ -110,8 +104,7 @@ export function Carousel({
       className="relative"
     >
       <div ref={viewportRef} className="overflow-hidden">
-        {/* embla needs the gap inside the slides: a flex `gap` would throw
-            off the positions it calculates. */}
+        {/* embla 要求間距放在 slide 裡面；用 flex gap 會讓它算錯位置 */}
         <div className="flex touch-pan-y" style={{ marginLeft: -gap }}>
           {slides.map((slide, index) => (
             <div
@@ -154,8 +147,7 @@ export function Carousel({
       {dots && paging.pageCount > 1 && (
         <div className="mt-1 flex justify-center">
           {Array.from({ length: paging.pageCount }, (_, index) => (
-            // The dot is 4px tall, as on the live site. The padding makes
-            // the button around it a target that can actually be hit.
+            // 圓點只有 4px 高（同真站），靠按鈕的 padding 才點得到
             <button
               key={index}
               type="button"

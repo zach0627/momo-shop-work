@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import { SearchBox } from './search-box';
 
-// spec: app-layout / 搜尋框為展示用
+// 規格 app-layout：搜尋框為展示用
 describe('SearchBox', () => {
   it('accepts text', () => {
     render(<SearchBox />);
@@ -17,7 +17,7 @@ describe('SearchBox', () => {
     render(<SearchBox />);
     const form = screen.getByRole('search');
 
-    // fireEvent returns false when a handler called preventDefault().
+    // handler 呼叫了 preventDefault() 時，fireEvent 會回傳 false
     const notCancelled = fireEvent.submit(form);
 
     expect(notCancelled).toBe(false);

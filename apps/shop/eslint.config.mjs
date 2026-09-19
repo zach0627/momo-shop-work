@@ -4,6 +4,6 @@ import baseConfig, { restrictedImports } from '../../eslint.config.mjs';
 export default [
   ...nx.configs['flat/react'],
   ...baseConfig,
-  // The app is the composition root: the only project allowed to import the router.
+  // app 是唯一可以 import router 的專案
   restrictedImports(['react-router']),
 ];

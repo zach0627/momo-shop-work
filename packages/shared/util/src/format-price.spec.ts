@@ -10,8 +10,7 @@ describe('formatPrice', () => {
     expect(formatPrice(amount)).toBe(expected);
   });
 
-  // Prices are whole TWD. A fraction can only come from arithmetic (a
-  // discount rate), and must not leak into the page as "1,234.5".
+  // 價格是整數的新台幣；折扣運算產生的小數不能出現在畫面上
   it('rounds a fractional amount to a whole number', () => {
     expect(formatPrice(1234.5)).toBe('1,235');
   });

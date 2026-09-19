@@ -26,11 +26,7 @@ function PlainAnchor({ href, children, ...rest }: AppLinkProps) {
 
 const LinkContext = createContext<LinkComponent>(PlainAnchor);
 
-/**
- * Lets the app decide how links navigate. Libs only ever render `AppLink`;
- * the app injects its router's link once, at the composition root. Without
- * a provider (unit tests, static rendering) links are plain anchors.
- */
+/** 讓 app 決定連結怎麼導頁：packages 一律用 AppLink，app 注入 router 的 Link；沒有 provider 時是一般的 <a>。 */
 export function LinkProvider({
   component,
   children,

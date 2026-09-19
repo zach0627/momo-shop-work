@@ -15,10 +15,6 @@ export default defineConfig(() => ({
     host: 'localhost',
   },
   plugins: [react(), tailwindcss()],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [],
-  // },
   build: {
     outDir: './dist',
     emptyOutDir: true,

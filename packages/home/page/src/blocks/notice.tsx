@@ -3,7 +3,7 @@ import type { NoticeSection } from '@momo/home-data-access';
 import { BannerImage } from '../ui/banner-image';
 import { SectionFrame } from '../ui/section-frame';
 
-/** One full-width announcement, e.g. the invoice fraud warning. */
+/** 一條滿版公告，例：詐騙發票提醒。 */
 export function Notice({ section }: { section: NoticeSection }) {
   return (
     <SectionFrame label={section.banner.alt}>

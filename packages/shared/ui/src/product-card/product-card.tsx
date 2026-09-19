@@ -3,11 +3,7 @@ import type { ReactNode } from 'react';
 import { AppLink } from '../link/link';
 import { PriceTag, type PriceTagProps } from '../price-tag/price-tag';
 
-/**
- * The least a card needs to know about a product. A domain `Product` has all
- * of these fields, so it is passed as it is - and this package never imports
- * the package that owns the domain model.
- */
+/** 商品卡需要的最少欄位。domain 的 Product 可以直接傳入，shared/ui 不用 import data-access。 */
 export interface ProductCardItem {
   name: string;
   imageUrl: string;
@@ -15,9 +11,9 @@ export interface ProductCardItem {
   originalPrice?: number;
 }
 
-/** vertical: image on top. horizontal: a 140px image on the left. */
+/** vertical：圖在上；horizontal：140px 的圖在左。 */
 export type ProductCardLayout = 'vertical' | 'horizontal';
-/** outlined: border, 8px corners, a soft shadow. plain: 4px corners only. */
+/** outlined：框線 + 8px 圓角 + 淡陰影；plain：只有 4px 圓角。 */
 export type ProductCardFrame = 'outlined' | 'plain';
 
 const FRAMES: Record<ProductCardFrame, string> = {
@@ -27,15 +23,15 @@ const FRAMES: Record<ProductCardFrame, string> = {
 
 export interface ProductCardProps {
   item: ProductCardItem;
-  /** Built by the caller with `paths`; this package knows no routes. */
+  /** 由呼叫端用 paths 組好；這個 package 不認識路由。 */
   href: string;
   layout?: ProductCardLayout;
   frame?: ProductCardFrame;
-  /** How the price looks; what it says always comes from `item`. */
+  /** 價格的外觀；數字一律來自 item。 */
   priceTag?: Omit<PriceTagProps, 'price' | 'originalPrice'>;
-  /** One red line above the name, e.g. "滿1件折100". */
+  /** 名稱上方的一行紅字，例：「滿1件折100」。 */
   promoText?: ReactNode;
-  /** Rendered under the link, not inside it, so it may hold a button. */
+  /** 渲染在連結外面，所以可以放按鈕。 */
   footer?: ReactNode;
 }
 
@@ -58,8 +54,7 @@ export function ProductCard({
           isHorizontal ? 'flex gap-2.5 p-4' : 'block'
         }`}
       >
-        {/* alt="": the name follows inside the same link, and an alt text
-            would make a screen reader say it twice. */}
+        {/* alt=""：名稱就在同一個連結裡，寫 alt 會被念兩次 */}
         <img
           src={item.imageUrl}
           alt=""
@@ -74,8 +69,7 @@ export function ProductCard({
           className={isHorizontal ? 'flex min-w-0 flex-1 flex-col' : 'p-2.5'}
         >
           {isHorizontal ? (
-            // The line keeps its height when empty, so the names of
-            // neighbouring cards in a rail stay aligned.
+            // 沒有促銷文字也保留這一行的高度，同一列卡片的名稱才會對齊
             <p className="text-ec-sm text-sale line-clamp-1 h-4.5">
               {promoText}
             </p>
