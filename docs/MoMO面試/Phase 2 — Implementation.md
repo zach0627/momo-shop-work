@@ -614,6 +614,7 @@ First Commit 至最後 Commit
   - 限時搶購卡片逐段對齊：380.4 → 385.4（真站 386），列距 391 → 395.4（396）；「搶」改為貼齊卡片右下角的紅色標籤（82 × 29、左上圓角 13px）；「最後 N 組」改用量到的 10px 圓角。佔位卡片跟著改，載入前後 384.6 → 385.4。
   - 兩個 hover 從真站的樣式表讀：橫式卡框線 `#d1d5db`、限時搶購卡陰影加深。
   - 做不到的照舊留在 Known Gaps：「看更多」（真站這一區已換版型，量不到）、footer 的透明度（隱藏分頁裡沒有掛載）、標題圖與「mo店+」圖示（素材沒有）。
+- **OpenSpec 歸檔**：`build-storefront-pages` 的五個 delta spec（app-layout、home-page、goods-detail、product-catalog、product-recommendation，共 29 個 requirement、54 個 scenario）併入 `openspec/specs/` 成為主規格，逐條比對與原文相同；變更本身搬到 `openspec/changes/archive/2026-09-20-build-storefront-pages/`。README、`CLAUDE.md`、`architecture.md` 的連結改指新位置，78 個相對連結檢查過沒有斷的。`openspec validate --all --strict` 7 / 7 通過。原本的 15.4 是「做不到的清單」而不是待辦，改成說明文字，任務因此是 69 / 69。
 - 全部 10 個專案 `lint / test / typecheck`（無快取）、build、E2E 3 / 3、`format:check`、`verify:boundaries` 全綠。
 - **沒有驗到的**：hover 的實際樣子與這輪調整的畫面（預覽面板在背景，截圖是空白的；以 DOM 量測為準）。
 

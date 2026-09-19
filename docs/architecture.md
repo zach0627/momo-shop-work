@@ -3,7 +3,7 @@
 > 這份文件描述「系統現在長什麼樣、為什麼這樣切、規模變大時怎麼管」。
 > 設計有變動時**先改這份文件再改 code**。決策的來龍去脈在 [`adr/`](./adr)，設計過程的原始筆記在 [`MoMO面試/`](./MoMO面試)。
 >
-> 三者的分工：**本文件**說明結構；**ADR** 說明每個決策為什麼這樣選、代價是什麼；**OpenSpec** 說明系統**對外可觀察的行為** —— [`openspec/specs/`](../openspec/specs) 是已實作的現況，[`openspec/changes/build-storefront-pages/`](../openspec/changes/build-storefront-pages) 是待實作的部分，每條 requirement 都附可直接轉成測試的 scenario。判斷「實作對不對」時以 OpenSpec 為準。
+> 三者的分工：**本文件**說明結構；**ADR** 說明每個決策為什麼這樣選、代價是什麼；**OpenSpec** 說明系統**對外可觀察的行為** —— [`openspec/specs/`](../openspec/specs) 是已實作的現況，每條 requirement 都附可直接轉成測試的 scenario；建出這兩個頁面的那一次變更（設計決策、逐項的驗證紀錄）已歸檔在 [`openspec/changes/archive/2026-09-20-build-storefront-pages/`](../openspec/changes/archive/2026-09-20-build-storefront-pages)，之後的變更放在 `openspec/changes/`。判斷「實作對不對」時以 OpenSpec 為準。
 
 ## 1. 範圍
 

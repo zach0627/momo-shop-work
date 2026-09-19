@@ -2,7 +2,7 @@
 
 先讀 [`docs/architecture.md`](./docs/architecture.md)。這份檔案只列**不能違反的規則**與**怎麼驗證自己做對了**。
 
-**行為規格在 OpenSpec**：`openspec/changes/build-storefront-pages/`。實作任何功能前，先讀對應的 `specs/<capability>/spec.md`；每個 `#### Scenario` 就是一個應該存在的測試。完成 `tasks.md` 的任務後立刻把 `- [ ]` 改成 `- [x]`。改行為之前先改規格，並跑 `openspec validate build-storefront-pages --strict`。
+**行為規格在 OpenSpec**：`openspec/specs/<capability>/spec.md` 是系統現在必須滿足的行為；每個 `#### Scenario` 都有對應的測試。**改行為之前先改規格**：用 `openspec new change "<name>"` 開一個變更（delta spec、design、tasks），完成 `tasks.md` 的任務後立刻把 `- [ ]` 改成 `- [x]`，做完用 `/opsx:archive` 歸檔、併入主規格。每次都跑 `openspec validate --all --strict`。建出這兩個頁面的那一次變更已歸檔在 `openspec/changes/archive/2026-09-20-build-storefront-pages/`，設計決策與逐項的驗證紀錄在那裡。
 
 ## 不能違反的規則
 

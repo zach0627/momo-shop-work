@@ -18,7 +18,7 @@ Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情�
 
 三條路由都包在同一個 layout 裡：捲動後收合的頂部列、搜尋框、可展開的 40 個分類、footer。
 
-沒做的、和真站不一樣的，全部列在 [Known Gaps](#known-gaps)。計畫裡的加分項也都做了：區塊層級的 error boundary、載入中的佔位（skeleton）、Playwright smoke test、靜態部署。實作進度逐項記在 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md)：每一項都寫了怎麼驗證的、哪些沒驗到。
+沒做的、和真站不一樣的，全部列在 [Known Gaps](#known-gaps)。計畫裡的加分項也都做了：區塊層級的 error boundary、載入中的佔位（skeleton）、Playwright smoke test、靜態部署。實作進度逐項記在 [`tasks.md`](./openspec/changes/archive/2026-09-20-build-storefront-pages/tasks.md)：每一項都寫了怎麼驗證的、哪些沒驗到。
 
 ## 快速開始
 
@@ -41,18 +41,19 @@ pnpm nx graph                              # 看依賴圖
 
 ## 先看這幾份
 
-| 文件                                                                                    | 內容                                                                                                                                                                    |
-| --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`docs/architecture.md`](./docs/architecture.md)                                        | 系統怎麼切、為什麼這樣切、規模變大時怎麼管                                                                                                                              |
-| [`docs/adr/`](./docs/adr)                                                               | 8 個決策：背景、理由、**代價**、演進觸發條件                                                                                                                            |
-| [`docs/agent-workflow.md`](./docs/agent-workflow.md)                                    | Human ↔ Agent 怎麼協作；Human 糾正 Agent 12 次、Agent 出錯 33 件、偏離計畫 53 項的完整紀錄；**協作效率評估**                                                            |
-| [`docs/design-tokens.md`](./docs/design-tokens.md)                                      | 兩層 design token（Primitive / Semantic）；每個顏色、字級、框線的數值都是從真實網站的計算樣式**量出來的**，並記錄在哪裡量到、哪些沒量到                                 |
-| [`openspec/changes/build-storefront-pages/`](./openspec/changes/build-storefront-pages) | **行為規格**（OpenSpec，已全部實作）：5 個 capability，scenario 直接翻成測試；`design.md` 說明專案設置原因、每個設計決策與放棄的方案；`tasks.md` 是逐項的實作與驗證紀錄 |
-| [`openspec/specs/module-boundaries/`](./openspec/specs/module-boundaries)               | 工程約束的規格：依賴方向、框架耦合的單點放行、package 的公開入口、可重現的安裝。每一條「會被擋下」都放過違規樣本確認                                                    |
-| [`openspec/config.yaml`](./openspec/config.yaml)                                        | 專案脈絡（為什麼存在、為什麼這樣設置、不能破的規則）—— 會被帶進之後每一份規格的撰寫指示                                                                                 |
-| [`CLAUDE.md`](./CLAUDE.md)                                                              | 給 Agent 的規則：不能違反的設計規則，以及「做事的方式」—— 後者多數條目對應到一次實際發生的事故                                                                          |
-| [`docs/MoMO面試/`](./docs/MoMO面試)                                                     | 原始的需求解析、設計筆記與逐步計畫（含每一步的完成紀錄）                                                                                                                |
-| [`docs/pictures/`](./docs/pictures)                                                     | 目標畫面（真實網站）的截圖，依頁面由上到下編號                                                                                                                          |
+| 文件                                                                                                                          | 內容                                                                                                                                                                            |
+| ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`docs/architecture.md`](./docs/architecture.md)                                                                              | 系統怎麼切、為什麼這樣切、規模變大時怎麼管                                                                                                                                      |
+| [`docs/adr/`](./docs/adr)                                                                                                     | 8 個決策：背景、理由、**代價**、演進觸發條件                                                                                                                                    |
+| [`docs/agent-workflow.md`](./docs/agent-workflow.md)                                                                          | Human ↔ Agent 怎麼協作；Human 糾正 Agent 12 次、Agent 出錯 33 件、偏離計畫 53 項的完整紀錄；**協作效率評估**                                                                    |
+| [`docs/design-tokens.md`](./docs/design-tokens.md)                                                                            | 兩層 design token（Primitive / Semantic）；每個顏色、字級、框線的數值都是從真實網站的計算樣式**量出來的**，並記錄在哪裡量到、哪些沒量到                                         |
+| [`openspec/specs/`](./openspec/specs)                                                                                         | **行為規格**（OpenSpec 主規格，已全部實作）：app-layout、home-page、goods-detail、product-catalog、product-recommendation 五個能力，scenario 直接翻成測試；另有下一列的工程約束 |
+| [`openspec/changes/archive/2026-09-20-build-storefront-pages/`](./openspec/changes/archive/2026-09-20-build-storefront-pages) | 建出這兩個頁面的那一次變更（已歸檔）：`proposal.md` 為什麼做；`design.md` 專案設置原因、每個設計決策與放棄的方案；`tasks.md` 逐項的實作與驗證紀錄（含沒驗到的）                 |
+| [`openspec/specs/module-boundaries/`](./openspec/specs/module-boundaries)                                                     | 工程約束的規格：依賴方向、框架耦合的單點放行、package 的公開入口、可重現的安裝。每一條「會被擋下」都放過違規樣本確認                                                            |
+| [`openspec/config.yaml`](./openspec/config.yaml)                                                                              | 專案脈絡（為什麼存在、為什麼這樣設置、不能破的規則）—— 會被帶進之後每一份規格的撰寫指示                                                                                         |
+| [`CLAUDE.md`](./CLAUDE.md)                                                                                                    | 給 Agent 的規則：不能違反的設計規則，以及「做事的方式」—— 後者多數條目對應到一次實際發生的事故                                                                                  |
+| [`docs/MoMO面試/`](./docs/MoMO面試)                                                                                           | 原始的需求解析、設計筆記與逐步計畫（含每一步的完成紀錄）                                                                                                                        |
+| [`docs/pictures/`](./docs/pictures)                                                                                           | 目標畫面（真實網站）的截圖，依頁面由上到下編號                                                                                                                                  |
 
 ## 技術選型
 
@@ -136,17 +137,17 @@ app → layout / page → feature → ui / data-access → util
 
 **「綠燈」本身也要被驗證。** 這個專案裡，回報成功但其實什麼都沒檢查的情況出現過四次：lint 規則的 tags 寫壞而靜默失效、`@nx/dependency-checks` 在預設設定下什麼都不檢查、負向探針因為別的理由失敗卻被當成「被擋下」、CI 第一次執行時 `nx affected` 一個 task 都沒跑。所以：
 
-| 做法                                                                                                                                            | 在哪裡                                                                                     |
-| ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| 依賴規則除了 lint，另有一支工具確認「規則真的套用到每個專案、而且專案真的有它要的 target」，並有自我測試                                        | `pnpm verify:boundaries`（[`tools/verify-boundaries.mjs`](./tools/verify-boundaries.mjs)） |
-| 聲稱「會被工具擋下」的行為，都放過故意違規的樣本；探針的輸出必須出現那條規則的名稱才算數                                                        | [`module-boundaries` 規格](./openspec/specs/module-boundaries)、[`CLAUDE.md`](./CLAUDE.md) |
-| 產生的資料可以檢查是否過期；版位資料指到的每一張圖都要存在                                                                                      | `pnpm verify:fixtures`、`apps/shop` 的 `home-assets.spec`                                  |
-| 安裝要可重現：在沒有 `node_modules` 的乾淨複本與 CI 上跑 `--frozen-lockfile`                                                                    | [CI](./.github/workflows/ci.yml)                                                           |
-| TDD 的紅燈要因為正確的理由而紅；只斷言「不存在」的測試要同時斷言一個「存在」；一寫就綠的測試用變異測試補驗                                      | [`agent-workflow.md`](./docs/agent-workflow.md) §4                                         |
-| main 的 CI 跑全部專案，PR 才跑 affected：main 的綠燈要代表整個 repo 是好的                                                                      | [CI](./.github/workflows/ci.yml)                                                           |
-| 用真的瀏覽器對 **build 出來的產物**走一次主要路徑；部署前對「要部署的那一份」再走一次                                                           | `pnpm nx e2e shop`、[CI](./.github/workflows/ci.yml) 的 `deploy` job                       |
-| 會改變 build 產物的環境變數要是快取 key 的一部分（`BASE_PATH`）。少了它，Nx 會把根路徑版的產物還原給子路徑的 build —— 部署前在本機跑 e2e 才抓到 | [`nx.json`](./nx.json) 的 `sharedGlobals`                                                  |
-| 沒驗到的照實寫，之後補驗到再回頭更新                                                                                                            | [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 各項的「沒有驗到的」      |
+| 做法                                                                                                                                            | 在哪裡                                                                                                   |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| 依賴規則除了 lint，另有一支工具確認「規則真的套用到每個專案、而且專案真的有它要的 target」，並有自我測試                                        | `pnpm verify:boundaries`（[`tools/verify-boundaries.mjs`](./tools/verify-boundaries.mjs)）               |
+| 聲稱「會被工具擋下」的行為，都放過故意違規的樣本；探針的輸出必須出現那條規則的名稱才算數                                                        | [`module-boundaries` 規格](./openspec/specs/module-boundaries)、[`CLAUDE.md`](./CLAUDE.md)               |
+| 產生的資料可以檢查是否過期；版位資料指到的每一張圖都要存在                                                                                      | `pnpm verify:fixtures`、`apps/shop` 的 `home-assets.spec`                                                |
+| 安裝要可重現：在沒有 `node_modules` 的乾淨複本與 CI 上跑 `--frozen-lockfile`                                                                    | [CI](./.github/workflows/ci.yml)                                                                         |
+| TDD 的紅燈要因為正確的理由而紅；只斷言「不存在」的測試要同時斷言一個「存在」；一寫就綠的測試用變異測試補驗                                      | [`agent-workflow.md`](./docs/agent-workflow.md) §4                                                       |
+| main 的 CI 跑全部專案，PR 才跑 affected：main 的綠燈要代表整個 repo 是好的                                                                      | [CI](./.github/workflows/ci.yml)                                                                         |
+| 用真的瀏覽器對 **build 出來的產物**走一次主要路徑；部署前對「要部署的那一份」再走一次                                                           | `pnpm nx e2e shop`、[CI](./.github/workflows/ci.yml) 的 `deploy` job                                     |
+| 會改變 build 產物的環境變數要是快取 key 的一部分（`BASE_PATH`）。少了它，Nx 會把根路徑版的產物還原給子路徑的 build —— 部署前在本機跑 e2e 才抓到 | [`nx.json`](./nx.json) 的 `sharedGlobals`                                                                |
+| 沒驗到的照實寫，之後補驗到再回頭更新                                                                                                            | [`tasks.md`](./openspec/changes/archive/2026-09-20-build-storefront-pages/tasks.md) 各項的「沒有驗到的」 |
 
 **執行期的可觀測性**只做到接縫，沒有接真的後端：
 
