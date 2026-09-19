@@ -37,7 +37,7 @@ export const SECTION_REGISTRY: SectionRegistry = {
 
   // ── 有自己邏輯的區塊：各自是獨立的 feature package，這裡只轉交標題 ──
 
-  // 限時搶購 → home/feature-flash-sale（佔位中）
+  // 限時搶購（倒數 + 每頁 2×5 件）→ home/feature-flash-sale
   'flash-sale': ({ section }) => (
     <FlashSale lead={section.title.lead} title={section.title.text} />
   ),

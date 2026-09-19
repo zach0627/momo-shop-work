@@ -200,7 +200,7 @@ export const HOME_LAYOUT: HomeSection[] = [
       SEARCH_SUGGESTIONS.map(([, keyword]) => keyword),
     ),
   },
-  // 12. 限時搶購：只給標題，內容由 home/feature-flash-sale 負責（佔位中）
+  // 12. 限時搶購：只給標題，倒數與商品由 home/feature-flash-sale 負責
   { id: 'flash-sale', type: 'flash-sale', title: { text: '限時搶購' } },
   // 13. 今日暢銷榜：只給標題，內容由 home/feature-ranking 負責（佔位中）
   { id: 'best-sellers', type: 'ranking', title: { text: '今日暢銷榜' } },

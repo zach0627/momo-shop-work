@@ -404,9 +404,15 @@ importers:
 
   packages/home/feature-flash-sale:
     dependencies:
+      '@momo/catalog-data-access':
+        specifier: workspace:*
+        version: link:../../catalog/data-access
       '@momo/shared-ui':
         specifier: workspace:*
         version: link:../../shared/ui
+      '@momo/shared-util':
+        specifier: workspace:*
+        version: link:../../shared/util
       react:
         specifier: 'catalog:'
         version: 19.3.0
