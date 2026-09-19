@@ -58,10 +58,10 @@
 
 ## 7. 共用元件（Step 7）
 
-- [ ] 7.1 TDD：`formatPrice`（`49900 → "49,900"`、`0`）；驗證：spec 通過
-- [ ] 7.2 TDD：`PriceTag` —— 有原價才顯示劃線價；驗證：兩個情境的 spec 通過（spec `home-page`「商品卡顯示售價與原價」）
-- [ ] 7.3 TDD：`ProductCard`（`ProductCardItem` 最小形狀、連到 `paths.goods(id)`、slots）；驗證：spec 通過，且 `shared/ui` 內沒有任何 data-access 的 import（spec `module-boundaries`「共用 ui 不認識 domain 資料型別」）
-- [ ] 7.4 安裝 `embla-carousel-react`，實作 `Carousel`（prev / next / dots / `perView`）與 `SectionHeader`；驗證：`nx lint shared-ui` 通過、其他 package import embla 時被擋
+- [x] 7.1 TDD：`formatPrice`（`49900 → "49,900"`、`0`；locale 固定、小數四捨五入、`$` 由呼叫端決定）；驗證：先對 `String(amount)` 紅燈（3 個需要千分位或進位的情境失敗），實作後 `nx test shared-util` 11 個通過
+- [x] 7.2 TDD：`PriceTag` —— 有原價才顯示劃線價，且原價必須高於售價；`tone`（price / brand）、`size`（sm 19px / md 21px）、`stacked`；劃線價是 `<del>`，前面有視覺隱藏的「原價」；`shared/ui` 宣告對 `@momo/shared-util` 的 workspace 依賴；驗證：先對空元件紅燈，兩個對空元件空洞通過的情境補上斷言後也紅燈；5 個 spec 通過（spec `home-page`「商品卡顯示售價與原價」）
+- [x] 7.3 TDD：`ProductCard`（`ProductCardItem` 最小形狀；`href` 由呼叫端用 `paths.goods(id)` 組好傳入；`layout` 直式 / 橫式、`frame`、`priceTag`；slots：`promoText`、`footer`）；**沒做 `topBadge` 與 `priceLabel`**（沒有使用者，見 `design.md` 第 10 點）；驗證：先 10 / 10 紅燈，實作後通過；其中一個 spec 把帶有多餘欄位的 domain 物件直接傳入，由 `typecheck` 把關；`shared/ui` 內沒有任何 data-access 的 import（spec `module-boundaries`「共用 ui 不認識 domain 資料型別」）
+- [x] 7.4 安裝 `embla-carousel-react`（版本寫在 `pnpm-workspace.yaml` 的 catalog，`shared/ui` 以 `catalog:` 宣告），實作 `Carousel`（prev / next / dots / `perView` / `gap` / `loop`）與 `SectionHeader`（`lead` + `title` + `icon`）；輪播的箭頭與圓點的尺寸、顏色到真站量測後加為 token；驗證：包裝邏輯對假的 embla API 11 個 spec、真的 embla 在 jsdom 掛載 2 個 spec；`nx lint shared-ui` 通過；探針：`home-page` import embla → 被 `no-restricted-imports` 擋下（輸出含規則名稱與自訂訊息）；瀏覽器實測：26 件商品 4 頁，下一頁 / 圓點 / 上一頁都正確換頁，到最後一頁時「下一頁」停用，點商品卡為同文件導頁到 `/goods/:id`
 
 ## 8. 首頁（Step 8）
 

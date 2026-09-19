@@ -183,7 +183,7 @@ momo-shop-work/
 │  └─ src/
 │     ├─ styles/theme.css                  @theme design tokens（品牌粉、價格紅、容器寬、圓角）
 │     ├─ link/            LinkProvider + AppLink（預設 <a>）      使用者：ProductCard / layout / home blocks
-│     ├─ product-card/    ProductCardItem 型別 + 基底卡片 + slots（topBadge / promoText / footer / priceLabel）
+│     ├─ product-card/    ProductCardItem 型別 + 基底卡片（直式 / 橫式）+ slots（promoText / footer）—— Step 7 修訂：原規劃的 topBadge、priceLabel 沒有使用者，沒做；限時搶購需要時再加
 │     │                                                           使用者：home product-rail / flash-sale / ranking / recommendation
 │     ├─ price-tag/       售價 + 劃線原價                          使用者：ProductCard / goods-info
 │     ├─ carousel/        ★ 唯一 import embla（prev / next / dots / perView）

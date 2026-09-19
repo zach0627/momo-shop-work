@@ -2,7 +2,7 @@
 
 Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情頁。全程使用 Mock Data，不呼叫任何真實 API。
 
-> **狀態：進行中。** 目前完成 workspace、10 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）。首頁的業務區塊與商品詳情頁的內容尚未實作。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
+> **狀態：進行中。** 目前完成 workspace、10 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）、共用元件（`PriceTag`、兩種版型的 `ProductCard`、`Carousel`、`SectionHeader`）。首頁的業務區塊與商品詳情頁的內容尚未實作。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
 
 ## 先看這幾份
 
@@ -65,6 +65,8 @@ app → layout / page → feature → ui / data-access → util
 | Repository + Context 而非 MSW                         | 接縫在 TypeScript interface 上；測試可注入小的 fake                                     | 不驗證 HTTP 細節（[ADR-0005](./docs/adr/0005-repository-seam-with-context-injection.md)）                                                                       |
 | 整個 layout 放 package，而非 `apps/shop/src/layouts`  | app 只有接線；路由層級的組合（page、layout）都受 lint 約束                              | 多一條自訂的型別規則，而且和 Nx 官方範例的放法不同（[ADR-0007](./docs/adr/0007-layout-as-a-lib-and-a-tier.md)）                                                 |
 | 每個 package 宣告自己的依賴，版本用 pnpm catalog 統一 | package 不靠根目錄偷渡依賴；整個 workspace 只有一份 React；少宣告、多宣告都由 lint 擋下 | 檢查工具只看得到明寫的 import，只寫 JSX 的 package 要單點放行；而且它在設定不對時會靜默地不檢查，得另外驗證（[ADR-0008](./docs/adr/0008-packages-not-libs.md)） |
+| 共用元件的選項跟著第一個使用者出現，不預留            | `ProductCard` 的每個 prop 都說得出誰在用；計畫裡的 `topBadge` 因為查無使用者而沒做      | 限時搶購需要的三個選項（「限搶價」標籤、浮起的外框、紅色 23px 價格）要等做到它時再回頭改 `shared/ui`（`design.md` 第 10 點）                                    |
+| 輪播的換頁邏輯對假的 embla API 測試                   | jsdom 不做排版也測得到包裝邏輯；另有一個 spec 用真的 embla 掛載，套件升級改名時會被發現 | 「真的會捲動」沒有自動化測試，只在瀏覽器手動驗證過                                                                                                              |
 | TDD 只打有邏輯的地方                                  | 測試數量少、每個都有意義                                                                | 純版面區塊沒有單元測試保護                                                                                                                                      |
 
 ## Known Gaps

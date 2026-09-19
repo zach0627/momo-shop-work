@@ -42,7 +42,7 @@ First Commit 至最後 Commit
 | ✅ | 4 ★ | Walking skeleton：兩條路由走得通（+ 兩層 design token） | `feat(shop): walking skeleton with routing and shell` | paths、AppLink | ✗ |
 | ✅ | 5 ★ | **Layout**：TopBar(fixed→compact) + Header + 分類展開 + Footer（原 Step 7，提前） | 依內容拆分 | 分類展開、搜尋框、compact | ✗ |
 | ✅ | 6 | 素材 + fixtures + catalog/data-access | `feat(catalog): mock repository, fixtures and query hooks` | #3 | ✗ |
-| ⬜ | 7 | shared util / ui | `feat(shared): price formatting and core ui components` | #1 #2 | ✗ |
+| ✅ | 7 | shared util / ui | `feat(shared): price formatting and core ui components` | #1 #2 | ✗ |
 | ⬜ | 8 ★ | 首頁 config-driven + 6 blocks | `feat(home): config-driven section renderer and blocks` | #5 | ✗ |
 | ⬜ | 9 | 你可能會喜歡：3 列 + 看更多 | `feat(recommendation): paginated grid with load more` | #4 | ✗ |
 | ⬜ | 10 ★ | 商品詳情頁（純展示） | `feat(goods): display-only goods detail page` | #8 | ✗ |
@@ -189,7 +189,7 @@ First Commit 至最後 Commit
 **Commit**：`feat(catalog): mock repository, generated fixtures and query hooks`
   - ↳ 實際拆成 6 個 commit（素材 → models 與 fixtures → repository → hooks 與測試入口 → app 與 layout 接上 → 文件），每個單獨為綠。
 
-### Step 7 — Shared util / ui
+### Step 7 — Shared util / ui ✅
 
 > **對照真站得到的事實（2026-09-19，桌機版 DOM）**，`ProductCard` 要照這個做：
 > - 商品卡有**兩種版型**：直式（圖在上）—— 降價好貨 131×238、圖 128×128；限時搶購 230×386、圖 208×208。橫式（圖在左）—— momo 店取與今日暢銷榜都是 335×174、圖 140×140。
@@ -198,16 +198,32 @@ First Commit 至最後 Commit
 > - 區塊標題在真站上是一張 1220×70 的圖，素材裡沒有 → `SectionHeader` 用文字，字級是估計值。
 
 **目標**：通過 Rule of Two 的共用元件，全部不認識 domain model。
-- [ ] 安裝 `embla-carousel-react`。
-- [ ] **TDD #1**：`formatPrice`（`49900 → "49,900"`、`0`）。
-- [ ] **TDD #2**：`PriceTag`（售價；有 `originalPrice` 才出現劃線價）。
-- [ ] **TDD #2**：`ProductCard`（`ProductCardItem` 最小形狀；名稱 / 圖 / 價格；`href` 落在連結上；slots：`topBadge` `promoText` `footer` `priceLabel`）。
-- [ ] `Carousel`（embla 包裝：prev / next / dots / `perView`）、`SectionHeader`。
-- [ ] `index.ts` 只匯出上述公開 API。
+- [x] 安裝 `embla-carousel-react`。
+  - ↳ 8.6.0（支援 React 19）。版本寫在 `pnpm-workspace.yaml` 的 catalog，`shared/ui` 以 `catalog:` 宣告。**分兩次安裝**：`@nx/dependency-checks` 會擋「宣告了卻沒用到」的依賴，所以 embla 和 `Carousel` 在同一個 commit 才加進來，每個 commit 才能單獨為綠。
+- [x] **TDD #1**：`formatPrice`（`49900 → "49,900"`、`0`）。
+  - ↳ locale 固定為 `en-US`（千分位不跟著機器走）、小數四捨五入；`$` 不在裡面 —— 它放哪、多大是設計決定（真站的 `$` 是 13px，數字是 21px）。紅燈：對 `String(amount)`，3 個需要千分位或進位的情境失敗；`999` 與 `0` 本來就不需要千分位，通過是對的。
+- [x] **TDD #2**：`PriceTag`（售價；有 `originalPrice` 才出現劃線價）。
+  - ↳ 多了 `tone`（`price` / `brand`）、`size`（sm 19px / md 21px）、`stacked`（原價放下面：降價好貨；放旁邊：橫式商品卡、推薦區）—— 都是從真站量到的。
+  - ↳ 劃線價是 `<del>`，前面有視覺隱藏的「原價」（多數螢幕閱讀器不會念出 `<del>`）。**原價必須高於售價才顯示**：domain 有這個保證，但 `shared/ui` 不認識 domain，而「比售價低的劃線價」會被讀成漲價。
+  - ↳ 真站的劃線原價依區塊用了三種幾乎一樣的灰（`#999` / `#9ca3af` / `#b3b3b3`）；這裡一個角色一個 token（`ink-muted`）。
+  - ↳ `shared/ui` 因此宣告對 `@momo/shared-util` 的 workspace 依賴（→ `pnpm install` → `nx sync`，lockfile 的 importer 已確認）。
+- [x] **TDD #2**：`ProductCard`（`ProductCardItem` 最小形狀；名稱 / 圖 / 價格；`href` 落在連結上；slots：`promoText` `footer`）。
+  - ↳ **Step 7 修訂：沒做 `topBadge` 與 `priceLabel`。** `topBadge` 原本唯一的使用者是名次徽章，而它不存在；動工前重看截圖，限時搶購的「搶」在卡片底部那一列、不在圖上。`priceLabel`（「限搶價」）、浮起的外框、紅色 23px 價格只屬於限時搶購（Step 11，可砍），跟著它一起加。
+  - ↳ 多了三個**視覺**選項：`layout`（`vertical` / `horizontal`）、`frame`（`outlined` / `plain`）、`priceTag`（轉給 `PriceTag` 的外觀設定）。不是業務 variant —— 沒有 `variant="flash-sale"`。
+  - ↳ `href` 由呼叫端用 `paths.goods(id)` 組好傳入，`shared/ui` 不認識路由，`ProductCardItem` 也不需要 `id`。連結走 `AppLink`（有一個 spec 確認它用的是 app 注入的 link）。
+  - ↳ `footer` 渲染在連結**外面**（feature 可能放按鈕，按鈕放在連結裡是無效的 HTML）；圖的 `alt=""`（名稱就在同一個連結裡，寫 alt 會被念兩次）。
+  - ↳ 有一個 spec 把帶著多餘欄位的 domain 物件直接傳入，由 `typecheck` 把關「`Product` 不用轉換就能傳」。紅燈 10 / 10。
+- [x] `Carousel`（embla 包裝：prev / next / dots / `perView`）、`SectionHeader`。
+  - ↳ `Carousel`：另有 `label`（必填，無障礙名稱）、`gap`、`loop`；`perView` 可以是小數（真站的降價好貨約 8.45 張，最後一張露出一部分）；一次翻一整頁；無處可翻的箭頭停用；只有一頁時不顯示圓點；圓點 4px 高但按鈕有 padding，點得到。
+  - ↳ **箭頭與圓點到真站量過**，加為 token：`carousel-arrow`（黑 30%，hover 40%）、`carousel-dot`（`#ededed`），目前頁用 `brand`；尺寸記在 `design-tokens.md`。
+  - ↳ **測試分兩份**：jsdom 不做排版，真的 embla 永遠只有一頁，所以包裝邏輯對一個「會換頁的假 embla API」測（11 個）；另一份用真的 embla 只測掛載得起來（2 個）。後者第一次執行就抓到我的錯誤假設：我以為沒設 breakpoints 就不會碰 `matchMedia`，實際上 embla 無條件執行 `[].map(ownerWindow.matchMedia)`。
+  - ↳ `SectionHeader`：`<h2>`，`lead`（前半淺色：「降價」+「好貨」，念起來仍是一個標題）、`title`、`icon`。真站的標題是圖，字級仍是估計值。
+- [x] `index.ts` 只匯出上述公開 API。
 
 **驗證**：`pnpm nx test shared-ui shared-util`、`pnpm nx lint shared-ui`
 **Review 重點**：`shared/ui` 有沒有 import 任何 data-access（不該有）；`ProductCard` 的 props 是否夠用又不過度。
 **Commit**：`feat(shared): price formatting and core ui components`
+  - ↳ 實際拆成 5 個 commit（`formatPrice` → `PriceTag` → `ProductCard` → `Carousel` + `SectionHeader` → 文件）。
 
 ### Step 8 ★ — 首頁 config-driven
 
@@ -320,6 +336,7 @@ First Commit 至最後 Commit
 | — | **layout 該放哪：查證與定案（ADR-0007）**。Human 連續追問：放 `apps/shop/src/layouts` 會不會比較好？Nx 以往怎麼放？是不是該叫 `feature-shell`？查證 Nx 文件、`nrwl/react-template`、`nrwl/nx-examples` 與 feature-shell 模式後，比較三種放法，**維持 `libs/shop/layout`，不搬程式**。`architecture.md` §3 註明 `page` 與 `layout` 是我們在 Nx 四種 type 之上自訂的延伸；README 的取捨表新增這一項 | `c87daa7` |
 | — | **`libs/` → `packages/`，並照 package 的規矩調整（ADR-0008）**。Human 指出每個 lib 都有 `package.json`，應該叫 packages，而且「不能只是改名」。對照 pnpm、Nx、Turborepo 的慣例後找到三個改名解決不了的問題並修正：① 拿掉 package 內部的 `src/lib/`；② 設計 token 的樣式改由 `@momo/shared-ui` 的 `exports` 公開，app 不再以相對路徑伸進去；③ 執行期依賴下放到各 package、版本由 pnpm catalog 統一，以 `@nx/dependency-checks` 強制，`verify-boundaries` 確認這條規則真的在運作。保留依 domain 分組（`packages/<scope>/<name>`） | `1587fbb` `8e18bb0` `aab099c` `e494945` `748d08b` |
 | 6 | **素材 + Catalog 資料層**：`tools/import-assets.mjs`（202 張圖、ASCII slug、以雜湊對帳）；`tools/gen-fixtures.mjs`（122 件商品、決定性、`--check`）；models 與 `CatalogRepository` interface；`createMockCatalogRepository`（注入 `data` / `now` / `latencyMs`）；Context 注入、6 個 query hooks、`query-keys`；次要入口 `@momo/catalog-data-access/testing`；app 的 composition root 注入 mock；`shop/layout` 改讀 `useCategories`。catalog 26 個測試、layout 13 個 | `cb3b680` `c2814e6` `ebb3b5f` `ec89864` `4d511e6` `52b64a0` |
+| 7 | **共用元件**：`formatPrice`（shared/util）；`PriceTag`、`ProductCard`（直式 / 橫式、`outlined` / `plain`、slots `promoText` `footer`）、`Carousel`（embla 的唯一 import 點）、`SectionHeader`；輪播箭頭與圓點的 token。shared-util 11 個測試、shared-ui 33 個 | `f01a941` `3963523` `78d4130` `708324b`（+ 文件的 commit） |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -422,4 +439,15 @@ First Commit 至最後 Commit
 - **錯的三項**（都已修正）：① moPro 在真站上每張圖都連到商品頁 ——「用圖磚呈現」對，「不是商品」錯；素材沒有商品編號所以維持不可點，列入 Known Gaps。② **今日暢銷榜沒有名次徽章**，那是自己加的，還被寫成一條行為規格。③ 區塊標題量不到不是因為「在跨來源 iframe 裡」，而是它是一張 1220×70 的背景圖。
 - 新得知：商品卡有直式與橫式兩種版型（寫進 Step 7 開頭）；真站另有 3 個區塊與 2 個廣告 iframe 不在素材與截圖裡（列入 Known Gaps）。
 
-**下一步：Step 7 — Shared util / ui**（`formatPrice`、`PriceTag`、`ProductCard`、`Carousel`、`SectionHeader`）→ 對應 `tasks.md` 第 7 組。新的外部套件（`embla-carousel-react`）要先加進 `pnpm-workspace.yaml` 的 catalog，並宣告在 `shared/ui` 自己的 `package.json`。
+**Step 7 驗證結果**
+- 全部 11 個專案 `lint / test / typecheck`（無快取、循序）全綠；`nx build shop` 成功；`pnpm verify:boundaries`：11 個專案、12 條規則、**10 條依賴**（新增 `shared-ui → shared-util`）、0 違規；`pnpm verify:fixtures` 通過。
+- 探針：讓 `home-page` import `embla-carousel-react` → lint 失敗，輸出含規則名稱 `no-restricted-imports` 與自訂訊息（另外也被 `@nx/dependency-checks` 擋了一次）；探針檔已刪除。
+- 瀏覽器實測（1440×900，用一個**暫時的**探針頁渲染真的 fixtures，沒有 commit）：
+  - 降價好貨：26 件商品分 4 頁；下一頁 0–8 → 8–16；點第 4 顆圓點 → 17–25 且「下一頁」停用；上一頁 → 第 3 頁。
+  - 橫式商品卡高 174px，和真站相同；直式卡片 128×237（真站 130.7×238.3，差在探針頁的容器寬度）。
+  - 箭頭 32×56、黑 30%，停用時 opacity 0.25；推薦格狀版型價格 19px `#db2777`、劃線價 `#999` line-through；`footer` 在連結外。
+  - 點商品卡 → 同文件導頁到 `/goods/10019468`；console 沒有錯誤。
+- 紅燈階段發現 5 個「不顯示 X」的 spec 對空元件空洞通過（只斷言不存在）→ 全部補上「該有的東西存在」的斷言。補完當下沒有回頭重跑紅燈，寫這份紀錄時才發現，於是補做：把兩個元件暫時換回空實作重跑，`PriceTag` 5 / 5、`Carousel` 11 / 11 全紅，再用 git 還原。
+- **留給 Step 8 的事**：`home-page` 規格寫橫式商品卡「帶一行促銷文字」，但 `Product` 目前沒有 `promoText`（只有 `FlashSaleItem` 有）。`ProductCard` 的 `promoText` 是 slot，不受影響；Step 8 要決定促銷文字從哪來（建議：`Product` 加選填的 `promoText`，由 fixture 產生器填）。
+
+**下一步：Step 8 ★ — 首頁 config-driven**（`home/data-access` 的 `HomeSection` 與版位設定、`SectionRenderer`、6 個私有 blocks）→ 對應 `tasks.md` 第 8 組
