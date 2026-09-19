@@ -1,6 +1,9 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { createMemoryRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
+
+import { createMockCatalogRepository } from '@momo/catalog-data-access';
+import { formatPrice } from '@momo/shared-util';
 
 import { Providers } from './providers';
 import { routes } from './router';
@@ -13,12 +16,20 @@ function renderAt(path: string) {
       <RouterProvider router={router} />
     </Providers>,
   );
+  return router;
 }
 
 function expectLayout() {
   expect(screen.getByRole('banner')).toBeTruthy();
   expect(screen.getByRole('main')).toBeTruthy();
   expect(screen.getByRole('contentinfo')).toBeTruthy();
+}
+
+/** A product that really is in the catalog the app injects. */
+async function aRealProduct() {
+  const [product] =
+    await createMockCatalogRepository().getCollection('price-drop');
+  return product;
 }
 
 // spec: app-layout / 每個頁面都有共用外框
@@ -48,14 +59,55 @@ describe('routes', () => {
     expect(within(hero).queryAllByRole('link')).toHaveLength(0);
   });
 
-  it('passes the goods id from the URL to the goods detail page', async () => {
-    renderAt('/goods/15687497');
+  // spec: goods-detail / 與首頁卡片為同一件商品
+  it('leads from a home page card to a detail page with the same name and price', async () => {
+    const router = renderAt('/');
+    const rail = await screen.findByRole('region', { name: '降價好貨' });
+    const [card] = await within(rail).findAllByRole('link');
+    const name = within(card).getByRole('heading', { level: 3 }).textContent;
+    const href = card.getAttribute('href');
+    const product = await aRealProduct();
+    expect(name).toBe(product.name);
+
+    fireEvent.click(card);
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: '商品詳情' }),
+      await screen.findByRole('heading', { level: 1, name: product.name }),
     ).toBeTruthy();
-    expect(within(screen.getByRole('main')).getByText('15687497')).toBeTruthy();
+    expect(router.state.location.pathname).toBe(href);
+    expect(
+      within(screen.getByRole('main')).getByText(formatPrice(product.price)),
+    ).toBeTruthy();
     expectLayout();
+  });
+
+  it('passes the goods id from the URL to the goods detail page', async () => {
+    const product = await aRealProduct();
+
+    renderAt(`/goods/${product.id}`);
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: product.name }),
+    ).toBeTruthy();
+    expect(within(screen.getByRole('main')).getByText(product.id)).toBeTruthy();
+    expect(
+      screen.getAllByRole('button', { name: /購買|購物車|追蹤/ }),
+    ).toHaveLength(3);
+    expectLayout();
+  });
+
+  // spec: goods-detail / 開啟不存在的商品
+  it('keeps the layout and the way home when the goods id has no product', async () => {
+    renderAt('/goods/no-such-goods');
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: '找不到商品' }),
+    ).toBeTruthy();
+    expectLayout();
+    const logo = within(screen.getByRole('banner')).getByRole('link', {
+      name: /momo/,
+    });
+    expect(logo.getAttribute('href')).toBe('/');
   });
 
   it('shows a not-found page inside the layout for an unknown path', async () => {
@@ -69,8 +121,8 @@ describe('routes', () => {
 
   // spec: app-layout / Logo 連回首頁
   it('links the logo back to the home page', async () => {
-    renderAt('/goods/15687497');
-    await screen.findByRole('heading', { level: 1, name: '商品詳情' });
+    renderAt('/goods/no-such-goods');
+    await screen.findByRole('heading', { level: 1 });
 
     const logo = within(screen.getByRole('banner')).getByRole('link', {
       name: /momo/,
