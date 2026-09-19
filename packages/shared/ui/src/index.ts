@@ -10,3 +10,10 @@ export {
   type PriceTagProps,
   type PriceTone,
 } from './price-tag/price-tag';
+export {
+  ProductCard,
+  type ProductCardFrame,
+  type ProductCardItem,
+  type ProductCardLayout,
+  type ProductCardProps,
+} from './product-card/product-card';
