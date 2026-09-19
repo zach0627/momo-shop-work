@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 
+import { installCarouselTestEnvironment } from '../testing';
 import { Carousel } from './carousel';
 
 /**
@@ -8,41 +9,15 @@ import { Carousel } from './carousel';
  * method; this spec is what would notice.
  */
 
-// embla constructs both without checking that they exist; jsdom has neither.
-class ObserverStub {
-  observe() {
-    return undefined;
-  }
-  unobserve() {
-    return undefined;
-  }
-  disconnect() {
-    return undefined;
-  }
-}
-
 describe('Carousel with the real embla', () => {
-  // embla reaches matchMedia through the element's own window
-  // (ownerDocument.defaultView), which is not the object vi.stubGlobal
-  // writes to - and it needs the function even with no breakpoints set.
-  const ownerWindow = document.defaultView as Window;
+  let uninstall: () => void;
 
   beforeAll(() => {
-    vi.stubGlobal('ResizeObserver', ObserverStub);
-    vi.stubGlobal('IntersectionObserver', ObserverStub);
-    Object.defineProperty(ownerWindow, 'matchMedia', {
-      configurable: true,
-      value: () => ({
-        matches: false,
-        addEventListener: () => undefined,
-        removeEventListener: () => undefined,
-      }),
-    });
+    uninstall = installCarouselTestEnvironment();
   });
 
   afterAll(() => {
-    vi.unstubAllGlobals();
-    Reflect.deleteProperty(ownerWindow, 'matchMedia');
+    uninstall();
   });
 
   it('mounts, renders its slides and unmounts without throwing', () => {
