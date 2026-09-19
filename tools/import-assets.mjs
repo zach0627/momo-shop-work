@@ -136,7 +136,8 @@ for (const file of walk(source)) {
     }
     written.add(`${slug}/${out}`);
     mkdirSync(join(target, slug, 'card'), { recursive: true });
-    // 已經是夠小的 WebP 就原檔照搬：重新壓縮只會多損失一次畫質，檔案也不會變小
+    // 已經是 880px 以內的 WebP 就原檔照搬：重新壓縮會再小一些（實測 0–38%），但會多損失一次畫質；
+    // 詳情頁一次只載入一張，選畫質
     const { format, width, height } = await sharp(file).metadata();
     if (format === 'webp' && Math.max(width, height) <= DETAIL_MAX)
       copyFileSync(file, join(target, slug, out));

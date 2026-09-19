@@ -325,7 +325,7 @@ TDD 只打有邏輯的地方：純函式、repository、分頁與「看更多」
 
 **刻意不測**：純版面區塊（banner 類）、`use-compact-header`（jsdom 沒有 IntersectionObserver；E2E 目前也還沒涵蓋）。
 
-每個專案都有測試（10 個專案、173 個），所以沒有任何一個設 `passWithNoTests`：測試被誤刪時那個專案的 `test` 會失敗，而不是悄悄通過。新增的空 package 若暫時需要它，**加入第一個 spec 時就要拿掉**。
+每個專案都有測試（10 個專案、177 個），所以沒有任何一個設 `passWithNoTests`：測試被誤刪時那個專案的 `test` 會失敗，而不是悄悄通過。新增的空 package 若暫時需要它，**加入第一個 spec 時就要拿掉**。
 
 ## 9. 建置、快取與部署
 
@@ -335,6 +335,8 @@ Demo 站在 GitHub Pages：<https://zach0627.github.io/momo-shop-work/>。CI 的
 - **會改變產物的環境變數必須是 Nx 快取 key 的一部分。** `BASE_PATH` 列在 `nx.json` 的 `sharedGlobals`。少了它，Nx 會把另一種 base 的產物從快取還原回來，而且不會有任何警告 —— 部署前在本機對子路徑的 build 跑 E2E 才發現。之後新增任何會影響 build 的環境變數，都要加在這裡。
 - Pages 沒有 SPA fallback：`404.html` 是 `index.html` 的複本，直接開或重新整理深層網址時 router 會依網址渲染（HTTP 狀態碼仍是 404，這是這個做法的代價）。
 - `noindex`：它是真實品牌的仿作，公開但不該被搜尋引擎收錄。
+- **圖片在素材匯入時縮到顯示尺寸的兩倍 —— 為了 GitHub Pages 上的展示。** GitHub Pages 是單純的靜態主機，不會替我們縮圖，每個還沒被它的 CDN 快取的檔案約要 0.45 秒才開始傳；而素材是 momo 的原圖（最寬 1000px），商品卡只顯示 128–225px。所以 `tools/import-assets.mjs` 在複製素材時就替每件商品產生兩個 WebP：商品卡用的（這件商品出現過的最大卡片 × 2，同一件商品可能出現在好幾區）與詳情頁用的（最長 880px，詳情頁顯示 440px），一律不放大；猜你想搜縮到 372px。商品資料的 `imageUrl` 是卡片圖、`images` 是大圖。首頁 157 張圖 6,842 → 3,647 KB。這是 demo 的做法：正式環境應由圖片 CDN 依裝置提供多種尺寸（`srcset`、AVIF）。規格在 [`openspec/specs/image-delivery`](../openspec/specs/image-delivery)，設計與放棄的方案在 [`openspec/changes/archive/2026-09-20-optimize-demo-images/design.md`](../openspec/changes/archive/2026-09-20-optimize-demo-images/design.md)。
+- 檔名沒變、內容換了的圖（例：縮過的猜你想搜）：10 分鐘內造訪過的瀏覽器會先顯示快取的舊檔（`max-age=600`），之後自動更新。
 
 ## 10. 決策紀錄與演進方向
 

@@ -29,6 +29,8 @@
 - `@nx/dependency-checks` 回報「沒用到 react」而該 package 只寫 JSX 時，在**它自己的** eslint 設定加 `dependencyChecks(['react'])`，不要改根設定。改了這條規則的設定後一定要跑 `pnpm verify:boundaries` —— 它會靜默地什麼都不檢查。
 - 驗證關卡 `lint` 與 `typecheck` 都要跑：相對路徑的跨專案引用由 lint 擋，套件名稱加內部路徑的深層引用由型別檢查擋。
 - 新增 package 後確認 `pnpm-lock.yaml` 的 `importers` 有它的條目（`packages/<scope>/<name>: {}`）。pnpm 12 不會自動補，少了的話本機正常、但全新 clone 的 `pnpm install --frozen-lockfile` 會失敗。
+- **素材一律經過 `tools/import-assets.mjs`**：商品圖會產生商品卡用（`card/`，這件商品出現過的最大卡片 × 2）與詳情頁用（最長 880px）兩個 WebP，猜你想搜縮到 372px —— 為了 GitHub Pages 上的展示，它不會替我們縮圖。商品卡的顯示寬度改了，要同時改工具的 `PRODUCT_FOLDERS` 與 `apps/shop/src/app/image-sizes.spec.ts` 的 `CARD_WIDTHS`。
+- **含反斜線的程式（正規表示式）不要經過 shell 的 heredoc 或 `node -e` 字串寫進檔案**，用編輯工具：shell 會吃掉反斜線，而且不一定報錯（縮圖規則就這樣靜默失效過）。
 - `*.generated.ts` 不要手改：改 `tools/gen-fixtures.mjs` 後跑 `pnpm gen:fixtures`，提交前 `pnpm verify:fixtures` 要通過。新增素材一律經過 `tools/import-assets.mjs`（把對照加進去），不要手動複製 —— 它會在有檔案沒被交代時失敗。
 - 測試 UI 時用 `@momo/catalog-data-access/testing`、`@momo/home-data-access/testing` 的 fake repository 注入小而可控的資料，不要依賴真 fixture 的內容或筆數。
 - 任何會掛載 `Carousel` 的 spec（直接或透過頁面）都要先呼叫 `@momo/shared-ui/testing` 的 `installCarouselTestEnvironment()`：jsdom 沒有 embla 需要的 API。app 已經放在 `src/test-setup.ts`。

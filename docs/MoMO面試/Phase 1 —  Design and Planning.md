@@ -332,6 +332,13 @@ interface CatalogRepository {
 
 `logo→brand`｜`Footer→footer`｜`主要活動→home/main-events`（今日大牌→`today-brand`）｜`官方優惠→home/official-deals`｜`降價好貨→home/price-drop`｜`品牌折扣→home/brand-discount`｜`發票詐騙提醒→home/fraud-notice`｜`官方旗艦名店→home/flagship-stores`｜`momo店快取→home/store-pickup`｜`信用卡加碼優惠→home/card-offers`｜`猜你想搜→home/search-suggest`｜`限時搶購→home/flash-sale`｜`今日暢銷榜→home/best-sellers`｜`momopro…→home/mopro`｜`你可能會喜歡→home/recommendations`
 
+> **部署後的修訂 —— 只為了 GitHub Pages 上的展示**：demo 部署到 GitHub Pages 後，圖片要等很久才出現。原因是素材是 momo 的原圖（最寬 1000px），商品卡卻只顯示 128–225px，首頁 157 張圖合計 6.8 MB；GitHub Pages 是單純的靜態主機，不會替我們縮圖。所以「素材搬遷」這一步多做一件事：
+> - 商品圖產生兩個 WebP，一律不放大：商品卡用的（`<資料夾>/card/`，最長邊 = 這件商品出現過的最大卡片 × 2）與詳情頁用的（最長 880px，詳情頁顯示 440px）。
+> - 猜你想搜縮到 372px（顯示 186px）；原圖不再放進網站。
+> - 結果：首頁的圖 6,842 → 3,647 KB（商品圖少 76%），每張卡片圖仍是顯示寬度的 2–3 倍，不會糊。
+>
+> 這是**展示用**的優化，不是正式環境的做法：正式環境的圖片應由圖片 CDN 依裝置即時提供多種尺寸（`srcset`、AVIF）。規格見 `openspec/specs/image-delivery`，設計與取捨見 `openspec/changes/archive/2026-09-20-optimize-demo-images/design.md`。
+
 ### 8. 測試策略（TDD 只打有邏輯的地方）
 
 | # | 對象 | 驗證什麼 |
