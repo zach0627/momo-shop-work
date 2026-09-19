@@ -379,6 +379,9 @@ importers:
 
   packages/shared/ui:
     dependencies:
+      '@momo/shared-util':
+        specifier: workspace:*
+        version: link:../util
       react:
         specifier: 'catalog:'
         version: 19.3.0

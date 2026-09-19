@@ -21,6 +21,7 @@
     ]
   },
   "dependencies": {
+    "@momo/shared-util": "workspace:*",
     "react": "catalog:"
   }
 }
