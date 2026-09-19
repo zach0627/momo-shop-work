@@ -18,5 +18,9 @@
       "type:feature",
       "scope:catalog"
     ]
+  },
+  "dependencies": {
+    "@momo/shared-ui": "workspace:*",
+    "react": "catalog:"
   }
 }

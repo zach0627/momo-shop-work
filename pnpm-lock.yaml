@@ -363,7 +363,14 @@ importers:
         specifier: 'catalog:'
         version: 19.3.0
 
-  packages/catalog/feature-recommendation: {}
+  packages/catalog/feature-recommendation:
+    dependencies:
+      '@momo/shared-ui':
+        specifier: workspace:*
+        version: link:../../shared/ui
+      react:
+        specifier: 'catalog:'
+        version: 19.3.0
 
   packages/goods/page:
     dependencies:
@@ -380,9 +387,23 @@ importers:
         specifier: 'catalog:'
         version: 19.3.0
 
-  packages/home/feature-flash-sale: {}
+  packages/home/feature-flash-sale:
+    dependencies:
+      '@momo/shared-ui':
+        specifier: workspace:*
+        version: link:../../shared/ui
+      react:
+        specifier: 'catalog:'
+        version: 19.3.0
 
-  packages/home/feature-ranking: {}
+  packages/home/feature-ranking:
+    dependencies:
+      '@momo/shared-ui':
+        specifier: workspace:*
+        version: link:../../shared/ui
+      react:
+        specifier: 'catalog:'
+        version: 19.3.0
 
   packages/home/page:
     dependencies:
