@@ -44,7 +44,7 @@ First Commit 至最後 Commit
 | ✅ | 6 | 素材 + fixtures + catalog/data-access | `feat(catalog): mock repository, fixtures and query hooks` | #3 | ✗ |
 | ✅ | 7 | shared util / ui | `feat(shared): price formatting and core ui components` | #1 #2 | ✗ |
 | ✅ | 8 ★ | 首頁 config-driven + 6 blocks | `feat(home): config-driven section renderer and blocks` | #5 | ✗ |
-| ⬜ | 9 | 你可能會喜歡：3 列 + 看更多 | `feat(recommendation): paginated grid with load more` | #4 | ✗ |
+| ✅ | 9 | 你可能會喜歡：3 列 + 看更多 | `feat(recommendation): paginated grid with load more` | #4 | ✗ |
 | ⬜ | 10 ★ | 商品詳情頁（純展示） | `feat(goods): display-only goods detail page` | #8 | ✗ |
 | ⬜ | 11 | 限時搶購：倒數 + 2 列輪播 | `feat(flash-sale): countdown and two-row carousel` | #7 | ✓ |
 | ⬜ | 12 | 今日暢銷榜（橫式商品卡，沒有名次） | `feat(ranking): best sellers as horizontal cards` | — | ✓ |
@@ -264,20 +264,30 @@ First Commit 至最後 Commit
 **Commit**：`feat(home): config-driven section renderer and cms blocks`
   - ↳ 實際拆成 10 個 commit（商品的促銷文字 → `reportError` → home/data-access → app 注入與錯誤回報 → feature placeholders → `SectionRenderer` → layout 的容器 → 測試環境入口 → `Carousel` 的角色 → blocks 與 `HomePage`），外加文件。
 
-### Step 9 — 你可能會喜歡
+### Step 9 — 你可能會喜歡 ✅
 
 **目標**：3 列後出現「看更多」，點擊再載入 3 列，載完按鈕消失。
-- [ ] `model/page-size.ts`：`ROWS_PER_LOAD(3) × COLUMNS(5) = 15`。
-- [ ] **TDD #4**（注入 fake repo，例如 7 筆、每頁 3 筆）
-  - [ ] 初始只顯示第 1 頁
-  - [ ] 點「看更多」→ 數量增加
-  - [ ] 最後一頁載完 →「看更多」消失
-- [ ] `ui/recommendation-grid`、`ui/load-more-button`（私有）；`recommendation.tsx` 用 `useRecommendations`（`useInfiniteQuery`）。
-- [ ] `home/page` registry 換成真的元件。
+- [x] `model/page-size.ts`：`ROWS_PER_LOAD(3) × COLUMNS(5) = 15`。
+- [x] **TDD #4**（注入 fake repo，例如 7 筆、每頁 3 筆）
+  - [x] 初始只顯示第 1 頁
+  - [x] 點「看更多」→ 數量增加
+  - [x] 最後一頁載完 →「看更多」消失
+  - ↳ **用的是規格自己的數字**（55 / 10 / 恰好 15 件、每批 15），不是「7 筆、每頁 3 筆」：頁面大小是 feature 內部的常數，不為了測試開 prop。fake repository 照 `offset` / `limit` 切資料，規格的 scenario 一條對一條寫成測試。
+  - ↳ 10 個 spec，9 個先對 placeholder 紅燈；第 10 個（區塊以標題命名）placeholder 本來就滿足，是回歸保護。
+  - ↳ **「載入中重複點擊」的 spec 抓到資料層的 bug**：預期 repository 被呼叫 2 次，實際 4 次。Step 6 的 `useRecommendations` 靠 render 當下的 `isFetchingNextPage` 防重複，但連點發生在 React 重新 render 之前，closure 裡還是 `false`；而 `fetchNextPage` 預設會取消進行中的請求重來。改為 `fetchNextPage({ cancelRefetch: false })`，並在 hook 層級補 spec（修正前同樣紅燈）。單獨一個 commit。
+  - ↳ 多兩個規格以外的失敗情境：完全載不到 → 區塊不顯示；後面的批次失敗 → 已顯示的保留、按鈕保留（再按一次就是重試）。
+- [x] `ui/recommendation-grid`、`ui/load-more-button`（私有）；`recommendation.tsx` 用 `useRecommendations`（`useInfiniteQuery`）。
+  - ↳ 按鈕載入中顯示「載入中…」、用 `aria-disabled` 而不是 `disabled`：`disabled` 會讓鍵盤焦點消失，每載一批就要重新找位置。
+  - ↳ 新商品接在同一個以 id 為 key 的清單後面，已顯示的不移動、不重新掛載。
+  - ↳ 商品卡：`frame="plain"`、價格 19px。沒有星等、標籤、總銷量 —— 資料模型沒有這些欄位，列入 Known Gaps。
+  - ↳ 移除沒有使用者的 `ink-subtle` token（Step 7 的承諾）。
+- [x] `home/page` registry 換成真的元件。
+  - ↳ 不用換：Step 8 起 registry 就指向這個 package 的 placeholder，這一步只替換 package 的內容，首頁一行都沒改。
 
 **驗證**：`pnpm nx test catalog-feature-recommendation` + dev server：55 件 → 15 / 30 / 45 / 55
 **Review 重點**：`LoadMoreButton` 確實留在 feature 私有 `ui/`，沒有跑到 shared。
 **Commit**：`feat(recommendation): paginated product grid with load more`
+  - ↳ 實際是 2 個 commit（資料層的修正 → feature），外加文件。
 
 ### Step 10 ★ — 商品詳情頁（純展示）
 
@@ -359,6 +369,8 @@ First Commit 至最後 Commit
 | 6 | **素材 + Catalog 資料層**：`tools/import-assets.mjs`（202 張圖、ASCII slug、以雜湊對帳）；`tools/gen-fixtures.mjs`（122 件商品、決定性、`--check`）；models 與 `CatalogRepository` interface；`createMockCatalogRepository`（注入 `data` / `now` / `latencyMs`）；Context 注入、6 個 query hooks、`query-keys`；次要入口 `@momo/catalog-data-access/testing`；app 的 composition root 注入 mock；`shop/layout` 改讀 `useCategories`。catalog 26 個測試、layout 13 個 | `cb3b680` `c2814e6` `ebb3b5f` `ec89864` `4d511e6` `52b64a0` |
 | 7 | **共用元件**：`formatPrice`（shared/util）；`PriceTag`、`ProductCard`（直式 / 橫式、`outlined` / `plain`、slots `promoText` `footer`）、`Carousel`（embla 的唯一 import 點）、`SectionHeader`；輪播箭頭與圓點的 token。shared-util 11 個測試、shared-ui 33 個 | `f01a941` `3963523` `78d4130` `708324b`（+ 文件的 commit） |
 | 8 | **首頁 config-driven**：`Product.promoText`；`reportError`；`home/data-access`（`HomeSection` 9 種、15 筆版位設定、repository、hook、testing 入口）；app 注入 + `QueryCache` 統一回報 + 素材存在性的 spec；3 個 feature 的 placeholder；`SectionRenderer` + `SectionRegistry`；6 個 blocks；`HomePage` 的三種狀態；layout 不再決定頁面寬度；`Carousel` 改為 group；`@momo/shared-ui/testing` | `61e8d7d` `cbd9321` `62dcdbb` `b6d6dc0` `2197f33` `4130acd` `89d5e1d` `81fdf69` `50e31e2` `0bb5896`（+ 文件的 commit） |
+| 8+ | Human 要求的中文註解：`section-registry.tsx`（首頁 15 個區塊 → type 的對照表，每個項目說明是哪一塊）、`home-layout.ts`（每筆一行，應要求精簡） | `26c37c0` `3ab8ebf` |
+| 9 | **你可能會喜歡**：`Recommendation`（3 列 × 5、「看更多」、載完消失、失敗時的兩種行為）；私有的 `recommendation-grid`、`load-more-button`、`page-size`；修正 `useRecommendations` 的重複請求；移除 `ink-subtle`。feature 10 個測試、catalog-data-access 29 個 | `c82ec59` `d75e1b9`（+ 文件的 commit） |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -480,4 +492,10 @@ First Commit 至最後 Commit
 - **沒有完成的**：用眼睛逐段對照截圖。預覽面板在背景時截圖會錯位或逾時，版面與行為改由 DOM 讀取。需要 Human 在瀏覽器實際看一次。
 - 過程中的錯誤：(1) 搬測試環境補丁時加的 `name in target` 判斷讓補丁被跳過（jsdom 的 `matchMedia` 屬性存在但值是 undefined）；(2) 同名的巢狀 landmark，由整合測試抓到。
 
-**下一步：Step 9 — 你可能會喜歡**（`catalog/feature-recommendation`：3 列後「看更多」，TDD #4）→ 對應 `tasks.md` 第 9 組
+**Step 9 驗證結果**
+- 全部 11 個專案 `lint / test / typecheck`（無快取、循序）全綠；`nx build shop` 成功；`pnpm verify:boundaries`：**23 條依賴**（新增 `catalog-feature-recommendation → catalog-data-access`、`→ shared-util`）、0 違規；`pnpm verify:fixtures` 通過。
+- 瀏覽器（用 Human 自己開著的 dev server，沒有另外啟動）：55 件依序 15 → 30 → 45 → 55，**每次都連點兩下**；55 件沒有重複；前 15 件的位置始終不變；載完最後一批按鈕消失；載入中按鈕顯示「載入中…」且 `aria-disabled="true"`；5 欄、每格 224.8px（真站 224）；console 無錯誤。
+- `index.ts` 只匯出 `Recommendation`；`LoadMoreButton` 留在 feature 私有的 `ui/`。
+- **沒有實測的**：「看更多」按鈕的樣式。真站的這個區塊要捲動到才掛載，預覽面板在背景時捲動不會觸發，量不到；依截圖估計，已記在 `design-tokens.md` 的「沒有量到的」。
+
+**下一步：Step 10 ★ — 商品詳情頁（純展示）**（左圖、右 title + 說明、下方三顆**不綁行為**的按鈕；商品不存在 → not found）→ 對應 `tasks.md` 第 10 組

@@ -76,8 +76,9 @@
 
 ## 9. 你可能會喜歡（Step 9）
 
-- [ ] 9.1 TDD（注入 fake repository）：初始 1 頁 → 點「看更多」增加 → 全部載完按鈕消失；載入中重複點擊只載一批；驗證：spec 通過（spec `product-recommendation`）
-- [ ] 9.2 `ui/recommendation-grid`、`ui/load-more-button` 為 feature 私有，registry 換成真的元件；驗證：dev server 上 55 件依序顯示 15 / 30 / 45 / 55，且這兩個元件不在該 package 的 `index.ts`
+- [x] 9.1 TDD（注入 fake repository，用規格自己的數字）：55 件 → 顯示 15 件與按鈕；10 件、恰好 15 件 → 全部顯示且沒有按鈕；15 → 30 且前 15 件不動；45 → 55 後按鈕消失；載入中重複點擊只載一批；每件商品連到 `/goods/:id`；另有兩個規格以外的情境（後面的批次失敗 → 已顯示的保留、可再按一次重試；完全載不到 → 區塊不顯示）；驗證：10 個 spec 中 9 個先對 placeholder 紅燈（第 10 個「區塊以標題命名」placeholder 已滿足），實作後通過（spec `product-recommendation`）
+- [x] 9.1a 修正 `useRecommendations` 的 `loadMore`：原本靠 render 當下的 `isFetchingNextPage` 防重複，連點發生在 React 重新 render 之前，判斷是過期的；而 `fetchNextPage` 預設會取消進行中的請求重來 → 同一頁被要了三次。改為 `fetchNextPage({ cancelRefetch: false })`；驗證：由 9.1 的 spec 抓到（預期 2 次呼叫、實際 4 次），再於 hook 層級補 spec，修正前同樣紅燈
+- [x] 9.2 `ui/recommendation-grid`、`ui/load-more-button` 為 feature 私有；首頁的 registry 從 Step 8 起就指向這個 package，所以首頁不用改；按鈕載入中為 `aria-disabled`（不用 `disabled`，避免鍵盤焦點遺失）；移除沒有使用者的 `ink-subtle` token（Step 7 的承諾）；驗證：瀏覽器中 55 件依序顯示 15 / 30 / 45 / 55，每次都連點兩下，55 件無重複、前 15 件位置不變、最後按鈕消失；5 欄、每格 224.8px（真站 224）；`index.ts` 只匯出 `Recommendation`。**按鈕的樣式未實測**（真站的這個區塊要捲動才掛載，預覽面板在背景時不會發生），依截圖估計
 
 ## 10. 商品詳情頁（Step 10）
 

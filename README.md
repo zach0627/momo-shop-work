@@ -2,7 +2,7 @@
 
 Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情頁。全程使用 Mock Data，不呼叫任何真實 API。
 
-> **狀態：進行中。** 目前完成 workspace、10 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）、共用元件（`PriceTag`、兩種版型的 `ProductCard`、`Carousel`、`SectionHeader`）、**由版位資料驅動的首頁**（15 筆設定、6 種通用 block；商品卡可點進詳情頁）。限時搶購、今日暢銷榜、你可能會喜歡目前是佔位區塊，商品詳情頁的內容尚未實作。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
+> **狀態：進行中。** 目前完成 workspace、10 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）、共用元件（`PriceTag`、兩種版型的 `ProductCard`、`Carousel`、`SectionHeader`）、**由版位資料驅動的首頁**（15 筆設定、6 種通用 block；商品卡可點進詳情頁）。「你可能會喜歡」每次載入 3 列、載完後「看更多」消失。限時搶購與今日暢銷榜目前是佔位區塊，商品詳情頁的內容尚未實作。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
 
 ## 先看這幾份
 
@@ -85,6 +85,8 @@ app → layout / page → feature → ui / data-access → util
 | 猜你想搜 9 個關鍵字中有 3 個是自己寫的                                                                  | 目標截圖只看得到前 6 個；後 3 個依圖片內容命名（其中「哈利波特」後來發現真站也有）                             |
 | 降價好貨與品牌折扣之間的「訂閱 moPro+」橫幅、官方優惠的熱搜排行、官方優惠的黃色底沒有做                 | 素材裡沒有橫幅與熱搜的資料；黃色底是截圖當天的活動檔期樣式，實測當天真站是白底                                 |
 | 主要活動的圓點在圖的下方；真站疊在圖上                                                                  | `Carousel` 的圓點目前只有一種位置                                                                              |
+| 「你可能會喜歡」的商品卡沒有星等、評論數、標籤（速 / 折價券 / 登記）與總銷量                            | 商品資料模型沒有這些欄位；要做的話是 `Product` 加欄位、從商品卡的 `footer` slot 放進去，元件不用改             |
+| 「看更多」按鈕的尺寸與顏色是依截圖估的                                                                  | 真站的這個區塊要捲動才會掛載，量測時預覽面板在背景，沒有發生                                                   |
 | 主 header 右側的三張活動小圖沒有做                                                                      | 素材裡沒有這三張圖                                                                                             |
 
 ## 開發
