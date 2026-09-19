@@ -52,3 +52,6 @@ Thumbs.db
 .nx/migrate-runs
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
+
+# Vitest coverage 與 Playwright 的輸出
+test-output

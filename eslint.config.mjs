@@ -121,6 +121,7 @@ export function dependencyChecks(ignoredDependencies = []) {
             '{projectRoot}/eslint.config.{js,cjs,mjs}',
             '{projectRoot}/vite.config.{js,ts,mjs,mts}',
             '{projectRoot}/vitest.config.{js,ts,mjs,mts}',
+            '{projectRoot}/playwright.config.ts',
           ],
         },
       ],

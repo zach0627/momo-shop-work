@@ -6,7 +6,16 @@
     "name": "shop",
     "tags": [
       "type:app"
-    ]
+    ],
+    "targets": {
+      "e2e": {
+        "command": "playwright test",
+        "options": {
+          "cwd": "apps/shop"
+        },
+        "cache": false
+      }
+    }
   },
   "dependencies": {
     "@momo/catalog-data-access": "workspace:*",

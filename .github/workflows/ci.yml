@@ -46,6 +46,18 @@ jobs:
       - if: github.event_name == 'push'
         run: pnpm exec nx run-many -t lint test typecheck build
 
+      # 真的瀏覽器走一次主要路徑（首頁 → 商品卡 → 詳情頁、輪播換頁）。用 runner 內建的 Chrome，不另外下載
+      - if: github.event_name == 'push'
+        run: pnpm exec nx e2e shop
+
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: apps/shop/test-output/playwright
+          if-no-files-found: ignore
+          retention-days: 7
+
       # PR：只跑被改到的專案（和 PR 的 base 比）
       - if: github.event_name == 'pull_request'
         uses: nrwl/nx-set-shas@v4
