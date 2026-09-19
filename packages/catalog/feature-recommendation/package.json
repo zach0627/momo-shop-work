@@ -20,7 +20,9 @@
     ]
   },
   "dependencies": {
+    "@momo/catalog-data-access": "workspace:*",
     "@momo/shared-ui": "workspace:*",
+    "@momo/shared-util": "workspace:*",
     "react": "catalog:"
   }
 }

@@ -55,8 +55,6 @@
   --color-ink-label: var(--momo-gray-500);
   /* struck original price, goods code */
   --color-ink-muted: var(--momo-gray-450);
-  /* original price in the recommendation grid */
-  --color-ink-subtle: var(--momo-gray-400);
   /* "Home" in the breadcrumb */
   --color-breadcrumb-root: var(--momo-amber-700);
 
