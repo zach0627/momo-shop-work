@@ -24,8 +24,8 @@
 - [x] 4.1 `home-data-access`、`home-page`、`shared-ui`、`shop` 的 lint / test / typecheck 全綠
 - [x] 4.2 瀏覽器（1440 × 900）逐項量測，和真站一致（design 的表格）：官方優惠圖示 192.5、捷徑＋熱搜 136、三塊之間 0；整頁的 16px 間隔正好 4 個，位置正確；console 沒有錯誤。熱度的灰與熱搜的圓角刻意沿用既有 token（design §6）
 - [x] 4.3 完整關卡：10 個專案 lint / test / typecheck（184 個測試）、build、E2E 3 / 3、`format:check`、`verify:boundaries`（0 違規）、`verify:fixtures`、`openspec validate --all --strict` 全綠
-- [ ] 4.4 部署後在正式站量一次
+- [x] 4.4 部署後在正式站量（commit `f000372`，CI 的 verify 與 deploy 都成功）：和本機相同 —— 圖示輪播 192.5、捷徑＋熱搜 136、分隔線在 x = 610、熱搜一項 188.3 × 32（間距 6）、三塊之間 0、整頁 4 個 16px 間隔；熱搜沒有任何連結；這次載入沒有失敗的請求
 
 ## 5. 文件
 
-- [ ] 5.1 README Known Gaps（膠囊是素材差異；熱搜已做，內容固定、不可點）、`docs/design-tokens.md`、`docs/architecture.md` §6、`docs/agent-workflow.md`、Phase 2 筆記
+- [x] 5.1 README Known Gaps（膠囊是素材差異；熱搜已做，內容固定、不可點）、`docs/design-tokens.md`、`docs/architecture.md` §6、`docs/agent-workflow.md`、Phase 2 筆記
