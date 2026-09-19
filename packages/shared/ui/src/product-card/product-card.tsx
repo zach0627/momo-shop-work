@@ -24,6 +24,14 @@ export const PRODUCT_CARD_FRAMES: Record<ProductCardFrame, string> = {
   raised: 'rounded-card border border-line-soft shadow-card-raised p-2.5',
 };
 
+// 滑鼠移上去（真站實測）；佔位的 ProductCardSkeleton 不用這張表
+const FRAME_HOVER: Record<ProductCardFrame, string> = {
+  outlined: '',
+  bordered: 'transition-colors duration-200 hover:border-line-card-hover',
+  plain: '',
+  raised: 'transition-shadow duration-200 hover:shadow-card-hover',
+};
+
 export interface ProductCardProps {
   item: ProductCardItem;
   /** 由呼叫端用 paths 組好；這個 package 不認識路由。 */
@@ -53,7 +61,7 @@ export function ProductCard({
 
   return (
     <article
-      className={`${PRODUCT_CARD_FRAMES[frame]} bg-surface h-full overflow-hidden`}
+      className={`${PRODUCT_CARD_FRAMES[frame]} ${FRAME_HOVER[frame]} bg-surface h-full overflow-hidden`}
     >
       <AppLink
         href={href}
@@ -77,7 +85,7 @@ export function ProductCard({
             isHorizontal
               ? 'flex min-w-0 flex-1 flex-col'
               : isPadded
-                ? 'pt-2'
+                ? 'pt-1'
                 : 'p-2.5'
           }
         >
@@ -88,15 +96,20 @@ export function ProductCard({
             </p>
           ) : (
             promoText && (
-              <p className="text-ec-base text-sale line-clamp-1 font-bold">
+              <p className="text-ec-base text-sale mb-0.5 line-clamp-1 font-bold">
                 {promoText}
               </p>
             )
           )}
-          <h3 className="text-ec-base text-ink line-clamp-2 h-10">
+          {/* raised（限時搶購）的名稱行高 21px、兩行 42px，下方留 2px；其餘兩行 40px */}
+          <h3
+            className={`text-ec-base text-ink line-clamp-2 ${
+              isPadded ? 'mb-0.5 h-10.5 leading-5.25' : 'h-10'
+            }`}
+          >
             {item.name}
           </h3>
-          <div className={isHorizontal ? 'mt-6' : 'mt-1'}>
+          <div className={isHorizontal ? 'mt-6' : isPadded ? '' : 'mt-1'}>
             <PriceTag
               price={item.price}
               originalPrice={item.originalPrice}
@@ -106,7 +119,7 @@ export function ProductCard({
         </div>
       </AppLink>
       {footer && (
-        <div className={isPadded ? 'pt-1' : 'px-2.5 pb-2.5'}>{footer}</div>
+        <div className={isPadded ? 'pt-2' : 'px-2.5 pb-2.5'}>{footer}</div>
       )}
     </article>
   );

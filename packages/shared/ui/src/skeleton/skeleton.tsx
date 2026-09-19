@@ -50,21 +50,22 @@ export function ProductCardSkeleton({
       />
       <span
         className={`block ${
-          isHorizontal ? 'min-w-0 flex-1 pt-5.5' : isRaised ? 'pt-2' : 'p-2.5'
+          isHorizontal ? 'min-w-0 flex-1 pt-5.5' : isRaised ? 'pt-1' : 'p-2.5'
         }`}
       >
         {/* 限時搶購的卡片在名稱上面多一行促銷文字 */}
-        {isRaised && <span className={`${LINE} mb-1 h-4 w-1/2`} />}
+        {isRaised && <span className={`${LINE} mb-0.5 h-5 w-1/2`} />}
+        {/* 名稱兩行：限時搶購 42px，其餘 40px */}
         <span className={`${LINE} h-4 w-full`} />
-        <span className={`${LINE} mt-2 h-4 w-2/3`} />
+        <span className={`${LINE} h-4 w-2/3 ${isRaised ? 'mt-2.5' : 'mt-2'}`} />
         {/* 價格那一行：限時搶購的字比較大（23 / 28.75），其餘是 21 / 26 */}
         <span
-          className={`${LINE} w-1/2 ${isRaised ? 'h-7' : 'h-6.5'} ${isHorizontal ? 'mt-6' : 'mt-1'}`}
+          className={`${LINE} w-1/2 ${isRaised ? 'mt-0.5 h-7' : 'h-6.5'} ${isHorizontal ? 'mt-6' : isRaised ? '' : 'mt-1'}`}
         />
         {stacked && <span className={`${LINE} mt-1 h-3.5 w-1/3`} />}
       </span>
       {/* 限時搶購卡片底部的「最後 N 組」那一列 */}
-      {isRaised && <span className={`${LINE} mt-1 h-7 w-full`} />}
+      {isRaised && <span className={`${LINE} mt-2 h-7.75 w-full`} />}
     </span>
   );
 }

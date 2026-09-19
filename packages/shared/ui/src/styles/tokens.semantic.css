@@ -97,6 +97,8 @@
   --color-line: var(--momo-gray-200);
   /* 橫式商品卡（momo 店取、今日暢銷榜）框線 */
   --color-line-card: var(--momo-gray-250);
+  /* 同上，hover（真站的 class：hover:mu-border-gray-300） */
+  --color-line-card-hover: var(--momo-slate-300);
   /* 限時搶購商品卡框線 */
   --color-line-soft: var(--momo-gray-150);
   /* 頂部列的底線 */
@@ -174,6 +176,10 @@
   --radius-pill: 22px;
   /* 展開的分類面板下方兩角 */
   --radius-panel: 12px;
+  /* 限時搶購「最後 N 組」 */
+  --radius-chip: 10px;
+  /* 限時搶購「搶」標籤的左上角（右下角由卡片的圓角裁切） */
+  --radius-tab: 13px;
   /* 詳情頁的動作按鈕是直角（0px）：用 rounded-none */
 
   /* ---- 陰影 ---- */
@@ -182,6 +188,8 @@
   --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   /* 限時搶購商品卡 */
   --shadow-card-raised: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  /* 同上，hover */
+  --shadow-card-hover: 0 2px 8px 0 rgb(0 0 0 / 0.15);
   /* 展開的分類面板 */
   --shadow-panel: 0 2px 8px 0 rgb(0 0 0 / 0.08);
 
