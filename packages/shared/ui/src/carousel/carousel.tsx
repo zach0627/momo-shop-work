@@ -100,7 +100,11 @@ export function Carousel({
   const slides = Children.toArray(children);
 
   return (
-    <section
+    // A group, not a region: a carousel sits inside a section that is already
+    // a named landmark, and a second landmark of the same name is noise for
+    // screen reader users (WAI-ARIA APG, carousel pattern).
+    <div
+      role="group"
       aria-roledescription="carousel"
       aria-label={label}
       className="relative"
@@ -171,6 +175,6 @@ export function Carousel({
           ))}
         </div>
       )}
-    </section>
+    </div>
   );
 }

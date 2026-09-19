@@ -9,6 +9,12 @@ import { Carousel } from './carousel';
  * method; this spec is what would notice.
  */
 
+/** The carousel itself is a group too; slides are the groups inside it. */
+const getSlides = () =>
+  screen
+    .getAllByRole('group')
+    .filter((node) => node.getAttribute('aria-roledescription') === 'slide');
+
 describe('Carousel with the real embla', () => {
   let uninstall: () => void;
 
@@ -29,8 +35,8 @@ describe('Carousel with the real embla', () => {
       </Carousel>,
     );
 
-    expect(screen.getByRole('region', { name: '限時搶購' })).toBeTruthy();
-    expect(screen.getAllByRole('group')).toHaveLength(3);
+    expect(screen.getByRole('group', { name: '限時搶購' })).toBeTruthy();
+    expect(getSlides()).toHaveLength(3);
     expect(() => unmount()).not.toThrow();
   });
 

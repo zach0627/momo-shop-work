@@ -53,6 +53,12 @@ function createFakeEmbla(pageCount: number) {
   return api;
 }
 
+/** The carousel itself is a group too; slides are the groups inside it. */
+const getSlides = () =>
+  screen
+    .getAllByRole('group')
+    .filter((node) => node.getAttribute('aria-roledescription') === 'slide');
+
 function renderCarousel(
   pageCount: number,
   props: Partial<React.ComponentProps<typeof Carousel>> = {},
@@ -73,10 +79,10 @@ describe('Carousel', () => {
   it('is a labelled carousel whose children are its slides', () => {
     renderCarousel(1);
 
-    const region = screen.getByRole('region', { name: '降價好貨' });
+    const region = screen.getByRole('group', { name: '降價好貨' });
     expect(region.getAttribute('aria-roledescription')).toBe('carousel');
 
-    const slides = screen.getAllByRole('group');
+    const slides = getSlides();
     expect(slides.map((slide) => slide.getAttribute('aria-label'))).toEqual([
       '1 / 3',
       '2 / 3',
@@ -88,7 +94,7 @@ describe('Carousel', () => {
   it('sizes each slide to show `perView` of them at once', () => {
     renderCarousel(1, { perView: 4 });
 
-    const [slide] = screen.getAllByRole('group');
+    const [slide] = getSlides();
     expect(slide.style.flexBasis).toBe('25%');
   });
 
@@ -120,7 +126,7 @@ describe('Carousel', () => {
   it('hides the arrows on request', () => {
     renderCarousel(3, { arrows: false });
 
-    expect(screen.getAllByRole('group')).toHaveLength(3);
+    expect(getSlides()).toHaveLength(3);
     expect(screen.queryByRole('button', { name: '下一頁' })).toBeNull();
     expect(screen.queryByRole('button', { name: '上一頁' })).toBeNull();
   });
@@ -158,14 +164,14 @@ describe('Carousel', () => {
   it('shows no dots when everything fits on one page', () => {
     renderCarousel(1, { dots: true });
 
-    expect(screen.getAllByRole('group')).toHaveLength(3);
+    expect(getSlides()).toHaveLength(3);
     expect(screen.queryByRole('button', { name: /^第 \d 頁$/ })).toBeNull();
   });
 
   it('shows no dots unless asked to', () => {
     renderCarousel(3);
 
-    expect(screen.getAllByRole('group')).toHaveLength(3);
+    expect(getSlides()).toHaveLength(3);
     expect(screen.queryByRole('button', { name: /^第 \d 頁$/ })).toBeNull();
   });
 
