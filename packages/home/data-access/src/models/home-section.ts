@@ -28,6 +28,17 @@ export interface SectionTitle {
 interface SectionBase {
   /** 版位內唯一；也是 React 的 key。 */
   id: string;
+  /** 和下一個區塊之間留一條灰色間隔。真站只有少數區塊這樣，其餘緊貼。 */
+  gapAfter?: boolean;
+}
+
+/** 熱搜排行的一項；名次就是在清單裡的順序。 */
+export interface HotSearch {
+  keyword: string;
+  /** 熱度，單位「萬」。 */
+  heat: number;
+  rising?: boolean;
+  isNew?: boolean;
 }
 
 export interface HeroSection extends SectionBase {
@@ -59,6 +70,8 @@ export interface BannerGridSection extends SectionBase {
 export interface ShortcutBarSection extends SectionBase {
   type: 'shortcut-bar';
   items: Shortcut[];
+  /** 右欄的熱搜排行，依名次。 */
+  hotSearches?: HotSearch[];
 }
 
 export interface NoticeSection extends SectionBase {

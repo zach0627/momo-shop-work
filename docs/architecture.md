@@ -200,8 +200,15 @@ type Banner = {
   caption?: string;
 };
 type Shortcut = { id: string; iconUrl: string; label: string };
+type HotSearch = {
+  keyword: string;
+  heat: number;
+  rising?: boolean;
+  isNew?: boolean;
+}; // 名次就是陣列順序
 type SectionTitle = { lead?: string; text: string }; // lead：標題前半較淺的字（「降價」+「好貨」）
 
+// 每一種都另有選填的 gapAfter：和下一個區塊之間留 16px 的灰色間隔（預設緊貼）
 type HomeSection =
   | {
       id: string;
@@ -226,7 +233,12 @@ type HomeSection =
       columns: number;
       banners: Banner[];
     }
-  | { id: string; type: 'shortcut-bar'; items: Shortcut[] }
+  | {
+      id: string;
+      type: 'shortcut-bar';
+      items: Shortcut[];
+      hotSearches?: HotSearch[];
+    } // 右欄的熱搜排行
   | { id: string; type: 'notice'; banner: Banner }
   | {
       id: string;
@@ -257,6 +269,7 @@ HomePage            useHomeLayout() → 載入中 / 載入失敗 / <SectionRende
 - **錯誤回報集中在 app 的 QueryCache**：每個失敗的查詢由 `createQueryClient()` 回報一次、帶上 query key。頁面只負責顯示狀態，不會漏報也不會重複報。
 - **一個 block 撐起 5 個區塊**：官方優惠圖示、品牌折扣、信用卡加碼、猜你想搜、moPro 都是 `banner-carousel`，差別只在資料（一次幾張、間距、有沒有說明文字）。
 - **版面數值放在資料裡**（`perView`、`gap`、`columns`）：這是 config-driven 的代價之一 —— CMS 要懂一點版面。數值都是在真站 1220px 版面量到的，實作後再到瀏覽器對過一次（hero 327×445、圖示 148.5、品牌磚 218.8×365、信用卡 250×125、猜你想搜 186×234）。
+- **區塊之間的間隔也是資料**（`gapAfter`）：真站整頁只有詐騙提醒、momo 店取、信用卡加碼、限時搶購下方留 16px，其餘緊貼。同一種 block 有時有、有時沒有（momo 店取有、今日暢銷榜沒有），所以間隔不屬於元件，而是營運排版位時決定的。`SectionRenderer` 在標示的區塊後面放一個透出灰底的空元素；頁面本身不再替每個區塊留間隔。最初是每個區塊之間都留 16px，Human 對照真站截圖後才改（[OpenSpec 變更](../openspec/changes/archive/2026-09-20-match-official-deals/design.md)）。
 - 商品列拿到的是 collection key，商品由 catalog 提供，所以卡片與它連到的詳情頁不可能對不起來。商品列載入失敗時自己消失，不拖垮整頁；載入中先保留高度，下面的區塊不會跳動。
 
 13 個業務區塊對應 15 筆 section 設定（官方優惠拆成 3 筆），只需要 8 種 renderer。調整區塊順序、上下架區塊都只改資料（實際驗證：調換 `home-layout.ts` 的兩筆，畫面上兩個區塊跟著對調，沒有動任何元件）。對照表見 [設計筆記 §5](./MoMO面試/Phase%201%20—%20%20Design%20and%20Planning.md)。
@@ -325,7 +338,7 @@ TDD 只打有邏輯的地方：純函式、repository、分頁與「看更多」
 
 **刻意不測**：純版面區塊（banner 類）、`use-compact-header`（jsdom 沒有 IntersectionObserver；E2E 目前也還沒涵蓋）。
 
-每個專案都有測試（10 個專案、177 個），所以沒有任何一個設 `passWithNoTests`：測試被誤刪時那個專案的 `test` 會失敗，而不是悄悄通過。新增的空 package 若暫時需要它，**加入第一個 spec 時就要拿掉**。
+每個專案都有測試（10 個專案、184 個），所以沒有任何一個設 `passWithNoTests`：測試被誤刪時那個專案的 `test` 會失敗，而不是悄悄通過。新增的空 package 若暫時需要它，**加入第一個 spec 時就要拿掉**。
 
 ## 9. 建置、快取與部署
 

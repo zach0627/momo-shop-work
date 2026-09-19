@@ -1,4 +1,4 @@
-import { useEffect, type ComponentType } from 'react';
+import { Fragment, useEffect, type ComponentType } from 'react';
 
 import type { HomeSection } from '@momo/home-data-access';
 import { reportError } from '@momo/shared-util';
@@ -42,9 +42,15 @@ export function SectionRenderer({ sections, registry }: SectionRendererProps) {
           section: HomeSection;
         }>;
         return (
-          <SectionBoundary key={section.id} section={section}>
-            <Section section={section} />
-          </SectionBoundary>
+          <Fragment key={section.id}>
+            <SectionBoundary section={section}>
+              <Section section={section} />
+            </SectionBoundary>
+            {/* 真站只有少數區塊下方有 16px 的灰色間隔，其餘緊貼 */}
+            {section.gapAfter && (
+              <div aria-hidden="true" data-section-gap="" className="h-4" />
+            )}
+          </Fragment>
         );
       })}
     </>

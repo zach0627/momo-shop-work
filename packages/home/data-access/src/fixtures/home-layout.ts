@@ -1,4 +1,9 @@
-import type { Banner, HomeSection, Shortcut } from '../models/home-section';
+import type {
+  Banner,
+  HomeSection,
+  HotSearch,
+  Shortcut,
+} from '../models/home-section';
 
 /** 首頁的版位資料。檔名裡的數字（e12、e22、e102…）是位置，所以檔案順序用寫的、不用排序（字串排序會把 e102 排在 e12 前面）。 */
 
@@ -37,6 +42,19 @@ const MAIN_EVENTS = [
   'bt_7_701_01_e121.png',
   'bt_7_701_01_e141.jpg',
   'bt_7_701_01_e161.jpg',
+];
+
+// 熱搜排行：照目標截圖（名次、熱度、上升、新上榜）。第 5、8 名在截圖上被截斷，以真站當天的完整關鍵字補上
+const HOT_SEARCHES: HotSearch[] = [
+  { keyword: '中秋禮盒', heat: 1089 },
+  { keyword: 'on 昂跑', heat: 951 },
+  { keyword: '即享券', heat: 924 },
+  { keyword: '買一送一', heat: 916 },
+  { keyword: 'iphone 18 pro', heat: 908, rising: true },
+  { keyword: '即期品', heat: 894, rising: true },
+  { keyword: '電競筆電', heat: 892, isNew: true },
+  { keyword: 'longchamp', heat: 887, rising: true },
+  { keyword: 'ps5', heat: 883 },
 ];
 
 const SHORTCUTS: Shortcut[] = [
@@ -97,8 +115,13 @@ export const HOME_LAYOUT: HomeSection[] = [
       e('bt_7_708_01', [1, 2, 4, 5, 10, 11, 13, 14, 15], '2'),
     ),
   },
-  // 3. 官方優惠：圓形捷徑（秒殺、簽到、分次配、領券、看更多）
-  { id: 'official-deals-shortcuts', type: 'shortcut-bar', items: SHORTCUTS },
+  // 3. 官方優惠：左邊圓形捷徑（秒殺、簽到、分次配、領券、看更多），右邊熱搜排行
+  {
+    id: 'official-deals-shortcuts',
+    type: 'shortcut-bar',
+    items: SHORTCUTS,
+    hotSearches: HOT_SEARCHES,
+  },
   // 4. 官方優惠：超大牌，左 / 中 / 右三張
   {
     id: 'official-deals-mega-brand',
@@ -139,6 +162,7 @@ export const HOME_LAYOUT: HomeSection[] = [
   {
     id: 'fraud-notice',
     type: 'notice',
+    gapAfter: true,
     banner: {
       id: 'fraud-notice',
       imageUrl: `${ASSETS}/fraud-notice/fraud-notice.gif`,
@@ -165,6 +189,7 @@ export const HOME_LAYOUT: HomeSection[] = [
   {
     id: 'store-pickup',
     type: 'product-rail',
+    gapAfter: true,
     title: { lead: '超取', text: '$290免運無限次' },
     collection: 'store-pickup',
     card: 'horizontal',
@@ -174,6 +199,7 @@ export const HOME_LAYOUT: HomeSection[] = [
   {
     id: 'card-offers',
     type: 'banner-carousel',
+    gapAfter: true,
     label: '信用卡加碼優惠',
     perView: 4.75,
     gap: 0,
@@ -201,7 +227,12 @@ export const HOME_LAYOUT: HomeSection[] = [
     ),
   },
   // 12. 限時搶購：只給標題，倒數與商品由 home/feature-flash-sale 負責
-  { id: 'flash-sale', type: 'flash-sale', title: { text: '限時搶購' } },
+  {
+    id: 'flash-sale',
+    type: 'flash-sale',
+    title: { text: '限時搶購' },
+    gapAfter: true,
+  },
   // 13. 今日暢銷榜：和 momo 店取同一種商品列，只差商品、粉色底與「即時更新」標籤
   {
     id: 'best-sellers',

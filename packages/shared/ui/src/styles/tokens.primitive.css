@@ -9,6 +9,10 @@
   --momo-rose-500: #ff4c76;
   --momo-rose-550: #f73f64; /* 「即時更新」標籤（取樣自目標截圖） */
   --momo-red-600: #dd2222;
+  --momo-red-500: #ef4444; /* 熱搜「新上榜」的小紅點 */
+  --momo-red-400: #ff4343; /* 熱搜第 1 名 */
+  --momo-orange-500: #ff6a00; /* 熱搜第 2 名 */
+  --momo-amber-400: #ffc800; /* 熱搜第 3 名 */
   --momo-pink-100: #ffd9e5; /* 限時搶購的標題列 */
   --momo-blush-50: #fdf2f2; /* 「最後 N 組」的底色 */
 
@@ -34,13 +38,14 @@
   --momo-slate-300: #d1d5db; /* 橫式商品卡 hover 時的框線 */
 
   /* 中性色，由深到淺 */
-  --momo-black: #000000; /* 只以半透明使用：輪播箭頭 */
+  --momo-black: #000000; /* 輪播箭頭（半透明）、熱搜關鍵字 */
   --momo-gray-950: #222222;
   --momo-gray-900: #262626;
   --momo-gray-800: #404040;
   --momo-gray-700: #515151;
   --momo-gray-500: #888888;
   --momo-gray-450: #999999;
+  --momo-gray-400: #b3b3b3; /* 熱搜第 4 名之後 */
   --momo-gray-300: #cccccc;
   --momo-gray-250: #d9d9d9;
   --momo-gray-200: #e5e5e5;

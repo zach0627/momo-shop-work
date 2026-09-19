@@ -11,6 +11,8 @@ export interface SectionFrameProps {
   padded?: boolean;
   /** 版位資料指定的底色；沒給就是白色。 */
   background?: string;
+  /** 最後一列是輪播的圓點：底部只留 4px，圓點那一列本身有留白（真站：圖下方共 28px）。 */
+  endsWithDots?: boolean;
   children: ReactNode;
 }
 
@@ -20,6 +22,7 @@ export function SectionFrame({
   title,
   padded = true,
   background,
+  endsWithDots = false,
   children,
 }: SectionFrameProps) {
   return (
@@ -35,8 +38,12 @@ export function SectionFrame({
           badge={title.badge}
         />
       )}
-      {/* 真站實測：標題列下方留 16px；底部的留白由輪播的圓點那一列提供 */}
-      <div className={padded ? (title ? 'px-4 pt-4 pb-1' : 'p-4') : undefined}>
+      {/* 真站實測：內容上方 16px（有標題時在標題列下方）、左右 16px */}
+      <div
+        className={
+          padded ? `px-4 pt-4 ${endsWithDots ? 'pb-1' : 'pb-4'}` : undefined
+        }
+      >
         {children}
       </div>
     </section>

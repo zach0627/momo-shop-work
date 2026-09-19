@@ -11,7 +11,7 @@ export function BannerCarousel({
   section: BannerCarouselSection;
 }) {
   return (
-    <SectionFrame label={section.label} title={section.title}>
+    <SectionFrame label={section.label} title={section.title} endsWithDots>
       <Carousel
         label={section.label}
         perView={section.perView}

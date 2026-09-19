@@ -193,6 +193,25 @@ describe('SectionRenderer', () => {
     });
   });
 
+  // 規格 home-page：區塊之間的間隔由版位資料決定
+  it('leaves a gap only below the sections the data marks', () => {
+    const { container } = render(
+      <SectionRenderer
+        sections={[{ ...flashSale, gapAfter: true }, recommendation, rail]}
+        registry={registry}
+      />,
+    );
+
+    expect(rendered()).toEqual([
+      'flash-sale:fs',
+      'recommendation:rc',
+      'product-rail:pd',
+    ]);
+    const gaps = container.querySelectorAll('[data-section-gap]');
+    expect(gaps).toHaveLength(1);
+    expect(gaps[0].previousElementSibling?.textContent).toBe('flash-sale:fs');
+  });
+
   // registry['constructor'] 在每個物件上都存在，不能因此被當成「有註冊」
   it('treats a type named like an Object.prototype member as unknown', () => {
     render(

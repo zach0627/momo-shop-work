@@ -26,6 +26,7 @@ export function ProductRail({ section }: { section: ProductRailSection }) {
       label={label}
       title={section.title}
       background={section.background}
+      endsWithDots
     >
       {/* 載入中顯示佔位卡片並保留高度，下面的區塊才不會跳動 */}
       <div className={isHorizontal ? 'min-h-44' : 'min-h-60'}>

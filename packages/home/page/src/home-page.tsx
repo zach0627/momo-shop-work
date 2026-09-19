@@ -6,11 +6,11 @@ import { Skeleton } from '@momo/shared-ui';
 import { SECTION_REGISTRY } from './section-renderer/section-registry';
 import { SectionRenderer } from './section-renderer/section-renderer';
 
-/** 滿版灰底 + 1220px 的白色區帶；三種狀態共用。 */
+/** 滿版灰底 + 1220px 的白色區帶；三種狀態共用。區塊之間預設緊貼，間隔由版位資料決定。 */
 function PageSurface({ children }: { children: ReactNode }) {
   return (
     <div className="bg-surface-muted pb-4">
-      <div className="max-w-shop mx-auto flex w-full flex-col gap-4">
+      <div className="max-w-shop mx-auto flex w-full flex-col">
         <h1 className="sr-only">momo 購物網首頁</h1>
         {children}
       </div>

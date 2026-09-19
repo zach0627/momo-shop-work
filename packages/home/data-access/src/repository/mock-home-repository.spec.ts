@@ -84,6 +84,48 @@ describe('the home layout fixture', () => {
     expect(bestSellers.background).toBe('#f6e8eb');
   });
 
+  // 真站實測：只有這幾個區塊下方留灰色間隔，其餘緊貼
+  it('leaves a gap below exactly the sections the live page does', async () => {
+    const sections = await real.getLayout();
+
+    expect(
+      sections
+        .filter((section) => section.gapAfter)
+        .map((section) => section.id),
+    ).toEqual(['fraud-notice', 'store-pickup', 'card-offers', 'flash-sale']);
+  });
+
+  // 目標截圖上的熱搜排行，依名次
+  it('ranks nine hot searches beside the shortcuts', async () => {
+    const sections = await real.getLayout();
+    const shortcuts = sections.find(
+      (section) => section.type === 'shortcut-bar',
+    );
+
+    if (shortcuts?.type !== 'shortcut-bar') throw new Error('no shortcut bar');
+    expect(shortcuts.hotSearches?.map((item) => item.keyword)).toEqual([
+      '中秋禮盒',
+      'on 昂跑',
+      '即享券',
+      '買一送一',
+      'iphone 18 pro',
+      '即期品',
+      '電競筆電',
+      'longchamp',
+      'ps5',
+    ]);
+    expect(
+      shortcuts.hotSearches
+        ?.filter((item) => item.rising)
+        .map((item) => item.keyword),
+    ).toEqual(['iphone 18 pro', '即期品', 'longchamp']);
+    expect(
+      shortcuts.hotSearches
+        ?.filter((item) => item.isNew)
+        .map((item) => item.keyword),
+    ).toEqual(['電競筆電']);
+  });
+
   it('gives every section and every banner a unique id', async () => {
     const sections = await real.getLayout();
     const sectionIds = sections.map((section) => section.id);

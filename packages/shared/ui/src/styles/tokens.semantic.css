@@ -29,6 +29,14 @@
   --color-sale: var(--momo-red-600);
   /* 倒數計時的數字底色 */
   --color-countdown: var(--momo-rose-500);
+
+  /* ---- 熱搜排行（官方優惠）：名次圓圈的底色、新上榜的小紅點、關鍵字 ---- */
+  --color-rank-1: var(--momo-red-400);
+  --color-rank-2: var(--momo-orange-500);
+  --color-rank-3: var(--momo-amber-400);
+  --color-rank-rest: var(--momo-gray-400);
+  --color-rank-new: var(--momo-red-500);
+  --color-rank-keyword: var(--momo-black);
   /* 區塊標題旁的標籤「即時更新」（取樣自目標截圖：真站的標題列是一張圖） */
   --color-badge: var(--momo-rose-550);
 
@@ -99,6 +107,8 @@
   --color-line-card: var(--momo-gray-250);
   /* 同上，hover（真站的 class：hover:mu-border-gray-300） */
   --color-line-card-hover: var(--momo-slate-300);
+  /* 官方優惠捷徑與熱搜之間的直線 */
+  --color-line-divider: var(--momo-slate-300);
   /* 限時搶購商品卡框線 */
   --color-line-soft: var(--momo-gray-150);
   /* 頂部列的底線 */
@@ -135,6 +145,9 @@
   /* 「限搶價」、銷量 */
   --text-ec-2xs: 11px;
   --text-ec-2xs--line-height: 16px;
+  /* 熱搜的名次數字（粗體） */
+  --text-ec-xs: 12px;
+  --text-ec-xs--line-height: 20px;
   /* 頂部列、熱搜關鍵字、劃線原價、欄位標籤、品號 */
   --text-ec-sm: 13px;
   --text-ec-sm--line-height: 18px;

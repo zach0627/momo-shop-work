@@ -11,6 +11,7 @@ export type {
   ProductRailSection,
   RecommendationSection,
   SectionTitle,
+  HotSearch,
   Shortcut,
   ShortcutBarSection,
 } from './models/home-section';
