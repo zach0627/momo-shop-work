@@ -33,9 +33,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <CategoryNav categories={categories} activeId={ACTIVE_CATEGORY_ID} />
       </header>
 
-      <main className="mx-auto w-full max-w-shop flex-1 px-4 py-8">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
 
       <Footer />
     </div>
