@@ -260,6 +260,19 @@ HomePage            useHomeLayout() → 載入中 / 載入失敗 / <SectionRende
 
 `apps/shop` 有一個 spec 檢查版位資料指到的每一張圖都存在於 `public/`（60 多個路徑）：資料和檔案之間沒有別的東西把它們綁在一起，打錯字只會在瀏覽器裡變成破圖。放在 app 是因為檔案由 app 提供。
 
+### 商品詳情頁
+
+```
+goods.route.tsx（app）   useParams → <GoodsDetailPage goodsId />      讀網址是 app 的事
+└─ GoodsDetailPage       useProduct(goodsId) → 載入中 / 載入失敗 / 找不到商品 / 頁面
+   └─ 私有的 ui/         goods-gallery · goods-info · goods-actions · goods-not-found
+```
+
+- **展示用是決定，不是沒做完。** 三顆按鈕沒有 `onClick`、不導頁、不改狀態、不發請求。理由寫在 `goods-actions.tsx` 的註解，並由一個 spec 守住：每顆按鈕點兩次，比較點擊前後的頁面 HTML、網址、history 長度與 repository 被呼叫的次數。要接上行為，得先改這個 spec —— 也就是得是刻意的。
+- **和首頁讀同一份商品表**（`useProduct`）。app 的整合測試從首頁的商品卡點進詳情頁，檢查標題與售價一致。
+- **「找不到」是答案，不是錯誤**：`useProduct` 回 `null` → 顯示提示與回首頁的連結，外框照常。
+- 價格照真站詳情頁的寫法（「促銷價 50,200 元」，沒有 `$`），所以沒有重用商品卡的 `PriceTag`。主圖的 `alt` 是商品名稱：在這一頁它是內容，不是裝飾。
+
 ## 7. 資料層
 
 ```ts

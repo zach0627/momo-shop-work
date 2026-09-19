@@ -82,9 +82,9 @@
 
 ## 10. 商品詳情頁（Step 10）
 
-- [ ] 10.1 TDD：商品存在時標題、說明、價格與三顆按鈕都在；商品不存在時顯示 not-found 且沒有按鈕；驗證：spec 通過（spec `goods-detail`）
-- [ ] 10.2 TDD：三顆按鈕點擊後網址與頁面內容不變；驗證：spec 通過（spec `goods-detail`「動作按鈕不綁任何行為」）
-- [ ] 10.3 `goods-gallery`、`goods-info`、`goods-actions`、`goods-not-found` 為頁面私有，route 負責 `useParams → props`；驗證：從首頁任一商品卡進入，標題與售價一致
+- [x] 10.1 TDD：商品存在時主圖、標題、條列說明、品號、價格（有市售價才顯示劃線價）與三顆按鈕都在；商品不存在時顯示「找不到商品」、沒有按鈕、有「回首頁」；另有載入中（`role=status`）、載入失敗（`role=alert`）與「跟著 `goodsId` prop 變」；驗證：10 個 spec 先對 placeholder 全紅，實作後通過（spec `goods-detail`）
+- [x] 10.2 TDD：三顆按鈕各點兩次，比較點擊前後的頁面 HTML、網址、history 長度與 repository 被呼叫的次數，全部不變；`goods-page` 的原始碼裡沒有任何 `onClick`；驗證：spec 通過（spec `goods-detail`「動作按鈕不綁任何行為」）；瀏覽器中三顆按鈕各點一次，頁面、網址、history 都沒變
+- [x] 10.3 `goods-gallery`、`goods-info`、`goods-actions`、`goods-not-found` 為頁面私有（`index.ts` 只匯出 `GoodsDetailPage`），route 負責 `useParams → props`；app 的整合測試改用真的存在於 catalog 的商品（原本寫死的 id 其實不在 fixture 裡），並新增「首頁卡片 → 詳情頁同名同價」與「不存在的商品仍保留外框與回首頁的途徑」；移除沒有使用者的 `breadcrumb-root`、`ink-meta` token；驗證：瀏覽器中從 momo 店取的卡片（【NORDA】智慧手錶 LTE版、8,669）同文件導頁到它的詳情頁，標題與售價一致；標題 19px / 700、價格 25px / 700 `#d62872`、主圖 440×440、按鈕 160×40 直角，與 Step 4 在真站量到的值相同；`/goods/no-such-goods` 顯示找不到商品；console 無錯誤
 
 ## 11. 限時搶購（Step 11，可砍）
 

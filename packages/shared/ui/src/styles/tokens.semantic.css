@@ -49,14 +49,10 @@
   --color-ink-emphasis: var(--momo-gray-900);
   /* the default: product names, titles, nav items, field labels */
   --color-ink: var(--momo-gray-800);
-  /* sales count */
-  --color-ink-meta: var(--momo-gray-750);
   /* "促銷價", struck price on the detail page */
   --color-ink-label: var(--momo-gray-500);
   /* struck original price, goods code */
   --color-ink-muted: var(--momo-gray-450);
-  /* "Home" in the breadcrumb */
-  --color-breadcrumb-root: var(--momo-amber-700);
 
   /* "選擇分類", the title of the expanded category panel */
   --color-ink-title: var(--momo-slate-800);

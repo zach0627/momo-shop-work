@@ -45,7 +45,7 @@ First Commit 至最後 Commit
 | ✅ | 7 | shared util / ui | `feat(shared): price formatting and core ui components` | #1 #2 | ✗ |
 | ✅ | 8 ★ | 首頁 config-driven + 6 blocks | `feat(home): config-driven section renderer and blocks` | #5 | ✗ |
 | ✅ | 9 | 你可能會喜歡：3 列 + 看更多 | `feat(recommendation): paginated grid with load more` | #4 | ✗ |
-| ⬜ | 10 ★ | 商品詳情頁（純展示） | `feat(goods): display-only goods detail page` | #8 | ✗ |
+| ✅ | 10 ★ | 商品詳情頁（純展示） | `feat(goods): display-only goods detail page` | #8 | ✗ |
 | ⬜ | 11 | 限時搶購：倒數 + 2 列輪播 | `feat(flash-sale): countdown and two-row carousel` | #7 | ✓ |
 | ⬜ | 12 | 今日暢銷榜（橫式商品卡，沒有名次） | `feat(ranking): best sellers as horizontal cards` | — | ✓ |
 | ⬜ | 13 ★ | README + CI | `docs: readme with tradeoffs and roadmap` / `ci: nx affected` | — | README ✗ / CI ✓ |
@@ -289,18 +289,27 @@ First Commit 至最後 Commit
 **Commit**：`feat(recommendation): paginated product grid with load more`
   - ↳ 實際是 2 個 commit（資料層的修正 → feature），外加文件。
 
-### Step 10 ★ — 商品詳情頁（純展示）
+### Step 10 ★ — 商品詳情頁（純展示） ✅
 
 **目標**：左商品圖、右 title + 商品說明、下方三顆按鈕、Footer。**不做任何互動。**
-- [ ] **TDD #8**
-  - [ ] 商品存在 → title、商品說明（條列）、價格、`直接購買` `放入購物車` `加入追蹤` 三顆按鈕都在
-  - [ ] 商品不存在 → `goods-not-found`
-- [ ] 私有 `ui/`：`goods-gallery`（主圖）、`goods-info`、`goods-actions`（**無 onClick**）、`goods-not-found`。
-- [ ] `GoodsDetailPage({ goodsId })`；`goods.route.tsx` 負責 `useParams → props`。
+- [x] **TDD #8**
+  - [x] 商品存在 → title、商品說明（條列）、價格、`直接購買` `放入購物車` `加入追蹤` 三顆按鈕都在
+  - [x] 商品不存在 → `goods-not-found`
+  - ↳ 10 個 spec 先對 placeholder 全紅。除了上面兩項，還有：有市售價才顯示劃線價、載入中（`role=status`）、載入失敗（`role=alert`）、跟著 `goodsId` prop 變。
+  - ↳ **「按鈕什麼都不做」有測試守著**：三顆按鈕各點兩次，比較點擊前後的頁面 HTML、網址、history 長度與 repository 被呼叫的次數，全部不變。展示用是決定、不是沒做完 —— 之後有人要接上行為，得先改這個 spec，也就是得是刻意的。
+- [x] 私有 `ui/`：`goods-gallery`（主圖）、`goods-info`、`goods-actions`（**無 onClick**）、`goods-not-found`。
+  - ↳ 整個 `goods-page` 的原始碼裡沒有任何 `onClick`（已 grep 確認）。理由寫在 `goods-actions.tsx` 的註解裡。
+  - ↳ 只有主圖：縮圖切換與放大鏡是互動。沒有相關商品、付款 / 配送資訊、麵包屑、「你可能會喜歡」—— 你的筆記寫的是「左邊商品圖、右邊 title 與商品說明、下面三顆按鈕即可，其餘可忽略」。都列入 Known Gaps。
+  - ↳ 價格照真站詳情頁的寫法（「促銷價 50,200 元」，沒有 `$`），所以沒有重用商品卡的 `PriceTag`。主圖的 alt 是商品名稱（在這一頁它是內容）。
+  - ↳ 移除沒有使用者的 `breadcrumb-root`、`ink-meta` token（對應的麵包屑與總銷量決定不做）；數值保留在 `design-tokens.md` 的文字裡。
+- [x] `GoodsDetailPage({ goodsId })`；`goods.route.tsx` 負責 `useParams → props`。
+  - ↳ route 從 walking skeleton 起就是這樣，不用改。
+  - ↳ **app 的整合測試裡寫死的 `/goods/15687497` 其實不在 fixture 裡**（那是規格範例的數字）。placeholder 只會把 id 印出來，所以一直是綠的。改為向注入的 mock repository 要一件真的商品，並新增兩個整合測試：首頁卡片 → 詳情頁同名同價；不存在的商品仍保留外框與回首頁的途徑。
 
 **驗證**：`pnpm nx test goods-page` + dev server：從首頁任一商品卡點進來；直接開 `/goods/不存在`
 **Review 重點**：三顆按鈕點了什麼都不會發生（符合 Phase 1 規則）。
 **Commit**：`feat(goods): display-only goods detail page`
+  - ↳ 1 個 commit，外加文件（含移除兩個 token）。
 
 > **檢查點**：此時「你要求的兩個頁面」都已完成。
 
@@ -371,6 +380,7 @@ First Commit 至最後 Commit
 | 8 | **首頁 config-driven**：`Product.promoText`；`reportError`；`home/data-access`（`HomeSection` 9 種、15 筆版位設定、repository、hook、testing 入口）；app 注入 + `QueryCache` 統一回報 + 素材存在性的 spec；3 個 feature 的 placeholder；`SectionRenderer` + `SectionRegistry`；6 個 blocks；`HomePage` 的三種狀態；layout 不再決定頁面寬度；`Carousel` 改為 group；`@momo/shared-ui/testing` | `61e8d7d` `cbd9321` `62dcdbb` `b6d6dc0` `2197f33` `4130acd` `89d5e1d` `81fdf69` `50e31e2` `0bb5896`（+ 文件的 commit） |
 | 8+ | Human 要求的中文註解：`section-registry.tsx`（首頁 15 個區塊 → type 的對照表，每個項目說明是哪一塊）、`home-layout.ts`（每筆一行，應要求精簡） | `26c37c0` `3ab8ebf` |
 | 9 | **你可能會喜歡**：`Recommendation`（3 列 × 5、「看更多」、載完消失、失敗時的兩種行為）；私有的 `recommendation-grid`、`load-more-button`、`page-size`；修正 `useRecommendations` 的重複請求；移除 `ink-subtle`。feature 10 個測試、catalog-data-access 29 個 | `c82ec59` `d75e1b9`（+ 文件的 commit） |
+| 10 | **商品詳情頁（展示用）**：`GoodsDetailPage` 的四種狀態（載入中 / 失敗 / 找不到商品 / 頁面）；私有的 `goods-gallery`、`goods-info`、`goods-actions`（無 onClick，有 spec 守著）、`goods-not-found`；app 整合測試改用真的商品並新增兩條；移除 `breadcrumb-root`、`ink-meta`。goods-page 10 個測試、app 11 個 | `d4eba24`（+ 文件的 commit） |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -498,4 +508,13 @@ First Commit 至最後 Commit
 - `index.ts` 只匯出 `Recommendation`；`LoadMoreButton` 留在 feature 私有的 `ui/`。
 - **沒有實測的**：「看更多」按鈕的樣式。真站的這個區塊要捲動到才掛載，預覽面板在背景時捲動不會觸發，量不到；依截圖估計，已記在 `design-tokens.md` 的「沒有量到的」。
 
-**下一步：Step 10 ★ — 商品詳情頁（純展示）**（左圖、右 title + 說明、下方三顆**不綁行為**的按鈕；商品不存在 → not found）→ 對應 `tasks.md` 第 10 組
+**Step 10 驗證結果**
+- 全部 11 個專案 `lint / test / typecheck`（無快取、循序）全綠；`nx build shop` 成功；`pnpm verify:boundaries`：**26 條依賴**（新增 `goods-page → catalog-data-access`、`→ shared-ui`、`→ shared-util`）、0 違規；`pnpm verify:fixtures` 通過。
+- 瀏覽器（1440px）：從首頁 momo 店取的卡片「【NORDA】智慧手錶 LTE版」8,669 點進去 → 同文件導頁到 `/goods/TP00005070000393`，**標題與售價一致**。標題 19px / 700 `#404040`、價格 25px / 700 `#d62872`、主圖 440×440、三顆按鈕 160×40、直角、白字 16px / 600，底色 `#d62872` / `#1c6fbc` / `#cccccc` —— 和 Step 4 在真站量到的值相同。
+- 三顆按鈕各點一次：頁面 HTML、網址、history 長度都沒變。
+- `/goods/no-such-goods` →「找不到商品」、沒有按鈕、「回首頁」與 logo 都連到 `/`、footer 還在；console 無錯誤。
+- **沒有用眼睛對照截圖**：預覽面板仍在背景，版面由 DOM 量測。需要 Human 在瀏覽器看一次。
+
+> **檢查點：需求要求的兩個頁面（首頁、商品詳情頁）都已完成。** 接下來的 Step 11（限時搶購）、Step 12（今日暢銷榜）是「可砍」的，Step 13 是 README 與 CI。
+
+**下一步：由 Human 決定** —— (a) 做 Step 11 限時搶購（倒數 + 每頁 2×5）；(b) 做 Step 12 今日暢銷榜（動工前要先決定它還需不需要獨立的 package）；(c) 跳過兩者、把它們從 `home-layout.ts` 拿掉，直接做 Step 13。
