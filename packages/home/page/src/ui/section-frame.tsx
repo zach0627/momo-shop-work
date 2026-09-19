@@ -35,7 +35,8 @@ export function SectionFrame({
           badge={title.badge}
         />
       )}
-      <div className={padded ? (title ? 'px-4 pb-4' : 'p-4') : undefined}>
+      {/* 真站實測：標題列下方留 16px；底部的留白由輪播的圓點那一列提供 */}
+      <div className={padded ? (title ? 'px-4 pt-4 pb-1' : 'p-4') : undefined}>
         {children}
       </div>
     </section>
