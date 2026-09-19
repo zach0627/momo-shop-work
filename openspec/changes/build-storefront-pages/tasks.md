@@ -88,8 +88,8 @@
 
 ## 11. 限時搶購（Step 11，可砍）
 
-- [ ] 11.1 TDD：`get-remaining`（含過期歸零）、`chunk`，以 fake timers 驗證倒數每秒遞減；驗證：spec 通過（spec `home-page`「限時搶購顯示倒數」）
-- [ ] 11.2 私有 ui（header、countdown、stock-left、grab-badge）、每張 slide 10 件；registry 換成真的元件；驗證：spec 確認卡片顯示限搶價、劃線原價與「最後 N 組」（spec `home-page`「限時搶購商品顯示限搶價與剩餘組數」）；dev server 上倒數在跳，與截圖 `11-flash-sale.png` 對照
+- [x] 11.1 TDD：`get-remaining`（過期、剛好到點、結束時間無法解析都歸零；小時不進位成天）、`chunk`，以 fake timers 驗證倒數 02:19:23 → 02:19:22、已結束顯示 00:00:00、到零後計時器停止；`use-countdown` 每次 tick 重新讀時鐘而不是減一（背景分頁會延後 `setInterval`，用減的會漂移）；驗證：15 個 spec 中 14 個先紅（第 15 個「空清單沒有頁」回傳 `[]` 的空實作剛好滿足），實作後通過（spec `home-page`「限時搶購顯示倒數」）
+- [x] 11.2 私有 ui：`flash-sale-header`（粉底 + 倒數）、`countdown`、`card-footer`（原規劃的 stock-left 與 grab-badge 合成一個檔案：兩者只有幾行、永遠一起出現）；每張 slide 是 2 × 5 的 grid；registry 從 Step 8 起就指向這個 package，所以首頁不用改；`shared/ui` 補上限時搶購才需要的選項（`PriceTag` 的 `tone="sale"`、`size="lg"`、`label`；`ProductCard` 的 `frame="raised"`；token `surface-sale`、`surface-stock`）；驗證：5 個 spec 先對 placeholder 全紅，實作後通過 —— 卡片顯示「限搶價」「2,998」、劃線的「$4,995」與「最後484組」；29 件分成 10 / 10 / 9 頁、第 2 頁第一件是第 11 件（spec `home-page`「限時搶購商品顯示限搶價與剩餘組數」）。瀏覽器（1440px）：倒數 2.1 秒內 02:59:55 → 02:59:53；數字方塊 28×28 `#ff4c76`；標題列 1220×70 `#ffd9e5`；3 顆圓點；卡片寬 229.6、欄距 239，與真站相同；下一頁 / 下一頁 / 上一頁讓目前頁 2 → 3 → 2，最後一頁「下一頁」停用；點商品卡同文件導頁；console 無錯誤。**沒有驗到的**：(1) slide 實際位移 —— 預覽面板在背景，瀏覽器暫停 `requestAnimationFrame`，embla 的捲動動畫不會前進（同一個 `Carousel` 的位移在 Step 7 面板在前景時驗過）；(2) 用眼睛對照截圖 `11-flash-sale.png` —— 同樣原因截圖是空白的，粉色底改由截圖檔取樣、其餘由 DOM 量測
 
 ## 12. 今日暢銷榜（Step 12，可砍）
 

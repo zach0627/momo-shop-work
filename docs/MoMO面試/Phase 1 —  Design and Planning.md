@@ -183,7 +183,7 @@ momo-shop-work/
 │  └─ src/
 │     ├─ styles/theme.css                  @theme design tokens（品牌粉、價格紅、容器寬、圓角）
 │     ├─ link/            LinkProvider + AppLink（預設 <a>）      使用者：ProductCard / layout / home blocks
-│     ├─ product-card/    ProductCardItem 型別 + 基底卡片（直式 / 橫式）+ slots（promoText / footer）—— Step 7 修訂：原規劃的 topBadge、priceLabel 沒有使用者，沒做；限時搶購需要時再加
+│     ├─ product-card/    ProductCardItem 型別 + 基底卡片（直式 / 橫式）+ slots（promoText / footer）—— Step 7 修訂：原規劃的 topBadge、priceLabel 沒有使用者，沒做；限時搶購需要時再加。Step 11 修訂：限時搶購做了，補上 frame="raised" 與 PriceTag 的 sale / lg / label；topBadge 仍沒有使用者
 │     │                                                           使用者：home product-rail / flash-sale / ranking / recommendation
 │     ├─ price-tag/       售價 + 劃線原價                          使用者：ProductCard / goods-info
 │     ├─ carousel/        ★ 唯一 import embla（prev / next / dots / perView）
@@ -222,7 +222,7 @@ momo-shop-work/
 ├─ packages/home/feature-flash-sale/           type:feature  scope:home   限時搶購
 │  └─ src/
 │     ├─ flash-sale.tsx                   container：useFlashSale；每張 slide = 10 件（5 × 2 grid）
-│     ├─ ui/     countdown.tsx · flash-sale-header.tsx · stock-left.tsx · grab-badge.tsx   ← 私有
+│     ├─ ui/     countdown.tsx · flash-sale-header.tsx · card-footer.tsx   ← 私有（Step 11 修訂：stock-left 與 grab-badge 合成 card-footer）
 │     └─ model/  get-remaining.ts（純函式）· use-countdown.ts · chunk.ts
 ├─ packages/home/feature-ranking/              type:feature  scope:home   今日暢銷榜
 │  └─ src/  ranking.tsx                                                      （原規劃的 ui/rank-badge 已移除：真站與截圖上都沒有名次）

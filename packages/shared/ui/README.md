@@ -9,8 +9,8 @@ src/
 ├─ index.ts            public API
 ├─ testing.ts          second entry: '@momo/shared-ui/testing'
 ├─ link/               AppLink + LinkProvider: the app injects its router's link
-├─ price-tag/          price, struck original price
-├─ product-card/       vertical / horizontal, outlined / plain, two slots
+├─ price-tag/          price, struck original price, optional label in front
+├─ product-card/       vertical / horizontal, outlined / plain / raised, two slots
 ├─ carousel/           the only file that imports embla
 ├─ section-header/     the title of a home page section
 └─ styles/             tokens.primitive.css → tokens.semantic.css → theme.css
@@ -19,7 +19,7 @@ src/
 - **Components declare the least they need.** `ProductCardItem` has four fields; a domain `Product` is passed as it is (structural typing), so this package never imports a data-access package.
 - **No routes.** `ProductCard` takes an `href`; the caller builds it with `paths` from `@momo/shared-util`.
 - **Visual options, not business variants.** `layout="horizontal"`, `frame="plain"`, `priceTag={{ tone: 'brand' }}` - never `variant="flash-sale"`. What a feature adds to a card goes into a slot (`promoText`, `footer`).
-- **Options arrive with their first user.** There is no `topBadge`, no "限搶價" label and no red 23px price yet: nothing in the workspace would use them. They belong to the flash sale and are added with it.
+- **Options arrive with their first user.** The "限搶價" label, the `raised` frame and the red 23px price were left out in step 7 and added in step 11, when the flash sale needed them - each a row in a lookup table or one prop. There is still no `topBadge`: nothing in the workspace would use it.
 - **`Carousel` is the only importer of `embla-carousel-react`** (an ESLint rule rejects it anywhere else), so replacing the library is a change to one file. Its wiring is tested against a fake embla, because jsdom lays nothing out; a second spec mounts the real library, and real paging is checked in a browser.
 - **A carousel is a `group`, not a `region`.** It always sits inside a section that is already a named landmark; a second landmark of the same name is noise for screen reader users (WAI-ARIA APG).
 - **`@momo/shared-ui/testing`** exports `installCarouselTestEnvironment()`: jsdom lacks what embla reaches for (`ResizeObserver`, `IntersectionObserver`, `matchMedia` on the element's own window). Any spec that mounts a `Carousel`, directly or through a page, calls it. The package that owns the library owns the shim.

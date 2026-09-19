@@ -146,7 +146,7 @@ UI → query hooks → useCatalogRepository() → CatalogRepository（interface�
 
 ### 10. 商品卡用 slots 而不是 variant
 
-**選擇**：`ProductCard` 提供 `promoText` 與 `footer` 兩個 slot；限時搶購的「最後 N 組」與「搶」由它的 feature 填進 `footer`。外觀用**視覺性質**的選項表達：`layout`（直式：圖在上 —— 降價好貨、限時搶購；橫式：圖在左、335×174 —— momo 店取、今日暢銷榜）、`frame`（`outlined` / `plain`）、`priceTag`（顏色、大小、原價放旁邊或下面）。兩種版型都可以帶一行紅色的促銷文字 —— 這些是對照真實網站的 DOM 得到的。`href` 由呼叫端用 `paths.goods(id)` 組好傳入，`shared/ui` 不認識路由。
+**選擇**：`ProductCard` 提供 `promoText` 與 `footer` 兩個 slot；限時搶購的「最後 N 組」與「搶」由它的 feature 填進 `footer`。外觀用**視覺性質**的選項表達：`layout`（直式：圖在上 —— 降價好貨、限時搶購；橫式：圖在左、335×174 —— momo 店取、今日暢銷榜）、`frame`（`outlined` / `plain` / `raised`）、`priceTag`（顏色、大小、原價放旁邊或下面、價格前的標籤）。兩種版型都可以帶一行紅色的促銷文字 —— 這些是對照真實網站的 DOM 得到的。`href` 由呼叫端用 `paths.goods(id)` 組好傳入，`shared/ui` 不認識路由。
 
 **為什麼**：三種卡片長得不一樣。用 `variant="flash-sale"` 會讓 `shared/ui` 知道業務概念；視覺選項加 slot 讓業務留在它所屬的 feature。`footer` 渲染在連結**外面**，因為 feature 可能放按鈕進去，而按鈕放在連結裡是無效的 HTML。
 
@@ -154,6 +154,8 @@ UI → query hooks → useCatalogRepository() → CatalogRepository（interface�
 
 - `topBadge` 沒有使用者。它原本是為了「暢銷榜的名次徽章」，而那個徽章是規劃時自己加的，真實網站與目標截圖上都沒有；限時搶購的「搶」在真站上位於卡片底部那一列，不在圖上。
 - `priceLabel`（「限搶價」）、浮起的外框、紅色 23px 的價格都只屬於限時搶購（Step 11，可砍）。它們跟著限時搶購一起加：每一項都是查表多一列或多一個 prop，不需要預先留位置。
+
+**Step 11 補上的**：限時搶購動工時，上面第二項的三個選項照預期各是一小筆改動 —— `PriceTag` 的查表多了 `tone: "sale"` 與 `size: "lg"` 兩列，外加一個 `label` prop（「限搶價」放在價格前；有標籤時 `$` 跟著用標籤的 11px 粗體，這是真站量到的）；`ProductCard` 的 `frame` 多了 `raised`（1px `line-soft`、較深的陰影、圖與文字一起內縮 10px）。命名仍是視覺性質，`shared/ui` 還是不知道「限時搶購」。`topBadge` 依然沒有使用者，沒有加。
 
 ### 11. 交付順序：walking skeleton 先行
 

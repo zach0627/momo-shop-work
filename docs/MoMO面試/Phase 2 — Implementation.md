@@ -46,7 +46,7 @@ First Commit 至最後 Commit
 | ✅ | 8 ★ | 首頁 config-driven + 6 blocks | `feat(home): config-driven section renderer and blocks` | #5 | ✗ |
 | ✅ | 9 | 你可能會喜歡：3 列 + 看更多 | `feat(recommendation): paginated grid with load more` | #4 | ✗ |
 | ✅ | 10 ★ | 商品詳情頁（純展示） | `feat(goods): display-only goods detail page` | #8 | ✗ |
-| ⬜ | 11 | 限時搶購：倒數 + 2 列輪播 | `feat(flash-sale): countdown and two-row carousel` | #7 | ✓ |
+| ✅ | 11 | 限時搶購：倒數 + 2 列輪播 | `feat(flash-sale): countdown and two-row carousel` | #7 | ✓ |
 | ⬜ | 12 | 今日暢銷榜（橫式商品卡，沒有名次） | `feat(ranking): best sellers as horizontal cards` | — | ✓ |
 | ⬜ | 13 ★ | README + CI | `docs: readme with tradeoffs and roadmap` / `ci: nx affected` | — | README ✗ / CI ✓ |
 | ⬜ | P2 | Playwright / SectionBoundary / Skeleton / 部署 | 各自一個 commit | — | ✓ |
@@ -313,14 +313,25 @@ First Commit 至最後 Commit
 
 > **檢查點**：此時「你要求的兩個頁面」都已完成。
 
-### Step 11 — 限時搶購　（可砍）
+### Step 11 — 限時搶購　（可砍） ✅
 
-- [ ] **TDD #7**：`model/get-remaining(endsAt, now)`（含過期歸零）、`model/chunk`；fake timers 下 `countdown` 顯示正確。
-- [ ] 私有 `ui/`：`flash-sale-header`（粉底 + 倒數）、`countdown`、`stock-left`、`grab-badge`；每張 slide = 10 件（5 × 2）。
-- [ ] registry 換成真的元件。
+- [x] **TDD #7**：`model/get-remaining(endsAt, now)`（含過期歸零）、`model/chunk`；fake timers 下 `countdown` 顯示正確。
+  - ↳ 15 個 spec 中 14 個先紅（第 15 個「空清單沒有頁」，回傳 `[]` 的空實作剛好滿足）。規格的數字照用：02:19:23 過 1 秒 → 02:19:22；已結束 → 00:00:00。
+  - ↳ 歸零的情況有三種：已過期、剛好到點、結束時間無法解析（`NaN` 不能漏到畫面上）。小時不進位成天：真站只有時：分：秒三格。
+  - ↳ `use-countdown` 每次 tick **重新讀時鐘**，不是減一：背景分頁會延後 `setInterval`，用減的會漂移。到零就停掉計時器。
+- [x] 私有 `ui/`：`flash-sale-header`（粉底 + 倒數）、`countdown`、`stock-left`、`grab-badge`；每張 slide = 10 件（5 × 2）。
+  - ↳ **`stock-left` 與 `grab-badge` 合成一個 `card-footer`**：兩者各只有幾行，永遠一起出現在卡片底部同一列。「搶」是裝飾（`aria-hidden`）：整張卡片就是連結。
+  - ↳ 每秒只有 `Countdown` 重新 render，不是 29 張商品卡。`role="timer"`，螢幕閱讀器不會每秒唸一次。
+  - ↳ **標題列在真站是一整張圖**（`bt_7_713_01_e9.png`，1220×70），素材裡沒有 → 用文字、Heroicons 的火焰與 token 重現；粉色底 `#ffd9e5` 從目標截圖取樣，token 的說明寫明來源。「倒數」與數字方塊是真的 DOM，為實測值。
+  - ↳ **回頭補 `shared/ui`**（Step 7 說好「跟著第一個使用者加」的三個選項）：`PriceTag` 的 `tone="sale"`、`size="lg"`、`label`（「限搶價」；有標籤時 `$` 跟著用 11px 粗體，真站量到的）；`ProductCard` 的 `frame="raised"`；token `surface-sale`、`surface-stock`。`label` 的 spec 先紅。
+  - ↳ 規格以外多了兩個情境：載入失敗、沒有商品 → 區塊不顯示（和推薦區同一個原則）。
+- [x] registry 換成真的元件。
+  - ↳ registry 從 Step 8 起就指向這個 package（placeholder 佔著位置），所以 `home/page` 一行都沒改；只更新了 `section-registry.tsx` 與 `home-layout.ts` 的中文註解。
 
 **驗證**：`pnpm nx test home-feature-flash-sale` + dev server 看倒數有在跳
 **Commit**：`feat(flash-sale): countdown and two-row product carousel`
+  - ↳ 2 個 commit（先 `shared/ui` 的選項，再 feature），外加文件。
+  - ↳ **收尾逐項核對時找到一個漏掉的**：這個 package 現在有明寫的 `import … from 'react'`（`use-countdown`、`countdown`），eslint 設定裡「只寫 JSX 所以對 react 放行」的例外與那行註解已經不成立。比照 `home/page`、`goods/page` 移除；移除後 lint 仍通過（表示規則真的看得到 import），`verify:boundaries` 0 違規。ADR-0008 裡過期的放行清單一併更新。
 
 ### Step 12 — 今日暢銷榜　（可砍）
 
@@ -381,6 +392,8 @@ First Commit 至最後 Commit
 | 8+ | Human 要求的中文註解：`section-registry.tsx`（首頁 15 個區塊 → type 的對照表，每個項目說明是哪一塊）、`home-layout.ts`（每筆一行，應要求精簡） | `26c37c0` `3ab8ebf` |
 | 9 | **你可能會喜歡**：`Recommendation`（3 列 × 5、「看更多」、載完消失、失敗時的兩種行為）；私有的 `recommendation-grid`、`load-more-button`、`page-size`；修正 `useRecommendations` 的重複請求；移除 `ink-subtle`。feature 10 個測試、catalog-data-access 29 個 | `c82ec59` `d75e1b9`（+ 文件的 commit） |
 | 10 | **商品詳情頁（展示用）**：`GoodsDetailPage` 的四種狀態（載入中 / 失敗 / 找不到商品 / 頁面）；私有的 `goods-gallery`、`goods-info`、`goods-actions`（無 onClick，有 spec 守著）、`goods-not-found`；app 整合測試改用真的商品並新增兩條；移除 `breadcrumb-root`、`ink-meta`。goods-page 10 個測試、app 11 個 | `d4eba24`（+ 文件的 commit） |
+| — | **程式碼註解全面改寫**（Human 第 11 次糾正）：繁體中文、以一行為主，只留對照資訊、不直覺的流程、重要或太難的函式、spec 對應的規格；設計沿革與取捨移到文件。868 行 → 418 行。規則寫進 `CLAUDE.md` | `e250c76` `d680f80` |
+| 11 | **限時搶購**：`get-remaining`、`chunk`、`use-countdown`（重新讀時鐘、到零停止）；私有的 `flash-sale-header`、`countdown`、`card-footer`；每頁 2 × 5 的輪播；`shared/ui` 補上 `PriceTag` 的 `sale` / `lg` / `label` 與 `ProductCard` 的 `raised`、token `surface-sale` `surface-stock`。feature 20 個測試 | `41cbf92` `8e51f22`（+ 文件的 commit） |
 
 **Step 1 與原計畫的偏離（之後寫進 `docs/agent-workflow.md`）**
 - Nx 23 的 `react-monorepo` preset 會下載官方示範電商範本且忽略 flags → 不採用，改「空 workspace + generator」。
@@ -447,6 +460,7 @@ First Commit 至最後 Commit
   - **分類面板**：展開後 40 個膠囊、9 欄 × 124px、間距 10px；膠囊 124×44、圓角 22px；五種半透明底色與真站量到的值相同；作用中的「首頁」為白底 + 品牌色框線。
 - 沒做的：主 header 右側三張活動小圖（沒有素材）。
 - 沒複核的：footer 與倒數數字幾個顏色的透明度（量的時候轉換函式把 alpha 丟掉了；複核時瀏覽器面板是隱藏的、虛擬化區塊沒掛載）。從截圖看是實色，做限時搶購時一併確認。
+  - ↳ Step 11：倒數數字底色已用原始字串複核，`rgb(255, 76, 118)`、不透明。footer 的三個值仍未複核。
 
 **Layout 升為一層：驗證結果與過程中的錯誤**
 - 拆成 3 個 commit（規則與 tags → 搬資料夾 → 文件與步驟），前兩個在 commit 前都跑過 11 個專案的 `lint / test / typecheck`（無快取）+ `verify:boundaries`；第二個另跑 `sync:check` 與 `build`。`verify:boundaries`：11 個專案、**12 條規則**、7 條依賴、0 違規。
@@ -517,4 +531,14 @@ First Commit 至最後 Commit
 
 > **檢查點：需求要求的兩個頁面（首頁、商品詳情頁）都已完成。** 接下來的 Step 11（限時搶購）、Step 12（今日暢銷榜）是「可砍」的，Step 13 是 README 與 CI。
 
-**下一步：由 Human 決定** —— (a) 做 Step 11 限時搶購（倒數 + 每頁 2×5）；(b) 做 Step 12 今日暢銷榜（動工前要先決定它還需不需要獨立的 package）；(c) 跳過兩者、把它們從 `home-layout.ts` 拿掉，直接做 Step 13。
+**Human 的決定**：照 Agent 的建議 (a) → (b) → Step 13。
+
+**Step 11 驗證結果**
+- 全部 11 個專案 `lint / test / typecheck`（無快取、循序）全綠；`nx build shop` 成功；`pnpm verify:boundaries`：**28 條依賴**（新增 `home-feature-flash-sale → catalog-data-access`、`→ shared-util`）、0 違規；`pnpm verify:fixtures` 通過。
+- 瀏覽器（1440px、真的 fixture）：倒數 2.1 秒內 02:59:55 → 02:59:53；數字方塊 28×28 `#ff4c76`；標題列 1220×70 `#ffd9e5`；29 件分成 10 / 10 / 9、3 顆圓點；卡片寬 229.6、欄距 239 —— **和真站完全相同**，框線、圓角、陰影、內距也相同。
+- 下一頁 / 下一頁 / 上一頁 → 目前頁的圓點 2 → 3 → 2，最後一頁「下一頁」停用；點商品卡 → 同文件導頁到它的詳情頁；console 無錯誤。
+- **和真站的差距**：卡片高 380.4（真站 386）、列距 391（真站 396），差在哪一段沒有逐項比對。列入 Known Gaps。
+- **沒有驗到的**：(1) slide 實際位移 —— 預覽面板在背景，瀏覽器暫停 `requestAnimationFrame`，embla 的動畫不會前進；只驗到狀態。同一個 `Carousel` 的位移在 Step 7 面板在前景時驗過。(2) 用眼睛對照截圖 `11-flash-sale.png` —— 收尾時再試一次，面板仍在背景、截圖是空白的。**需要 Human 在瀏覽器看一次，並按一次下一頁。**
+- 過程中的錯誤：量測腳本判斷目前頁時沒把 slide 的 `padding-left` 算進去；和上面的 rAF 暫停疊在一起，一開始分不出是誰的問題。已記在 `agent-workflow.md`。
+
+**下一步：Step 12 — 今日暢銷榜。動工前要 Human 先決定**：保留獨立的 `home/feature-ranking` package，或改為 `product-rail` 的一種版型（它已經沒有自己的邏輯）。

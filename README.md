@@ -2,7 +2,7 @@
 
 Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情頁。全程使用 Mock Data，不呼叫任何真實 API。
 
-> **狀態：進行中。** 目前完成 workspace、10 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）、共用元件（`PriceTag`、兩種版型的 `ProductCard`、`Carousel`、`SectionHeader`）、**由版位資料驅動的首頁**（15 筆設定、6 種通用 block；商品卡可點進詳情頁）。「你可能會喜歡」每次載入 3 列、載完後「看更多」消失。**商品詳情頁**（展示用：主圖、標題、說明、價格與三顆不綁行為的按鈕；商品不存在時顯示提示）。需求要求的兩個頁面都已完成；限時搶購與今日暢銷榜目前是佔位區塊。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
+> **狀態：進行中。** 目前完成 workspace、10 個 domain package 與由 lint 強制的依賴規則、設計文件、ADR 與行為規格（OpenSpec）、全站 layout、素材與商品資料層（mock repository + query hooks）、共用元件（`PriceTag`、兩種版型的 `ProductCard`、`Carousel`、`SectionHeader`）、**由版位資料驅動的首頁**（15 筆設定、6 種通用 block；商品卡可點進詳情頁）。「你可能會喜歡」每次載入 3 列、載完後「看更多」消失。**商品詳情頁**（展示用：主圖、標題、說明、價格與三顆不綁行為的按鈕；商品不存在時顯示提示）。需求要求的兩個頁面都已完成。**限時搶購**（每秒更新的倒數、每頁 2 列 × 5 件可換頁的商品，卡片顯示限搶價、劃線原價與「最後 N 組」）。今日暢銷榜目前是佔位區塊。頁面實作依 [`tasks.md`](./openspec/changes/build-storefront-pages/tasks.md) 進行，已勾選的項目即已完成。
 
 ## 先看這幾份
 
@@ -65,7 +65,7 @@ app → layout / page → feature → ui / data-access → util
 | Repository + Context 而非 MSW                         | 接縫在 TypeScript interface 上；測試可注入小的 fake                                     | 不驗證 HTTP 細節（[ADR-0005](./docs/adr/0005-repository-seam-with-context-injection.md)）                                                                       |
 | 整個 layout 放 package，而非 `apps/shop/src/layouts`  | app 只有接線；路由層級的組合（page、layout）都受 lint 約束                              | 多一條自訂的型別規則，而且和 Nx 官方範例的放法不同（[ADR-0007](./docs/adr/0007-layout-as-a-lib-and-a-tier.md)）                                                 |
 | 每個 package 宣告自己的依賴，版本用 pnpm catalog 統一 | package 不靠根目錄偷渡依賴；整個 workspace 只有一份 React；少宣告、多宣告都由 lint 擋下 | 檢查工具只看得到明寫的 import，只寫 JSX 的 package 要單點放行；而且它在設定不對時會靜默地不檢查，得另外驗證（[ADR-0008](./docs/adr/0008-packages-not-libs.md)） |
-| 共用元件的選項跟著第一個使用者出現，不預留            | `ProductCard` 的每個 prop 都說得出誰在用；計畫裡的 `topBadge` 因為查無使用者而沒做      | 限時搶購需要的三個選項（「限搶價」標籤、浮起的外框、紅色 23px 價格）要等做到它時再回頭改 `shared/ui`（`design.md` 第 10 點）                                    |
+| 共用元件的選項跟著第一個使用者出現，不預留            | `ProductCard` 的每個 prop 都說得出誰在用；計畫裡的 `topBadge` 因為查無使用者而沒做      | 做到限時搶購時要回頭改 `shared/ui`：「限搶價」標籤、浮起的外框、紅色 23px 價格三個選項是 Step 11 才加的，各是一小筆改動（`design.md` 第 10 點）                 |
 | 輪播的換頁邏輯對假的 embla API 測試                   | jsdom 不做排版也測得到包裝邏輯；另有一個 spec 用真的 embla 掛載，套件升級改名時會被發現 | 「真的會捲動」沒有自動化測試，只在瀏覽器手動驗證過                                                                                                              |
 | TDD 只打有邏輯的地方                                  | 測試數量少、每個都有意義                                                                | 純版面區塊沒有單元測試保護                                                                                                                                      |
 
@@ -89,6 +89,10 @@ app → layout / page → feature → ui / data-access → util
 | 「看更多」按鈕的尺寸與顏色是依截圖估的                                                                  | 真站的這個區塊要捲動才會掛載，量測時預覽面板在背景，沒有發生                                                                                                      |
 | 詳情頁只有主圖，沒有縮圖列與放大鏡；沒有相關商品、付款與配送資訊、麵包屑、「你可能會喜歡」              | 需求筆記寫明詳情頁只要「左邊商品圖、右邊 title 與商品說明、下面三顆按鈕」，其餘可忽略；縮圖切換與放大屬於互動，而這一頁是展示用                                   |
 | 詳情頁的三顆按鈕點了沒有反應                                                                            | **刻意的**，不是未完成：需求明訂不可往下做。購物車與結帳是未來的 domain（[ADR-0006](./docs/adr/0006-domain-dependency-map.md)），有測試確保按鈕不會被順手接上行為 |
+| 限時搶購的標題列是用文字、圖示與色塊重現的；真站的整條標題列（含火焰與「限時搶購」字樣）是一張圖        | 素材裡沒有這張圖。粉色底從目標截圖取樣；「倒數」與數字方塊在真站是真的 DOM，數值為實測                                                                            |
+| 限時搶購卡片上的「搶」只是裝飾，不是按鈕                                                                | 整張卡片就是連到詳情頁的連結；搶購與結帳流程不在範圍內                                                                                                            |
+| 限時搶購的商品卡比真站矮約 6px（380 對 386），列距也因此少 5px                                          | 寬度、欄距、框線、圓角、陰影與內距都和真站相同；高度差在哪一段沒有逐項比對，也沒有為了湊高度加空白                                                                |
+| 限時搶購倒數歸零後停在 00:00:00，區塊不會消失、也不會換下一檔                                           | mock 的結束時間固定是「現在 + 3 小時」，重新整理就重新倒數；檔期輪替是後端的事                                                                                    |
 | 主 header 右側的三張活動小圖沒有做                                                                      | 素材裡沒有這三張圖                                                                                                                                                |
 
 ## 開發
