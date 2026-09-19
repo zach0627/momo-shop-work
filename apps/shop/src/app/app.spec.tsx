@@ -8,7 +8,7 @@ describe('App', () => {
     render(<App />);
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: '首頁' }),
+      await screen.findByRole('heading', { level: 1, name: 'momo 購物網首頁' }),
     ).toBeTruthy();
     expect(screen.getByRole('banner')).toBeTruthy();
     expect(screen.getByRole('contentinfo')).toBeTruthy();

@@ -47,7 +47,22 @@
       "path": "../../shared/util/tsconfig.lib.json"
     },
     {
+      "path": "../../shared/ui/tsconfig.lib.json"
+    },
+    {
+      "path": "../feature-ranking/tsconfig.lib.json"
+    },
+    {
+      "path": "../feature-flash-sale/tsconfig.lib.json"
+    },
+    {
       "path": "../data-access/tsconfig.lib.json"
+    },
+    {
+      "path": "../../catalog/feature-recommendation/tsconfig.lib.json"
+    },
+    {
+      "path": "../../catalog/data-access/tsconfig.lib.json"
     }
   ]
 }

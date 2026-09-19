@@ -108,6 +108,7 @@ export const HOME_LAYOUT: HomeSection[] = [
   {
     id: 'official-deals-mega-brand',
     type: 'banner-grid',
+    label: '超大牌',
     columns: 3,
     banners: banners(
       'official-deals',
@@ -122,7 +123,7 @@ export const HOME_LAYOUT: HomeSection[] = [
     title: { lead: '降價', text: '好貨' },
     collection: 'price-drop',
     card: 'vertical',
-    perView: 8.45,
+    perView: 8.52,
   },
   {
     id: 'brand-discount',
@@ -152,6 +153,7 @@ export const HOME_LAYOUT: HomeSection[] = [
     id: 'flagship-stores',
     type: 'banner-grid',
     title: { text: '官方旗艦名店' },
+    label: '官方旗艦名店',
     columns: 4,
     banners: banners(
       'flagship-stores',
@@ -166,7 +168,7 @@ export const HOME_LAYOUT: HomeSection[] = [
     title: { lead: '超取', text: '$290免運無限次' },
     collection: 'store-pickup',
     card: 'horizontal',
-    perView: 3.45,
+    perView: 3.47,
   },
   {
     id: 'card-offers',

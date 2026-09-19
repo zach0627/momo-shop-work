@@ -52,6 +52,8 @@ export interface BannerCarouselSection extends SectionBase {
 export interface BannerGridSection extends SectionBase {
   type: 'banner-grid';
   title?: SectionTitle;
+  /** Names the section for assistive technology when there is no title. */
+  label: string;
   columns: number;
   banners: Banner[];
 }

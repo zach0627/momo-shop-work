@@ -127,6 +127,8 @@
   /* ---- Surfaces --------------------------------------------------------- */
 
   --color-surface: var(--momo-white);
+  /* the caption bar under a search suggestion fades from `surface` to this */
+  --color-surface-caption: var(--momo-blush-100);
   /* top bar */
   --color-surface-muted: var(--momo-gray-100);
   /* the category toggle button */

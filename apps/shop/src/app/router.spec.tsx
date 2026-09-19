@@ -27,9 +27,25 @@ describe('routes', () => {
     renderAt('/');
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: '首頁' }),
+      await screen.findByRole('heading', { level: 1, name: 'momo 購物網首頁' }),
     ).toBeTruthy();
     expectLayout();
+  });
+
+  // The whole chain with the real mock repositories: layout data -> section
+  // renderer -> product rail -> catalog -> a card that links to its page.
+  // spec: home-page / 點擊商品卡
+  it('renders the home sections and links a product card to its detail page', async () => {
+    renderAt('/');
+
+    const rail = await screen.findByRole('region', { name: '降價好貨' });
+    const [card] = await within(rail).findAllByRole('link');
+    expect(card.getAttribute('href')).toMatch(/^\/goods\/\w+$/);
+
+    // Banners are images, not links (spec: home-page / 點擊活動 banner).
+    const hero = screen.getByRole('region', { name: '主要活動' });
+    expect(within(hero).getAllByRole('img').length).toBeGreaterThan(0);
+    expect(within(hero).queryAllByRole('link')).toHaveLength(0);
   });
 
   it('passes the goods id from the URL to the goods detail page', async () => {
