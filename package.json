@@ -51,6 +51,7 @@
     "prettier": "^3.8.1",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "sharp": "^0.35.4",
     "tailwindcss": "catalog:",
     "tslib": "^2.3.0",
     "typescript": "~6.0.3",

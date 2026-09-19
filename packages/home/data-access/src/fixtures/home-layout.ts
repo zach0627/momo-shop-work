@@ -195,7 +195,7 @@ export const HOME_LAYOUT: HomeSection[] = [
     banners: banners(
       'search-suggest',
       '猜你想搜',
-      [1000, 1000],
+      [372, 372],
       SEARCH_SUGGESTIONS.map(([file]) => file),
       SEARCH_SUGGESTIONS.map(([, keyword]) => keyword),
     ),

@@ -4,7 +4,7 @@
 // 決定性：名稱、價格、說明由 id 的雜湊決定，不用亂數、不讀時鐘。
 // id 是真的（來自檔名）；名稱、價格與品牌是編的。
 import { createHash } from 'node:crypto';
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as prettier from 'prettier';
@@ -147,7 +147,11 @@ const collections = {};
 const problems = [];
 for (const [key, folder] of COLLECTIONS) {
   collections[key] = [];
-  for (const file of readdirSync(join(assets, folder)).sort(compare)) {
+  // 只看檔案：card/ 是 tools/import-assets.mjs 產生的商品卡縮圖
+  const files = readdirSync(join(assets, folder), { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name);
+  for (const file of files.sort(compare)) {
     const id = /^([A-Za-z]*\d+)_/.exec(file)?.[1];
     if (!id) {
       problems.push(`${folder}/${file}: no product id in the file name`);
@@ -175,9 +179,23 @@ const flashSaleIds = new Set(collections[FLASH_SALE_KEY]);
 const promoLineIds = new Set(
   PROMO_LINE_KEYS.flatMap((key) => collections[key]),
 );
+// 商品卡用主圖的縮圖（card/ 底下同名的檔案），詳情頁用原本的大圖
+const cardImage = (path) => path.replace(/\/([^/]+)$/, '/card/$1');
+for (const [id, paths] of images) {
+  const card = cardImage(paths[0]);
+  if (!existsSync(join(root, 'apps/shop/public', card)))
+    problems.push(
+      `${id}: no card image at ${card} - run tools/import-assets.mjs`,
+    );
+}
+if (problems.length) {
+  for (const p of problems) console.error(`x ${p}`);
+  process.exit(1);
+}
+
 const products = [...images.keys()].sort(compare).map((id) => ({
   id,
-  imageUrl: images.get(id)[0],
+  imageUrl: cardImage(images.get(id)[0]),
   images: images.get(id),
   ...describe(id, flashSaleIds.has(id)),
   ...(promoLineIds.has(id)

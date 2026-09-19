@@ -11,7 +11,7 @@ import { GoodsDetailPage } from './goods-detail-page';
 const iphone: Product = {
   id: '15687497',
   name: '【Apple】iPhone 18 Pro Max (256G/6.9吋)',
-  imageUrl: 'assets/home/best-sellers/15687497_OL_m.webp',
+  imageUrl: 'assets/home/best-sellers/card/15687497_OL_m.webp',
   images: ['assets/home/best-sellers/15687497_OL_m.webp'],
   price: 49900,
   originalPrice: 50858,
@@ -58,9 +58,10 @@ describe('GoodsDetailPage', () => {
       await screen.findByRole('heading', { level: 1, name: iphone.name }),
     ).toBeTruthy();
     expect(getProduct).toHaveBeenCalledWith('15687497');
+    // 主圖用詳情頁的大圖，不是商品卡的縮圖
     expect(
       screen.getByRole('img', { name: iphone.name }).getAttribute('src'),
-    ).toBe(iphone.imageUrl);
+    ).toBe(iphone.images[0]);
     expect(
       screen.getAllByRole('listitem').map((item) => item.textContent),
     ).toEqual(iphone.description);

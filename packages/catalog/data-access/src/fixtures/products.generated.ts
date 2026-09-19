@@ -5,7 +5,7 @@ import type { Product } from '../models/product';
 export const PRODUCTS = [
   {
     id: '10019468',
-    imageUrl: 'assets/home/flash-sale/10019468_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/10019468_OR_m.webp',
     images: ['assets/home/flash-sale/10019468_OR_m.webp'],
     name: '【樂活家】滴雞精 20入',
     price: 1519,
@@ -19,7 +19,7 @@ export const PRODUCTS = [
   },
   {
     id: '10116136',
-    imageUrl: 'assets/home/recommendations/10116136_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/10116136_OR_m.webp',
     images: ['assets/home/recommendations/10116136_OR_m.webp'],
     name: '【木森】不鏽鋼保溫瓶 750ml',
     price: 1019,
@@ -33,7 +33,7 @@ export const PRODUCTS = [
   },
   {
     id: '10242345',
-    imageUrl: 'assets/home/recommendations/10242345_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/10242345_OR_m.webp',
     images: ['assets/home/recommendations/10242345_OR_m.webp'],
     name: '【木森】綜合堅果 1kg 家庭號',
     price: 509,
@@ -47,7 +47,7 @@ export const PRODUCTS = [
   },
   {
     id: '10301751',
-    imageUrl: 'assets/home/recommendations/10301751_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/10301751_OR_m.webp',
     images: ['assets/home/recommendations/10301751_OR_m.webp'],
     name: '【沐光】氣炸鍋 4L',
     price: 4419,
@@ -61,7 +61,7 @@ export const PRODUCTS = [
   },
   {
     id: '10362698',
-    imageUrl: 'assets/home/recommendations/10362698_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/10362698_OR_m.webp',
     images: ['assets/home/recommendations/10362698_OR_m.webp'],
     name: '【原野】無線吸塵器 旗艦款',
     price: 14419,
@@ -75,7 +75,7 @@ export const PRODUCTS = [
   },
   {
     id: '10362820',
-    imageUrl: 'assets/home/recommendations/10362820_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/10362820_OR_m.webp',
     images: ['assets/home/recommendations/10362820_OR_m.webp'],
     name: '【KAITO】純棉床包四件組 雙人',
     price: 3249,
@@ -89,7 +89,7 @@ export const PRODUCTS = [
   },
   {
     id: '1077163',
-    imageUrl: 'assets/home/price-drop/1077163_OL_m.webp',
+    imageUrl: 'assets/home/price-drop/card/1077163_OL_m.webp',
     images: ['assets/home/price-drop/1077163_OL_m.webp'],
     name: '【禾日】綜合堅果 1kg 家庭號',
     price: 579,
@@ -103,7 +103,7 @@ export const PRODUCTS = [
   },
   {
     id: '10773381',
-    imageUrl: 'assets/home/recommendations/10773381_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/10773381_OR_m.webp',
     images: ['assets/home/recommendations/10773381_OR_m.webp'],
     name: '【MORI】運動休閒鞋 男款',
     price: 3509,
@@ -117,7 +117,7 @@ export const PRODUCTS = [
   },
   {
     id: '10776324',
-    imageUrl: 'assets/home/recommendations/10776324_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/10776324_OR_m.webp',
     images: ['assets/home/recommendations/10776324_OR_m.webp'],
     name: '【LUMO】運動休閒鞋 男款',
     price: 1599,
@@ -131,7 +131,7 @@ export const PRODUCTS = [
   },
   {
     id: '10958352',
-    imageUrl: 'assets/home/recommendations/10958352_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/10958352_OR_m.webp',
     images: ['assets/home/recommendations/10958352_OR_m.webp'],
     name: '【樂活家】快煮壺 1.7L',
     price: 999,
@@ -145,7 +145,7 @@ export const PRODUCTS = [
   },
   {
     id: '11006259',
-    imageUrl: 'assets/home/flash-sale/11006259_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/11006259_OR_m.webp',
     images: ['assets/home/flash-sale/11006259_OR_m.webp'],
     name: '【暖居】純棉床包四件組 雙人',
     price: 2129,
@@ -159,7 +159,7 @@ export const PRODUCTS = [
   },
   {
     id: '11045444',
-    imageUrl: 'assets/home/recommendations/11045444_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/11045444_OR_m.webp',
     images: ['assets/home/recommendations/11045444_OR_m.webp'],
     name: '【ARLO】保濕精華液 50ml',
     price: 1639,
@@ -173,7 +173,7 @@ export const PRODUCTS = [
   },
   {
     id: '11103128',
-    imageUrl: 'assets/home/recommendations/11103128_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/11103128_OR_m.webp',
     images: ['assets/home/recommendations/11103128_OR_m.webp'],
     name: '【禾日】無線吸塵器 旗艦款',
     price: 11919,
@@ -187,7 +187,7 @@ export const PRODUCTS = [
   },
   {
     id: '11156090',
-    imageUrl: 'assets/home/recommendations/11156090_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/11156090_OR_m.webp',
     images: ['assets/home/recommendations/11156090_OR_m.webp'],
     name: '【NORDA】保濕精華液 30ml',
     price: 1599,
@@ -201,7 +201,7 @@ export const PRODUCTS = [
   },
   {
     id: '11236766',
-    imageUrl: 'assets/home/recommendations/11236766_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/11236766_OR_m.webp',
     images: ['assets/home/recommendations/11236766_OR_m.webp'],
     name: '【青嶼】運動休閒鞋 男款',
     price: 2259,
@@ -215,7 +215,7 @@ export const PRODUCTS = [
   },
   {
     id: '11332602',
-    imageUrl: 'assets/home/recommendations/11332602_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/11332602_OR_m.webp',
     images: ['assets/home/recommendations/11332602_OR_m.webp'],
     name: '【MORI】運動休閒鞋 男款',
     price: 2759,
@@ -229,7 +229,7 @@ export const PRODUCTS = [
   },
   {
     id: '11356902',
-    imageUrl: 'assets/home/flash-sale/11356902_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/11356902_OR_m.webp',
     images: ['assets/home/flash-sale/11356902_OR_m.webp'],
     name: '【原野】機械鍵盤 紅軸',
     price: 2979,
@@ -243,7 +243,7 @@ export const PRODUCTS = [
   },
   {
     id: '11788884',
-    imageUrl: 'assets/home/recommendations/11788884_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/11788884_OR_m.webp',
     images: ['assets/home/recommendations/11788884_OR_m.webp'],
     name: '【樂活家】無線吸塵器 旗艦款',
     price: 14109,
@@ -257,7 +257,7 @@ export const PRODUCTS = [
   },
   {
     id: '11929493',
-    imageUrl: 'assets/home/flash-sale/11929493_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/11929493_OR_m.webp',
     images: ['assets/home/flash-sale/11929493_OR_m.webp'],
     name: '【KAITO】抽取式衛生紙 100抽 x24包',
     price: 929,
@@ -271,7 +271,7 @@ export const PRODUCTS = [
   },
   {
     id: '11994146',
-    imageUrl: 'assets/home/flash-sale/11994146_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/11994146_OR_m.webp',
     images: ['assets/home/flash-sale/11994146_OR_m.webp'],
     name: '【VELA】洗衣精補充包 2kg x4',
     price: 569,
@@ -285,7 +285,7 @@ export const PRODUCTS = [
   },
   {
     id: '12137812',
-    imageUrl: 'assets/home/recommendations/12137812_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/12137812_OR_m.webp',
     images: ['assets/home/recommendations/12137812_OR_m.webp'],
     name: '【ARLO】空氣清淨機 12坪',
     price: 10909,
@@ -299,8 +299,8 @@ export const PRODUCTS = [
   },
   {
     id: '12305064',
-    imageUrl: 'assets/home/best-sellers/12305064_OR.jpg',
-    images: ['assets/home/best-sellers/12305064_OR.jpg'],
+    imageUrl: 'assets/home/best-sellers/card/12305064_OR.webp',
+    images: ['assets/home/best-sellers/12305064_OR.webp'],
     name: '【NORDA】保濕精華液 2入組',
     price: 1999,
     description: [
@@ -313,7 +313,7 @@ export const PRODUCTS = [
   },
   {
     id: '12553642',
-    imageUrl: 'assets/home/flash-sale/12553642_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/12553642_OR_m.webp',
     images: ['assets/home/flash-sale/12553642_OR_m.webp'],
     name: '【青嶼】高效防曬乳 SPF50+ 50ml',
     price: 1269,
@@ -327,7 +327,7 @@ export const PRODUCTS = [
   },
   {
     id: '12821057',
-    imageUrl: 'assets/home/recommendations/12821057_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/12821057_OR_m.webp',
     images: ['assets/home/recommendations/12821057_OR_m.webp'],
     name: '【暖居】純棉床包四件組 雙人',
     price: 1709,
@@ -340,7 +340,7 @@ export const PRODUCTS = [
   },
   {
     id: '12920308',
-    imageUrl: 'assets/home/price-drop/12920308_OL_m.webp',
+    imageUrl: 'assets/home/price-drop/card/12920308_OL_m.webp',
     images: ['assets/home/price-drop/12920308_OL_m.webp'],
     name: '【禾日】機械鍵盤 紅軸',
     price: 3559,
@@ -354,7 +354,7 @@ export const PRODUCTS = [
   },
   {
     id: '13013408',
-    imageUrl: 'assets/home/recommendations/13013408_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/13013408_OR_m.webp',
     images: ['assets/home/recommendations/13013408_OR_m.webp'],
     name: '【沐光】純棉床包四件組 雙人',
     price: 3329,
@@ -368,7 +368,7 @@ export const PRODUCTS = [
   },
   {
     id: '13060809',
-    imageUrl: 'assets/home/recommendations/13060809_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/13060809_OR_m.webp',
     images: ['assets/home/recommendations/13060809_OR_m.webp'],
     name: '【禾日】滴雞精 20入',
     price: 1519,
@@ -382,7 +382,7 @@ export const PRODUCTS = [
   },
   {
     id: '13103503',
-    imageUrl: 'assets/home/price-drop/13103503_OL_m.webp',
+    imageUrl: 'assets/home/price-drop/card/13103503_OL_m.webp',
     images: ['assets/home/price-drop/13103503_OL_m.webp'],
     name: '【KAITO】純棉床包四件組 雙人',
     price: 2639,
@@ -396,9 +396,9 @@ export const PRODUCTS = [
   },
   {
     id: '13683504',
-    imageUrl: 'assets/home/best-sellers/13683504_OR.jpg',
+    imageUrl: 'assets/home/best-sellers/card/13683504_OR.webp',
     images: [
-      'assets/home/best-sellers/13683504_OR.jpg',
+      'assets/home/best-sellers/13683504_OR.webp',
       'assets/home/recommendations/13683504_OR_m.webp',
     ],
     name: '【MORI】除濕機 10L',
@@ -414,7 +414,7 @@ export const PRODUCTS = [
   },
   {
     id: '13720776',
-    imageUrl: 'assets/home/recommendations/13720776_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/13720776_OR_m.webp',
     images: ['assets/home/recommendations/13720776_OR_m.webp'],
     name: '【原野】機械鍵盤 紅軸',
     price: 2159,
@@ -428,8 +428,8 @@ export const PRODUCTS = [
   },
   {
     id: '13998594',
-    imageUrl: 'assets/home/best-sellers/13998594_OR.jpg',
-    images: ['assets/home/best-sellers/13998594_OR.jpg'],
+    imageUrl: 'assets/home/best-sellers/card/13998594_OR.webp',
+    images: ['assets/home/best-sellers/13998594_OR.webp'],
     name: '【KAITO】抽取式衛生紙 100抽 x24包',
     price: 819,
     originalPrice: 1330,
@@ -443,7 +443,7 @@ export const PRODUCTS = [
   },
   {
     id: '14160572',
-    imageUrl: 'assets/home/recommendations/14160572_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/14160572_OR_m.webp',
     images: ['assets/home/recommendations/14160572_OR_m.webp'],
     name: '【海風】低敏貓砂 7L x3',
     price: 589,
@@ -457,7 +457,7 @@ export const PRODUCTS = [
   },
   {
     id: '14160574',
-    imageUrl: 'assets/home/recommendations/14160574_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/14160574_OR_m.webp',
     images: ['assets/home/recommendations/14160574_OR_m.webp'],
     name: '【LUMO】高效防曬乳 SPF50+ 50ml',
     price: 1259,
@@ -470,7 +470,7 @@ export const PRODUCTS = [
   },
   {
     id: '14160584',
-    imageUrl: 'assets/home/recommendations/14160584_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/14160584_OR_m.webp',
     images: ['assets/home/recommendations/14160584_OR_m.webp'],
     name: '【原野】滴雞精 20入',
     price: 2079,
@@ -484,7 +484,7 @@ export const PRODUCTS = [
   },
   {
     id: '14176994',
-    imageUrl: 'assets/home/flash-sale/14176994_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/14176994_OR_m.webp',
     images: ['assets/home/flash-sale/14176994_OR_m.webp'],
     name: '【VELA】機械鍵盤 紅軸',
     price: 4489,
@@ -498,7 +498,7 @@ export const PRODUCTS = [
   },
   {
     id: '14271823',
-    imageUrl: 'assets/home/recommendations/14271823_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/14271823_OR_m.webp',
     images: ['assets/home/recommendations/14271823_OR_m.webp'],
     name: '【海風】低敏貓砂 7L x3',
     price: 709,
@@ -512,7 +512,7 @@ export const PRODUCTS = [
   },
   {
     id: '14432356',
-    imageUrl: 'assets/home/recommendations/14432356_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/14432356_OR_m.webp',
     images: ['assets/home/recommendations/14432356_OR_m.webp'],
     name: '【KAITO】純棉床包四件組 雙人',
     price: 3079,
@@ -526,7 +526,7 @@ export const PRODUCTS = [
   },
   {
     id: '14440402',
-    imageUrl: 'assets/home/flash-sale/14440402_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/14440402_OR_m.webp',
     images: ['assets/home/flash-sale/14440402_OR_m.webp'],
     name: '【安禾】智慧手錶 LTE版',
     price: 11519,
@@ -540,7 +540,7 @@ export const PRODUCTS = [
   },
   {
     id: '14614874',
-    imageUrl: 'assets/home/flash-sale/14614874_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/14614874_OR_m.webp',
     images: ['assets/home/flash-sale/14614874_OR_m.webp'],
     name: '【木森】保濕精華液 2入組',
     price: 1109,
@@ -554,7 +554,7 @@ export const PRODUCTS = [
   },
   {
     id: '14779527',
-    imageUrl: 'assets/home/flash-sale/14779527_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/14779527_OR_m.webp',
     images: ['assets/home/flash-sale/14779527_OR_m.webp'],
     name: '【晨露】運動休閒鞋 男款',
     price: 2759,
@@ -568,7 +568,7 @@ export const PRODUCTS = [
   },
   {
     id: '14823433',
-    imageUrl: 'assets/home/recommendations/14823433_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/14823433_OR_m.webp',
     images: ['assets/home/recommendations/14823433_OR_m.webp'],
     name: '【青嶼】精選咖啡豆 半磅',
     price: 489,
@@ -582,7 +582,7 @@ export const PRODUCTS = [
   },
   {
     id: '14966869',
-    imageUrl: 'assets/home/recommendations/14966869_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/14966869_OR_m.webp',
     images: ['assets/home/recommendations/14966869_OR_m.webp'],
     name: '【VELA】快煮壺 1.7L',
     price: 1919,
@@ -596,7 +596,7 @@ export const PRODUCTS = [
   },
   {
     id: '15029526',
-    imageUrl: 'assets/home/flash-sale/15029526_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/15029526_OR_m.webp',
     images: ['assets/home/flash-sale/15029526_OR_m.webp'],
     name: '【青嶼】高效防曬乳 SPF50+ 50ml',
     price: 1159,
@@ -610,8 +610,8 @@ export const PRODUCTS = [
   },
   {
     id: '15033477',
-    imageUrl: 'assets/home/best-sellers/15033477_OR.jpg',
-    images: ['assets/home/best-sellers/15033477_OR.jpg'],
+    imageUrl: 'assets/home/best-sellers/card/15033477_OR.webp',
+    images: ['assets/home/best-sellers/15033477_OR.webp'],
     name: '【LUMO】高效防曬乳 SPF50+ 50ml',
     price: 1019,
     originalPrice: 1360,
@@ -625,7 +625,7 @@ export const PRODUCTS = [
   },
   {
     id: '15040578',
-    imageUrl: 'assets/home/flash-sale/15040578_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/15040578_OR_m.webp',
     images: ['assets/home/flash-sale/15040578_OR_m.webp'],
     name: '【MORI】精選咖啡豆 半磅',
     price: 869,
@@ -639,7 +639,7 @@ export const PRODUCTS = [
   },
   {
     id: '15088857',
-    imageUrl: 'assets/home/price-drop/15088857_OL_m.webp',
+    imageUrl: 'assets/home/price-drop/card/15088857_OL_m.webp',
     images: ['assets/home/price-drop/15088857_OL_m.webp'],
     name: '【LUMO】除濕機 10L',
     price: 11969,
@@ -652,7 +652,7 @@ export const PRODUCTS = [
   },
   {
     id: '15110257',
-    imageUrl: 'assets/home/flash-sale/15110257_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/15110257_OR_m.webp',
     images: ['assets/home/flash-sale/15110257_OR_m.webp'],
     name: '【MORI】精選咖啡豆 半磅',
     price: 459,
@@ -666,7 +666,7 @@ export const PRODUCTS = [
   },
   {
     id: '15152423',
-    imageUrl: 'assets/home/recommendations/15152423_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/15152423_OR_m.webp',
     images: ['assets/home/recommendations/15152423_OR_m.webp'],
     name: '【原野】滴雞精 20入',
     price: 1269,
@@ -680,7 +680,7 @@ export const PRODUCTS = [
   },
   {
     id: '15180510',
-    imageUrl: 'assets/home/flash-sale/15180510_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/15180510_OR_m.webp',
     images: ['assets/home/flash-sale/15180510_OR_m.webp'],
     name: '【禾日】洗衣精補充包 2kg x4',
     price: 549,
@@ -694,7 +694,7 @@ export const PRODUCTS = [
   },
   {
     id: '15192229',
-    imageUrl: 'assets/home/flash-sale/15192229_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/15192229_OR_m.webp',
     images: ['assets/home/flash-sale/15192229_OR_m.webp'],
     name: '【原野】洗衣精補充包 2kg x4',
     price: 679,
@@ -708,7 +708,7 @@ export const PRODUCTS = [
   },
   {
     id: '15209178',
-    imageUrl: 'assets/home/recommendations/15209178_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/15209178_OR_m.webp',
     images: ['assets/home/recommendations/15209178_OR_m.webp'],
     name: '【VELA】滴雞精 20入',
     price: 2229,
@@ -722,7 +722,7 @@ export const PRODUCTS = [
   },
   {
     id: '15220069',
-    imageUrl: 'assets/home/recommendations/15220069_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/15220069_OR_m.webp',
     images: ['assets/home/recommendations/15220069_OR_m.webp'],
     name: '【ARLO】不鏽鋼保溫瓶 750ml',
     price: 1209,
@@ -735,7 +735,7 @@ export const PRODUCTS = [
   },
   {
     id: '15306587',
-    imageUrl: 'assets/home/recommendations/15306587_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/15306587_OR_m.webp',
     images: ['assets/home/recommendations/15306587_OR_m.webp'],
     name: '【樂活家】洗衣精補充包 2kg x4',
     price: 489,
@@ -748,7 +748,7 @@ export const PRODUCTS = [
   },
   {
     id: '15352685',
-    imageUrl: 'assets/home/flash-sale/15352685_R_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/15352685_R_m.webp',
     images: ['assets/home/flash-sale/15352685_R_m.webp'],
     name: '【原野】洗衣精補充包 2kg x4',
     price: 809,
@@ -762,7 +762,7 @@ export const PRODUCTS = [
   },
   {
     id: '15353081',
-    imageUrl: 'assets/home/flash-sale/15353081_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/15353081_OR_m.webp',
     images: ['assets/home/flash-sale/15353081_OR_m.webp'],
     name: '【LUMO】精選咖啡豆 半磅',
     price: 389,
@@ -776,8 +776,8 @@ export const PRODUCTS = [
   },
   {
     id: '15454099',
-    imageUrl: 'assets/home/best-sellers/15454099_OR.jpg',
-    images: ['assets/home/best-sellers/15454099_OR.jpg'],
+    imageUrl: 'assets/home/best-sellers/card/15454099_OR.webp',
+    images: ['assets/home/best-sellers/15454099_OR.webp'],
     name: '【ARLO】空氣清淨機 12坪',
     price: 15409,
     originalPrice: 22670,
@@ -791,8 +791,8 @@ export const PRODUCTS = [
   },
   {
     id: '15467401',
-    imageUrl: 'assets/home/best-sellers/15467401_OR.jpg',
-    images: ['assets/home/best-sellers/15467401_OR.jpg'],
+    imageUrl: 'assets/home/best-sellers/card/15467401_OR.webp',
+    images: ['assets/home/best-sellers/15467401_OR.webp'],
     name: '【沐光】藍牙耳機 降噪版',
     price: 3149,
     originalPrice: 3710,
@@ -806,7 +806,7 @@ export const PRODUCTS = [
   },
   {
     id: '15468434',
-    imageUrl: 'assets/home/flash-sale/15468434_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/15468434_OR_m.webp',
     images: ['assets/home/flash-sale/15468434_OR_m.webp'],
     name: '【NORDA】空氣清淨機 12坪',
     price: 14259,
@@ -820,8 +820,8 @@ export const PRODUCTS = [
   },
   {
     id: '15559310',
-    imageUrl: 'assets/home/best-sellers/15559310_OR.jpg',
-    images: ['assets/home/best-sellers/15559310_OR.jpg'],
+    imageUrl: 'assets/home/best-sellers/card/15559310_OR.webp',
+    images: ['assets/home/best-sellers/15559310_OR.webp'],
     name: '【VELA】無線吸塵器 旗艦款',
     price: 12359,
     originalPrice: 13740,
@@ -835,7 +835,7 @@ export const PRODUCTS = [
   },
   {
     id: '15589261',
-    imageUrl: 'assets/home/recommendations/15589261_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/15589261_OR_m.webp',
     images: ['assets/home/recommendations/15589261_OR_m.webp'],
     name: '【VELA】洗衣精補充包 2kg x4',
     price: 519,
@@ -849,8 +849,8 @@ export const PRODUCTS = [
   },
   {
     id: '15597776',
-    imageUrl: 'assets/home/best-sellers/15597776_OR.jpg',
-    images: ['assets/home/best-sellers/15597776_OR.jpg'],
+    imageUrl: 'assets/home/best-sellers/card/15597776_OR.webp',
+    images: ['assets/home/best-sellers/15597776_OR.webp'],
     name: '【安禾】保濕精華液 30ml',
     price: 1499,
     originalPrice: 1880,
@@ -864,7 +864,7 @@ export const PRODUCTS = [
   },
   {
     id: '15609159',
-    imageUrl: 'assets/home/recommendations/15609159_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/15609159_OR_m.webp',
     images: ['assets/home/recommendations/15609159_OR_m.webp'],
     name: '【沐光】氣炸鍋 4L',
     price: 1909,
@@ -878,7 +878,7 @@ export const PRODUCTS = [
   },
   {
     id: '15609162',
-    imageUrl: 'assets/home/recommendations/15609162_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/15609162_OR_m.webp',
     images: ['assets/home/recommendations/15609162_OR_m.webp'],
     name: '【晨露】除濕機 10L',
     price: 12849,
@@ -892,8 +892,8 @@ export const PRODUCTS = [
   },
   {
     id: '15609452',
-    imageUrl: 'assets/home/best-sellers/15609452_OR.jpg',
-    images: ['assets/home/best-sellers/15609452_OR.jpg'],
+    imageUrl: 'assets/home/best-sellers/card/15609452_OR.webp',
+    images: ['assets/home/best-sellers/15609452_OR.webp'],
     name: '【晨露】除濕機 10L',
     price: 8619,
     originalPrice: 11500,
@@ -907,7 +907,7 @@ export const PRODUCTS = [
   },
   {
     id: '15627675',
-    imageUrl: 'assets/home/recommendations/15627675_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/15627675_OR_m.webp',
     images: ['assets/home/recommendations/15627675_OR_m.webp'],
     name: '【ARLO】保濕精華液 50ml',
     price: 1859,
@@ -921,7 +921,7 @@ export const PRODUCTS = [
   },
   {
     id: '15633261',
-    imageUrl: 'assets/home/flash-sale/15633261_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/15633261_OR_m.webp',
     images: ['assets/home/flash-sale/15633261_OR_m.webp'],
     name: '【VELA】快煮壺 1.7L',
     price: 699,
@@ -935,7 +935,7 @@ export const PRODUCTS = [
   },
   {
     id: '15642257',
-    imageUrl: 'assets/home/price-drop/15642257_OL_m.webp',
+    imageUrl: 'assets/home/price-drop/card/15642257_OL_m.webp',
     images: ['assets/home/price-drop/15642257_OL_m.webp'],
     name: '【海風】抽取式衛生紙 100抽 x24包',
     price: 729,
@@ -948,7 +948,7 @@ export const PRODUCTS = [
   },
   {
     id: '15654630',
-    imageUrl: 'assets/home/flash-sale/15654630_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/15654630_OR_m.webp',
     images: ['assets/home/flash-sale/15654630_OR_m.webp'],
     name: '【MORI】除濕機 10L',
     price: 10239,
@@ -962,10 +962,10 @@ export const PRODUCTS = [
   },
   {
     id: '15684492',
-    imageUrl: 'assets/home/flash-sale/15684492_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/15684492_OR_m.webp',
     images: [
       'assets/home/flash-sale/15684492_OR_m.webp',
-      'assets/home/best-sellers/15684492_OR.jpg',
+      'assets/home/best-sellers/15684492_OR.webp',
     ],
     name: '【木森】保濕精華液 30ml',
     price: 709,
@@ -980,7 +980,7 @@ export const PRODUCTS = [
   },
   {
     id: '15684493',
-    imageUrl: 'assets/home/recommendations/15684493_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/15684493_OR_m.webp',
     images: ['assets/home/recommendations/15684493_OR_m.webp'],
     name: '【沐光】低敏貓砂 7L x3',
     price: 929,
@@ -994,7 +994,7 @@ export const PRODUCTS = [
   },
   {
     id: '15685652',
-    imageUrl: 'assets/home/recommendations/15685652_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/15685652_OR_m.webp',
     images: ['assets/home/recommendations/15685652_OR_m.webp'],
     name: '【海風】氣炸鍋 4L',
     price: 2109,
@@ -1008,7 +1008,7 @@ export const PRODUCTS = [
   },
   {
     id: '15686284',
-    imageUrl: 'assets/home/recommendations/15686284_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/15686284_OR_m.webp',
     images: ['assets/home/recommendations/15686284_OR_m.webp'],
     name: '【暖居】藍牙耳機 降噪版',
     price: 1019,
@@ -1022,7 +1022,7 @@ export const PRODUCTS = [
   },
   {
     id: '3829028',
-    imageUrl: 'assets/home/price-drop/3829028_OL_m.webp',
+    imageUrl: 'assets/home/price-drop/card/3829028_OL_m.webp',
     images: ['assets/home/price-drop/3829028_OL_m.webp'],
     name: '【KAITO】運動休閒鞋 男款',
     price: 3099,
@@ -1036,7 +1036,7 @@ export const PRODUCTS = [
   },
   {
     id: '4007505',
-    imageUrl: 'assets/home/price-drop/4007505_OL_m.webp',
+    imageUrl: 'assets/home/price-drop/card/4007505_OL_m.webp',
     images: ['assets/home/price-drop/4007505_OL_m.webp'],
     name: '【ARLO】洗衣精補充包 2kg x4',
     price: 859,
@@ -1049,7 +1049,7 @@ export const PRODUCTS = [
   },
   {
     id: '5764465',
-    imageUrl: 'assets/home/recommendations/5764465_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/5764465_OR_m.webp',
     images: ['assets/home/recommendations/5764465_OR_m.webp'],
     name: '【安禾】滴雞精 20入',
     price: 1859,
@@ -1063,7 +1063,7 @@ export const PRODUCTS = [
   },
   {
     id: '5766718',
-    imageUrl: 'assets/home/recommendations/5766718_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/5766718_OR_m.webp',
     images: ['assets/home/recommendations/5766718_OR_m.webp'],
     name: '【暖居】行動電源 10000mAh',
     price: 1659,
@@ -1076,7 +1076,7 @@ export const PRODUCTS = [
   },
   {
     id: '5766767',
-    imageUrl: 'assets/home/recommendations/5766767_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/5766767_OR_m.webp',
     images: ['assets/home/recommendations/5766767_OR_m.webp'],
     name: '【青嶼】抽取式衛生紙 100抽 x24包',
     price: 779,
@@ -1089,7 +1089,7 @@ export const PRODUCTS = [
   },
   {
     id: '5781320',
-    imageUrl: 'assets/home/recommendations/5781320_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/5781320_OR_m.webp',
     images: ['assets/home/recommendations/5781320_OR_m.webp'],
     name: '【MORI】抽取式衛生紙 100抽 x24包',
     price: 589,
@@ -1102,10 +1102,10 @@ export const PRODUCTS = [
   },
   {
     id: '6480933',
-    imageUrl: 'assets/home/flash-sale/6480933_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/6480933_OR_m.webp',
     images: [
       'assets/home/flash-sale/6480933_OR_m.webp',
-      'assets/home/best-sellers/6480933_OR.jpg',
+      'assets/home/best-sellers/6480933_OR.webp',
     ],
     name: '【木森】快煮壺 1.7L',
     price: 929,
@@ -1120,7 +1120,7 @@ export const PRODUCTS = [
   },
   {
     id: '6833903',
-    imageUrl: 'assets/home/recommendations/6833903_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/6833903_OR_m.webp',
     images: ['assets/home/recommendations/6833903_OR_m.webp'],
     name: '【MORI】低敏貓砂 7L x3',
     price: 939,
@@ -1134,7 +1134,7 @@ export const PRODUCTS = [
   },
   {
     id: '7024968',
-    imageUrl: 'assets/home/price-drop/7024968_OL_m.webp',
+    imageUrl: 'assets/home/price-drop/card/7024968_OL_m.webp',
     images: ['assets/home/price-drop/7024968_OL_m.webp'],
     name: '【青嶼】純棉床包四件組 雙人',
     price: 2369,
@@ -1148,7 +1148,7 @@ export const PRODUCTS = [
   },
   {
     id: '7378694',
-    imageUrl: 'assets/home/recommendations/7378694_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/7378694_OR_m.webp',
     images: ['assets/home/recommendations/7378694_OR_m.webp'],
     name: '【海風】除濕機 10L',
     price: 12389,
@@ -1162,7 +1162,7 @@ export const PRODUCTS = [
   },
   {
     id: '7679325',
-    imageUrl: 'assets/home/flash-sale/7679325_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/7679325_OR_m.webp',
     images: ['assets/home/flash-sale/7679325_OR_m.webp'],
     name: '【ARLO】洗衣精補充包 2kg x4',
     price: 479,
@@ -1176,7 +1176,7 @@ export const PRODUCTS = [
   },
   {
     id: '7849392',
-    imageUrl: 'assets/home/recommendations/7849392_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/7849392_OR_m.webp',
     images: ['assets/home/recommendations/7849392_OR_m.webp'],
     name: '【青嶼】抽取式衛生紙 100抽 x24包',
     price: 529,
@@ -1189,7 +1189,7 @@ export const PRODUCTS = [
   },
   {
     id: '7857623',
-    imageUrl: 'assets/home/flash-sale/7857623_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/7857623_OR_m.webp',
     images: ['assets/home/flash-sale/7857623_OR_m.webp'],
     name: '【海風】高效防曬乳 SPF50+ 50ml',
     price: 1259,
@@ -1203,7 +1203,7 @@ export const PRODUCTS = [
   },
   {
     id: '8013536',
-    imageUrl: 'assets/home/flash-sale/8013536_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/8013536_OR_m.webp',
     images: ['assets/home/flash-sale/8013536_OR_m.webp'],
     name: '【LUMO】藍牙耳機 降噪版',
     price: 1869,
@@ -1217,7 +1217,7 @@ export const PRODUCTS = [
   },
   {
     id: '8037995',
-    imageUrl: 'assets/home/recommendations/8037995_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/8037995_OR_m.webp',
     images: ['assets/home/recommendations/8037995_OR_m.webp'],
     name: '【木森】洗衣精補充包 2kg x4',
     price: 869,
@@ -1230,7 +1230,7 @@ export const PRODUCTS = [
   },
   {
     id: '8133411',
-    imageUrl: 'assets/home/recommendations/8133411_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/8133411_OR_m.webp',
     images: ['assets/home/recommendations/8133411_OR_m.webp'],
     name: '【原野】綜合堅果 1kg 家庭號',
     price: 759,
@@ -1244,7 +1244,7 @@ export const PRODUCTS = [
   },
   {
     id: '8372350',
-    imageUrl: 'assets/home/flash-sale/8372350_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/8372350_OR_m.webp',
     images: ['assets/home/flash-sale/8372350_OR_m.webp'],
     name: '【海風】行動電源 10000mAh',
     price: 1079,
@@ -1258,7 +1258,7 @@ export const PRODUCTS = [
   },
   {
     id: '8512957',
-    imageUrl: 'assets/home/flash-sale/8512957_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/8512957_OR_m.webp',
     images: ['assets/home/flash-sale/8512957_OR_m.webp'],
     name: '【NORDA】機械鍵盤 紅軸',
     price: 2549,
@@ -1272,7 +1272,7 @@ export const PRODUCTS = [
   },
   {
     id: '8531746',
-    imageUrl: 'assets/home/recommendations/8531746_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/8531746_OR_m.webp',
     images: ['assets/home/recommendations/8531746_OR_m.webp'],
     name: '【LUMO】氣炸鍋 4L',
     price: 3509,
@@ -1285,7 +1285,7 @@ export const PRODUCTS = [
   },
   {
     id: '9210811',
-    imageUrl: 'assets/home/recommendations/9210811_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/9210811_OR_m.webp',
     images: ['assets/home/recommendations/9210811_OR_m.webp'],
     name: '【海風】精選咖啡豆 半磅',
     price: 469,
@@ -1298,7 +1298,7 @@ export const PRODUCTS = [
   },
   {
     id: '9583170',
-    imageUrl: 'assets/home/recommendations/9583170_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/9583170_OR_m.webp',
     images: ['assets/home/recommendations/9583170_OR_m.webp'],
     name: '【禾日】綜合堅果 1kg 家庭號',
     price: 379,
@@ -1312,7 +1312,7 @@ export const PRODUCTS = [
   },
   {
     id: '9779579',
-    imageUrl: 'assets/home/recommendations/9779579_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/9779579_OR_m.webp',
     images: ['assets/home/recommendations/9779579_OR_m.webp'],
     name: '【ARLO】滴雞精 20入',
     price: 2819,
@@ -1326,7 +1326,7 @@ export const PRODUCTS = [
   },
   {
     id: '9835777',
-    imageUrl: 'assets/home/flash-sale/9835777_OR_m.webp',
+    imageUrl: 'assets/home/flash-sale/card/9835777_OR_m.webp',
     images: ['assets/home/flash-sale/9835777_OR_m.webp'],
     name: '【暖居】精選咖啡豆 半磅',
     price: 359,
@@ -1340,7 +1340,7 @@ export const PRODUCTS = [
   },
   {
     id: '9951817',
-    imageUrl: 'assets/home/recommendations/9951817_OR_m.webp',
+    imageUrl: 'assets/home/recommendations/card/9951817_OR_m.webp',
     images: ['assets/home/recommendations/9951817_OR_m.webp'],
     name: '【海風】高效防曬乳 SPF50+ 50ml',
     price: 889,
@@ -1353,7 +1353,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00003980002596',
-    imageUrl: 'assets/home/price-drop/TP00003980002596_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00003980002596_O.webp',
     images: ['assets/home/price-drop/TP00003980002596_O.webp'],
     name: '【LUMO】除濕機 10L',
     price: 12939,
@@ -1366,7 +1366,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00005070000393',
-    imageUrl: 'assets/home/store-pickup/TP00005070000393_OR.webp',
+    imageUrl: 'assets/home/store-pickup/card/TP00005070000393_OR.webp',
     images: ['assets/home/store-pickup/TP00005070000393_OR.webp'],
     name: '【NORDA】智慧手錶 LTE版',
     price: 8669,
@@ -1381,7 +1381,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00011250003140',
-    imageUrl: 'assets/home/price-drop/TP00011250003140_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00011250003140_O.webp',
     images: ['assets/home/price-drop/TP00011250003140_O.webp'],
     name: '【禾日】無線吸塵器 旗艦款',
     price: 7889,
@@ -1395,7 +1395,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00011690006673',
-    imageUrl: 'assets/home/price-drop/TP00011690006673_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00011690006673_O.webp',
     images: ['assets/home/price-drop/TP00011690006673_O.webp'],
     name: '【木森】保濕精華液 30ml',
     price: 739,
@@ -1408,7 +1408,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00013440000453',
-    imageUrl: 'assets/home/price-drop/TP00013440000453_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00013440000453_O.webp',
     images: ['assets/home/price-drop/TP00013440000453_O.webp'],
     name: '【沐光】低敏貓砂 7L x3',
     price: 549,
@@ -1421,7 +1421,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00020130000757',
-    imageUrl: 'assets/home/store-pickup/TP00020130000757_OR.webp',
+    imageUrl: 'assets/home/store-pickup/card/TP00020130000757_OR.webp',
     images: ['assets/home/store-pickup/TP00020130000757_OR.webp'],
     name: '【安禾】空氣清淨機 12坪',
     price: 7039,
@@ -1436,7 +1436,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00023530000484',
-    imageUrl: 'assets/home/price-drop/TP00023530000484_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00023530000484_O.webp',
     images: ['assets/home/price-drop/TP00023530000484_O.webp'],
     name: '【原野】快煮壺 1.7L',
     price: 1179,
@@ -1450,7 +1450,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00026070000149',
-    imageUrl: 'assets/home/price-drop/TP00026070000149_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00026070000149_O.webp',
     images: ['assets/home/price-drop/TP00026070000149_O.webp'],
     name: '【木森】智慧手錶 LTE版',
     price: 4949,
@@ -1464,7 +1464,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00035580000872',
-    imageUrl: 'assets/home/flash-sale/TP00035580000872_O.webp',
+    imageUrl: 'assets/home/flash-sale/card/TP00035580000872_O.webp',
     images: ['assets/home/flash-sale/TP00035580000872_O.webp'],
     name: '【青嶼】運動休閒鞋 男款',
     price: 1559,
@@ -1478,7 +1478,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00038620001283',
-    imageUrl: 'assets/home/price-drop/TP00038620001283_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00038620001283_O.webp',
     images: ['assets/home/price-drop/TP00038620001283_O.webp'],
     name: '【安禾】不鏽鋼保溫瓶 750ml',
     price: 759,
@@ -1492,7 +1492,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00040740004861',
-    imageUrl: 'assets/home/price-drop/TP00040740004861_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00040740004861_O.webp',
     images: ['assets/home/price-drop/TP00040740004861_O.webp'],
     name: '【暖居】藍牙耳機 降噪版',
     price: 3889,
@@ -1505,8 +1505,8 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00053910000004',
-    imageUrl: 'assets/home/store-pickup/TP00053910000004_OR_m.jpg',
-    images: ['assets/home/store-pickup/TP00053910000004_OR_m.jpg'],
+    imageUrl: 'assets/home/store-pickup/card/TP00053910000004_OR_m.webp',
+    images: ['assets/home/store-pickup/TP00053910000004_OR_m.webp'],
     name: '【青嶼】除濕機 10L',
     price: 7459,
     description: [
@@ -1519,7 +1519,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00056780000137',
-    imageUrl: 'assets/home/store-pickup/TP00056780000137_OR.webp',
+    imageUrl: 'assets/home/store-pickup/card/TP00056780000137_OR.webp',
     images: ['assets/home/store-pickup/TP00056780000137_OR.webp'],
     name: '【樂活家】機械鍵盤 紅軸',
     price: 4499,
@@ -1534,7 +1534,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00059680000231',
-    imageUrl: 'assets/home/store-pickup/TP00059680000231_OR.webp',
+    imageUrl: 'assets/home/store-pickup/card/TP00059680000231_OR.webp',
     images: ['assets/home/store-pickup/TP00059680000231_OR.webp'],
     name: '【MORI】行動電源 10000mAh',
     price: 699,
@@ -1549,7 +1549,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00074290000866',
-    imageUrl: 'assets/home/price-drop/TP00074290000866_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00074290000866_O.webp',
     images: ['assets/home/price-drop/TP00074290000866_O.webp'],
     name: '【MORI】精選咖啡豆 半磅',
     price: 529,
@@ -1563,7 +1563,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00074290001088',
-    imageUrl: 'assets/home/price-drop/TP00074290001088_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00074290001088_O.webp',
     images: ['assets/home/price-drop/TP00074290001088_O.webp'],
     name: '【NORDA】智慧手錶 LTE版',
     price: 5939,
@@ -1577,7 +1577,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00074940000415',
-    imageUrl: 'assets/home/price-drop/TP00074940000415_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00074940000415_O.webp',
     images: ['assets/home/price-drop/TP00074940000415_O.webp'],
     name: '【海風】氣炸鍋 4L',
     price: 3689,
@@ -1591,7 +1591,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00075410002861',
-    imageUrl: 'assets/home/price-drop/TP00075410002861_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00075410002861_O.webp',
     images: ['assets/home/price-drop/TP00075410002861_O.webp'],
     name: '【MORI】高效防曬乳 SPF50+ 50ml',
     price: 769,
@@ -1604,7 +1604,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00078450000954',
-    imageUrl: 'assets/home/price-drop/TP00078450000954_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00078450000954_O.webp',
     images: ['assets/home/price-drop/TP00078450000954_O.webp'],
     name: '【晨露】運動休閒鞋 男款',
     price: 1919,
@@ -1618,7 +1618,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00080580001912',
-    imageUrl: 'assets/home/price-drop/TP00080580001912_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00080580001912_O.webp',
     images: ['assets/home/price-drop/TP00080580001912_O.webp'],
     name: '【MORI】除濕機 10L',
     price: 9839,
@@ -1632,7 +1632,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00087250006498',
-    imageUrl: 'assets/home/price-drop/TP00087250006498_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00087250006498_O.webp',
     images: ['assets/home/price-drop/TP00087250006498_O.webp'],
     name: '【木森】不鏽鋼保溫瓶 750ml',
     price: 749,
@@ -1646,7 +1646,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00088150000098',
-    imageUrl: 'assets/home/price-drop/TP00088150000098_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00088150000098_O.webp',
     images: ['assets/home/price-drop/TP00088150000098_O.webp'],
     name: '【ARLO】智慧手錶 LTE版',
     price: 3299,
@@ -1660,7 +1660,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00089000000049',
-    imageUrl: 'assets/home/store-pickup/TP00089000000049_OR.webp',
+    imageUrl: 'assets/home/store-pickup/card/TP00089000000049_OR.webp',
     images: ['assets/home/store-pickup/TP00089000000049_OR.webp'],
     name: '【青嶼】運動休閒鞋 男款',
     price: 1599,
@@ -1674,7 +1674,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00091220004537',
-    imageUrl: 'assets/home/price-drop/TP00091220004537_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00091220004537_O.webp',
     images: ['assets/home/price-drop/TP00091220004537_O.webp'],
     name: '【NORDA】空氣清淨機 12坪',
     price: 12209,
@@ -1687,7 +1687,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00096370000059',
-    imageUrl: 'assets/home/store-pickup/TP00096370000059_OR.webp',
+    imageUrl: 'assets/home/store-pickup/card/TP00096370000059_OR.webp',
     images: ['assets/home/store-pickup/TP00096370000059_OR.webp'],
     name: '【禾日】無線吸塵器 旗艦款',
     price: 12399,
@@ -1702,7 +1702,7 @@ export const PRODUCTS = [
   },
   {
     id: 'TP00102840000302',
-    imageUrl: 'assets/home/price-drop/TP00102840000302_O.webp',
+    imageUrl: 'assets/home/price-drop/card/TP00102840000302_O.webp',
     images: ['assets/home/price-drop/TP00102840000302_O.webp'],
     name: '【暖居】氣炸鍋 4L',
     price: 4539,

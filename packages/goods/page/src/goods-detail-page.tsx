@@ -66,7 +66,7 @@ export function GoodsDetailPage({ goodsId }: GoodsDetailPageProps) {
     <PageContainer>
       <article className="flex items-start gap-8">
         <div className="w-110 shrink-0">
-          <GoodsGallery imageUrl={product.imageUrl} name={product.name} />
+          <GoodsGallery imageUrl={product.images[0]} name={product.name} />
         </div>
         <div className="min-w-0 flex-1">
           <GoodsInfo product={product} />
