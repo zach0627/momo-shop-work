@@ -322,6 +322,9 @@ importers:
       '@momo/goods-page':
         specifier: workspace:*
         version: link:../../packages/goods/page
+      '@momo/home-data-access':
+        specifier: workspace:*
+        version: link:../../packages/home/data-access
       '@momo/home-page':
         specifier: workspace:*
         version: link:../../packages/home/page
