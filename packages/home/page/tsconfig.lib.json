@@ -50,9 +50,6 @@
       "path": "../../shared/ui/tsconfig.lib.json"
     },
     {
-      "path": "../feature-ranking/tsconfig.lib.json"
-    },
-    {
       "path": "../feature-flash-sale/tsconfig.lib.json"
     },
     {

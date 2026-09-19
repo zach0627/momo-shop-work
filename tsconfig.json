@@ -13,9 +13,6 @@
       "path": "./packages/home/feature-flash-sale"
     },
     {
-      "path": "./packages/home/feature-ranking"
-    },
-    {
       "path": "./packages/catalog/data-access"
     },
     {

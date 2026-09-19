@@ -77,14 +77,9 @@ export interface ProductRailSection extends SectionBase {
   background?: string;
 }
 
-/** 以下三種有自己的邏輯，由各自的 feature package 抓資料。 */
+/** 以下兩種有自己的邏輯，由各自的 feature package 抓資料。 */
 export interface FlashSaleSection extends SectionBase {
   type: 'flash-sale';
-  title: SectionTitle;
-}
-
-export interface RankingSection extends SectionBase {
-  type: 'ranking';
   title: SectionTitle;
 }
 
@@ -101,7 +96,6 @@ export type HomeSection =
   | NoticeSection
   | ProductRailSection
   | FlashSaleSection
-  | RankingSection
   | RecommendationSection;
 
 export type HomeSectionType = HomeSection['type'];

@@ -24,7 +24,6 @@
     "@momo/catalog-feature-recommendation": "workspace:*",
     "@momo/home-data-access": "workspace:*",
     "@momo/home-feature-flash-sale": "workspace:*",
-    "@momo/home-feature-ranking": "workspace:*",
     "@momo/shared-ui": "workspace:*",
     "@momo/shared-util": "workspace:*",
     "react": "catalog:"

@@ -21,7 +21,6 @@ const registry: SectionRegistry = {
   notice: label('notice'),
   'product-rail': label('product-rail'),
   'flash-sale': label('flash-sale'),
-  ranking: label('ranking'),
   recommendation: label('recommendation'),
 };
 
@@ -30,10 +29,10 @@ const flashSale: HomeSection = {
   type: 'flash-sale',
   title: { text: '限時搶購' },
 };
-const ranking: HomeSection = {
-  id: 'rk',
-  type: 'ranking',
-  title: { text: '今日暢銷榜' },
+const recommendation: HomeSection = {
+  id: 'rc',
+  type: 'recommendation',
+  title: { text: '你可能會喜歡' },
 };
 const rail: HomeSection = {
   id: 'pd',
@@ -77,32 +76,32 @@ describe('SectionRenderer', () => {
   it('follows the order of the data, and follows it again when it changes', () => {
     const { rerender } = render(
       <SectionRenderer
-        sections={[flashSale, ranking, rail]}
+        sections={[flashSale, recommendation, rail]}
         registry={registry}
       />,
     );
     expect(rendered()).toEqual([
       'flash-sale:fs',
-      'ranking:rk',
+      'recommendation:rc',
       'product-rail:pd',
     ]);
 
     rerender(
       <SectionRenderer
-        sections={[ranking, flashSale, rail]}
+        sections={[recommendation, flashSale, rail]}
         registry={registry}
       />,
     );
     expect(rendered()).toEqual([
-      'ranking:rk',
+      'recommendation:rc',
       'flash-sale:fs',
       'product-rail:pd',
     ]);
 
     rerender(
-      <SectionRenderer sections={[ranking, rail]} registry={registry} />,
+      <SectionRenderer sections={[recommendation, rail]} registry={registry} />,
     );
-    expect(rendered()).toEqual(['ranking:rk', 'product-rail:pd']);
+    expect(rendered()).toEqual(['recommendation:rc', 'product-rail:pd']);
   });
 
   // 規格 home-page：未知的區塊型別不影響頁面

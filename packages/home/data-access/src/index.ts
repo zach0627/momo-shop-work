@@ -9,7 +9,6 @@ export type {
   HomeSectionType,
   NoticeSection,
   ProductRailSection,
-  RankingSection,
   RecommendationSection,
   SectionTitle,
   Shortcut,

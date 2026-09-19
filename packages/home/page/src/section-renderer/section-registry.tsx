@@ -1,6 +1,5 @@
 import { Recommendation } from '@momo/catalog-feature-recommendation';
 import { FlashSale } from '@momo/home-feature-flash-sale';
-import { Ranking } from '@momo/home-feature-ranking';
 
 import { BannerCarousel } from '../blocks/banner-carousel';
 import { BannerGrid } from '../blocks/banner-grid';
@@ -40,11 +39,6 @@ export const SECTION_REGISTRY: SectionRegistry = {
   // 限時搶購（倒數 + 每頁 2×5 件）→ home/feature-flash-sale
   'flash-sale': ({ section }) => (
     <FlashSale lead={section.title.lead} title={section.title.text} />
-  ),
-
-  // 今日暢銷榜 → home/feature-ranking（佔位中）
-  ranking: ({ section }) => (
-    <Ranking lead={section.title.lead} title={section.title.text} />
   ),
 
   // 你可能會喜歡 → catalog/feature-recommendation（詳情頁之後也會用，所以放 catalog）
