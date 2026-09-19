@@ -195,6 +195,18 @@ describe('the generated fixtures', () => {
     });
   });
 
+  // spec home-page: horizontal cards carry a promo line above the name.
+  it.each(['store-pickup', 'best-sellers'])(
+    'gives every product of the %s rail a promo line',
+    async (key) => {
+      const products = await real.getCollection(key);
+      expect(products.length).toBeGreaterThan(0);
+      for (const product of products) {
+        expect(product.promoText ?? '').not.toBe('');
+      }
+    },
+  );
+
   it('sells every flash sale product below its original price', async () => {
     const { items, endsAt } = await real.getFlashSale();
     expect(items.length).toBeGreaterThan(0);

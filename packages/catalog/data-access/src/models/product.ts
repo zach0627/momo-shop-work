@@ -9,6 +9,8 @@ export interface Product {
   price: number;
   /** Present only when the product is discounted; always above `price`. */
   originalPrice?: number;
+  /** One short promotion line, e.g. "滿1件折100". Shown by horizontal cards. */
+  promoText?: string;
   /** Bullet lines shown on the detail page. */
   description: string[];
 }

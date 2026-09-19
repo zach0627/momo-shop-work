@@ -30,6 +30,10 @@ const COLLECTIONS = [
   ['recommendations', 'home/recommendations'],
 ];
 const FLASH_SALE_KEY = 'flash-sale';
+// The rails shown as horizontal cards, which carry a promo line on the live
+// site. The line belongs to the product, so it is the same wherever the
+// product appears; whether a card shows it is the rail's decision.
+const PROMO_LINE_KEYS = ['store-pickup', 'best-sellers'];
 
 const BRANDS = [
   '沐光',
@@ -91,6 +95,14 @@ const PROMO_TEXTS = [
   '限量搶購',
   '加碼折 100',
   '結帳再折',
+];
+const PROMO_LINES = [
+  '滿1件折100',
+  '滿3000折200',
+  '滿額登記送mo幣',
+  '下單再折5%',
+  '超取免運',
+  '正品販售',
 ];
 
 // FNV-1a, 32 bit. `salt` gives independent numbers for the same id.
@@ -167,11 +179,17 @@ if (problems.length) {
 }
 
 const flashSaleIds = new Set(collections[FLASH_SALE_KEY]);
+const promoLineIds = new Set(
+  PROMO_LINE_KEYS.flatMap((key) => collections[key]),
+);
 const products = [...images.keys()].sort(compare).map((id) => ({
   id,
   imageUrl: images.get(id)[0],
   images: images.get(id),
   ...describe(id, flashSaleIds.has(id)),
+  ...(promoLineIds.has(id)
+    ? { promoText: pick(PROMO_LINES, id, 'promo-line') }
+    : {}),
 }));
 
 const flashSaleExtras = Object.fromEntries(
