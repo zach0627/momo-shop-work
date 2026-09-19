@@ -33,4 +33,14 @@ describe('SectionHeader', () => {
     expect(heading.contains(icon)).toBe(true);
     expect(heading.textContent).toBe('超取$290免運無限次');
   });
+
+  // 標籤是標題旁的補充，不是標題的一部分：區塊仍然叫「今日暢銷榜」
+  it('shows a badge beside the title without making it part of the heading', () => {
+    render(<SectionHeader title="今日暢銷榜" badge="即時更新" />);
+
+    expect(screen.getByText('即時更新')).toBeTruthy();
+    expect(
+      screen.getByRole('heading', { level: 2, name: '今日暢銷榜' }),
+    ).toBeTruthy();
+  });
 });

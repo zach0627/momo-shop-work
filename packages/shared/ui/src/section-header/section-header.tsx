@@ -6,17 +6,31 @@ export interface SectionHeaderProps {
   lead?: string;
   /** 放在標題前面，例：logo。 */
   icon?: ReactNode;
+  /** 標題旁的小標籤，例：「即時更新」。不屬於標題本身。 */
+  badge?: string;
 }
 
 /** 首頁區塊的標題。真站的標題是 1220×70 的圖，素材沒有提供，所以用文字；字級是估計值。 */
-export function SectionHeader({ title, lead, icon }: SectionHeaderProps) {
+export function SectionHeader({
+  title,
+  lead,
+  icon,
+  badge,
+}: SectionHeaderProps) {
   return (
-    <h2 className="text-ec-title text-ink flex h-17.5 items-center gap-2 px-4 font-medium">
-      {icon}
-      <span>
-        {lead && <span className="text-ink-muted">{lead}</span>}
-        {title}
-      </span>
-    </h2>
+    <div className="flex h-17.5 items-center gap-3 px-4">
+      <h2 className="text-ec-title text-ink flex items-center gap-2 font-medium">
+        {icon}
+        <span>
+          {lead && <span className="text-ink-muted">{lead}</span>}
+          {title}
+        </span>
+      </h2>
+      {badge && (
+        <span className="bg-badge text-ec-md text-on-action rounded-tile px-2.5 font-bold">
+          {badge}
+        </span>
+      )}
+    </div>
   );
 }

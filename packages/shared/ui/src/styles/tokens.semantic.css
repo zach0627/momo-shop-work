@@ -29,6 +29,8 @@
   --color-sale: var(--momo-red-600);
   /* 倒數計時的數字底色 */
   --color-countdown: var(--momo-rose-500);
+  /* 區塊標題旁的標籤「即時更新」（取樣自目標截圖：真站的標題列是一張圖） */
+  --color-badge: var(--momo-rose-550);
 
   /* ---- 文字 ---- */
 
@@ -91,8 +93,10 @@
 
   /* ---- 線條 ---- */
 
-  /* 商品卡框線 */
+  /* 直式商品卡（降價好貨）框線 */
   --color-line: var(--momo-gray-200);
+  /* 橫式商品卡（momo 店取、今日暢銷榜）框線 */
+  --color-line-card: var(--momo-gray-250);
   /* 限時搶購商品卡框線 */
   --color-line-soft: var(--momo-gray-150);
   /* 頂部列的底線 */

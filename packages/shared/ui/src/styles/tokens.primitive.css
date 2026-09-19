@@ -7,6 +7,7 @@
   --momo-magenta-600: #d62872; /* 品牌色 */
   --momo-pink-600: #db2777;
   --momo-rose-500: #ff4c76;
+  --momo-rose-550: #f73f64; /* 「即時更新」標籤（取樣自目標截圖） */
   --momo-red-600: #dd2222;
   --momo-pink-100: #ffd9e5; /* 限時搶購的標題列 */
   --momo-blush-50: #fdf2f2; /* 「最後 N 組」的底色 */
@@ -40,6 +41,7 @@
   --momo-gray-500: #888888;
   --momo-gray-450: #999999;
   --momo-gray-300: #cccccc;
+  --momo-gray-250: #d9d9d9;
   --momo-gray-200: #e5e5e5;
   --momo-gray-175: #ededed;
   --momo-gray-150: #f0f0f0;
