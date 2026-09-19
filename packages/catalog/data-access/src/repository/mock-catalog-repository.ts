@@ -30,7 +30,6 @@ export interface MockCatalogOptions {
 const COLLECTION_KEYS = {
   recommendations: 'recommendations',
   flashSale: 'flash-sale',
-  ranking: 'best-sellers',
 } as const;
 
 const DEFAULT_DATA: CatalogData = {
@@ -85,8 +84,6 @@ export function createMockCatalogRepository({
       );
       return respond({ endsAt: endsAt.toISOString(), items });
     },
-
-    getRanking: () => respond(productsOf(COLLECTION_KEYS.ranking)),
 
     getCategories: () => respond(data.categories),
   };

@@ -13,6 +13,5 @@ export interface CatalogRepository {
     limit: number;
   }): Promise<Page<Product>>;
   getFlashSale(): Promise<FlashSale>;
-  getRanking(): Promise<Product[]>;
   getCategories(): Promise<Category[]>;
 }

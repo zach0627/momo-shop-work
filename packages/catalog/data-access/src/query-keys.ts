@@ -6,6 +6,5 @@ export const catalogKeys = {
   recommendations: (pageSize: number) =>
     ['catalog', 'recommendations', pageSize] as const,
   flashSale: () => ['catalog', 'flash-sale'] as const,
-  ranking: () => ['catalog', 'ranking'] as const,
   categories: () => ['catalog', 'categories'] as const,
 };

@@ -21,6 +21,5 @@ export { useCategories } from './hooks/use-categories';
 export { useFlashSale } from './hooks/use-flash-sale';
 export { useProduct } from './hooks/use-product';
 export { useProductCollection } from './hooks/use-product-collection';
-export { useRanking } from './hooks/use-ranking';
 export { useRecommendations } from './hooks/use-recommendations';
 export { catalogKeys } from './query-keys';

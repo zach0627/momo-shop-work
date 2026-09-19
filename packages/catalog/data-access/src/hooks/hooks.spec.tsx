@@ -7,7 +7,6 @@ import { useCategories } from './use-categories';
 import { useFlashSale } from './use-flash-sale';
 import { useProduct } from './use-product';
 import { useProductCollection } from './use-product-collection';
-import { useRanking } from './use-ranking';
 import { useRecommendations } from './use-recommendations';
 
 const product = (id: string): Product => ({
@@ -86,20 +85,18 @@ describe('query hooks', () => {
     expect(getCollection).toHaveBeenCalledWith('price-drop');
   });
 
-  it('useFlashSale, useRanking and useCategories each read their own method', async () => {
+  it('useFlashSale and useCategories each read their own method', async () => {
     const { wrapper } = wrapperFor({
       getFlashSale: async () => ({
         endsAt: '2026-01-01T00:00:00.000Z',
         items: [],
       }),
-      getRanking: async () => [product('top')],
       getCategories: async () => [{ id: 'home', name: '首頁' }],
     });
 
     const { result } = renderHook(
       () => ({
         flashSale: useFlashSale(),
-        ranking: useRanking(),
         categories: useCategories(),
       }),
       { wrapper },
@@ -109,7 +106,6 @@ describe('query hooks', () => {
       expect(result.current.flashSale.data?.endsAt).toBe(
         '2026-01-01T00:00:00.000Z',
       );
-      expect(result.current.ranking.data).toEqual([product('top')]);
       expect(result.current.categories.data).toEqual([
         { id: 'home', name: '首頁' },
       ]);

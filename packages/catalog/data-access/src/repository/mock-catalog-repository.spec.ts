@@ -125,11 +125,6 @@ describe('createMockCatalogRepository', () => {
     });
   });
 
-  it('getRanking returns the best sellers in order', async () => {
-    const items = await repository.getRanking();
-    expect(items.map((p) => p.id)).toEqual(['b1', 'r2']);
-  });
-
   it('getCategories returns the categories in order', async () => {
     await expect(repository.getCategories()).resolves.toEqual(data.categories);
   });

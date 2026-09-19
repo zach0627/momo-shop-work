@@ -17,7 +17,6 @@ export function createFakeCatalogRepository(
       endsAt: new Date(0).toISOString(),
       items: [],
     }),
-    getRanking: async () => [],
     getCategories: async () => [],
     ...overrides,
   };
