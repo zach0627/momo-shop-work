@@ -4,6 +4,7 @@ import type { HomeSection } from '@momo/home-data-access';
 import { reportError } from '@momo/shared-util';
 
 import type { SectionRegistry } from './registry';
+import { SectionBoundary } from './section-boundary';
 
 export interface SectionRendererProps {
   sections: HomeSection[];
@@ -14,7 +15,7 @@ export interface SectionRendererProps {
 const isKnown = (registry: SectionRegistry, section: HomeSection) =>
   Object.hasOwn(registry, section.type);
 
-/** 依資料由上到下渲染首頁（自己不抓資料）。遇到不認識的 type：略過、回報一次，其餘照常。 */
+/** 依資料由上到下渲染首頁（自己不抓資料）。不認識的 type、或渲染時拋錯的區塊：略過、回報一次，其餘照常。 */
 export function SectionRenderer({ sections, registry }: SectionRendererProps) {
   const unknown = sections.filter((section) => !isKnown(registry, section));
   // 用字串當 effect 的依賴：內容相同的新陣列不會重複回報
@@ -40,7 +41,11 @@ export function SectionRenderer({ sections, registry }: SectionRendererProps) {
         const Section = registry[section.type] as ComponentType<{
           section: HomeSection;
         }>;
-        return <Section key={section.id} section={section} />;
+        return (
+          <SectionBoundary key={section.id} section={section}>
+            <Section section={section} />
+          </SectionBoundary>
+        );
       })}
     </>
   );

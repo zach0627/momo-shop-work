@@ -133,6 +133,66 @@ describe('SectionRenderer', () => {
     expect(sink.error).toHaveBeenCalledTimes(1);
   });
 
+  describe('when a section throws while rendering', () => {
+    // 被 error boundary 接住的錯誤 React 仍會印到 console.error；測試裡關掉
+    beforeEach(() => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    const Broken = () => {
+      throw new Error('price is not a number');
+    };
+
+    // 規格 home-page：一個區塊渲染時拋錯
+    it('drops that section, keeps the ones around it, and reports it', () => {
+      render(
+        <SectionRenderer
+          sections={[flashSale, recommendation, rail]}
+          registry={{ ...registry, recommendation: Broken }}
+        />,
+      );
+
+      expect(rendered()).toEqual(['flash-sale:fs', 'product-rail:pd']);
+      expect(sink.error).toHaveBeenCalledTimes(1);
+      const [error, context] = vi.mocked(sink.error).mock.calls[0];
+      expect(String(error)).toContain('price is not a number');
+      expect(context).toEqual({
+        sectionId: 'rc',
+        sectionType: 'recommendation',
+      });
+    });
+
+    // 規格 home-page：版位資料更新後恢復
+    it('shows the section again once new data for it stops throwing', () => {
+      const BrokenOnce = ({ section }: { section: HomeSection }) => {
+        if (section.type === 'recommendation' && section.title.text === 'bad')
+          throw new Error('bad title');
+        return (
+          <div data-testid="section">{`recommendation:${section.id}`}</div>
+        );
+      };
+      const custom = { ...registry, recommendation: BrokenOnce };
+      const bad: HomeSection = { ...recommendation, title: { text: 'bad' } };
+
+      const { rerender } = render(
+        <SectionRenderer sections={[flashSale, bad]} registry={custom} />,
+      );
+      expect(rendered()).toEqual(['flash-sale:fs']);
+
+      rerender(
+        <SectionRenderer
+          sections={[flashSale, recommendation]}
+          registry={custom}
+        />,
+      );
+      expect(rendered()).toEqual(['flash-sale:fs', 'recommendation:rc']);
+    });
+  });
+
   // registry['constructor'] 在每個物件上都存在，不能因此被當成「有註冊」
   it('treats a type named like an Object.prototype member as unknown', () => {
     render(
