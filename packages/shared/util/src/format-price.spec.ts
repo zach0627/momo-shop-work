@@ -2,7 +2,7 @@ import { formatPrice } from './format-price.js';
 
 describe('formatPrice', () => {
   it.each([
-    [49900, '49,900'],
+    [49900, '49.900'], // 探針：故意寫錯，CI 必須失敗
     [1234567, '1,234,567'],
     [999, '999'],
     [0, '0'],
