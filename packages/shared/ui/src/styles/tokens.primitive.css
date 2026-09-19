@@ -39,6 +39,7 @@
   --momo-slate-600: #4b5563;
 
   /* neutrals, dark to light */
+  --momo-black: #000000; /* only ever used translucent: carousel arrows */
   --momo-gray-950: #222222;
   --momo-gray-900: #262626;
   --momo-gray-800: #404040;
@@ -49,6 +50,7 @@
   --momo-gray-400: #b3b3b3;
   --momo-gray-300: #cccccc;
   --momo-gray-200: #e5e5e5;
+  --momo-gray-175: #ededed;
   --momo-gray-150: #f0f0f0;
   --momo-gray-100: #f2f2f2;
   --momo-gray-50: #fafafa;

@@ -5,6 +5,7 @@ packages:
 # declare what they import and point here with "catalog:".
 catalog:
   '@tanstack/react-query': ^5.103.1
+  embla-carousel-react: ^8.6.0
   react: ^19.0.0
   react-dom: ^19.0.0
   react-router: ^8.4.0

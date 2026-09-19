@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@momo/shared-util": "workspace:*",
+    "embla-carousel-react": "catalog:",
     "react": "catalog:"
   }
 }

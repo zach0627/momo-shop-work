@@ -1,3 +1,4 @@
+export { Carousel, type CarouselProps } from './carousel/carousel';
 export {
   AppLink,
   LinkProvider,
@@ -17,3 +18,7 @@ export {
   type ProductCardLayout,
   type ProductCardProps,
 } from './product-card/product-card';
+export {
+  SectionHeader,
+  type SectionHeaderProps,
+} from './section-header/section-header';

@@ -95,6 +95,24 @@
     transparent
   );
 
+  /* ---- Carousel ---------------------------------------------------------
+     Measured on the price-drop rail. The arrows are black at 30% (40% on
+     hover) over whatever slides underneath, so the opacity is part of the
+     token, like the category pills. A disabled arrow is the same colour at
+     25% opacity: `disabled:opacity-25`. The current dot is `brand`. */
+  --color-carousel-arrow: color-mix(
+    in srgb,
+    var(--momo-black) 30%,
+    transparent
+  );
+  --color-carousel-arrow-hover: color-mix(
+    in srgb,
+    var(--momo-black) 40%,
+    transparent
+  );
+  /* a dot that is not the current page */
+  --color-carousel-dot: var(--momo-gray-175);
+
   /* ---- Lines ------------------------------------------------------------ */
 
   /* product card border */
