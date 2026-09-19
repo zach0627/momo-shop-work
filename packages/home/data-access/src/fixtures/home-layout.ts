@@ -75,7 +75,11 @@ const SEARCH_SUGGESTIONS: Array<[file: string, keyword: string]> = [
   ['TP00096700000002_O.webp', '按摩球'],
 ];
 
+// 首頁由上到下的 15 個區塊。陣列順序 = 畫面順序：調整順序就搬動整筆，下架就刪掉那一筆。
+// perView：一次看得到幾張（小數 = 最後一張露出一部分）；gap：間距 px；columns：一列幾張。
+// 每一種 type 長什麼樣子，見 home/page 的 section-registry.tsx。
 export const HOME_LAYOUT: HomeSection[] = [
+  // 1. 主要活動輪播 + 右側今日大牌（素材只有四格中的一格）
   {
     id: 'main-events',
     type: 'hero',
@@ -91,6 +95,7 @@ export const HOME_LAYOUT: HomeSection[] = [
       ),
     },
   },
+  // 2. 官方優惠：8 格圖示輪播（3C新機、家電集購…）
   {
     id: 'official-deals-icons',
     type: 'banner-carousel',
@@ -104,7 +109,9 @@ export const HOME_LAYOUT: HomeSection[] = [
       e('bt_7_708_01', [1, 2, 4, 5, 10, 11, 13, 14, 15], '2'),
     ),
   },
+  // 3. 官方優惠：圓形捷徑（秒殺、簽到、分次配、領券、看更多）
   { id: 'official-deals-shortcuts', type: 'shortcut-bar', items: SHORTCUTS },
+  // 4. 官方優惠：超大牌，左 / 中 / 右三張
   {
     id: 'official-deals-mega-brand',
     type: 'banner-grid',
@@ -117,6 +124,7 @@ export const HOME_LAYOUT: HomeSection[] = [
       ['mega-brand-left.png', 'mega-brand-center.gif', 'mega-brand-right.jpg'],
     ),
   },
+  // 5. 降價好貨：直式商品卡，商品來自 catalog，可點進詳情頁
   {
     id: 'price-drop',
     type: 'product-rail',
@@ -125,6 +133,7 @@ export const HOME_LAYOUT: HomeSection[] = [
     card: 'vertical',
     perView: 8.52,
   },
+  // 6. 品牌折扣：直式品牌活動磚的輪播（沒有標題）
   {
     id: 'brand-discount',
     type: 'banner-carousel',
@@ -138,6 +147,7 @@ export const HOME_LAYOUT: HomeSection[] = [
       e('bt_7_703_01', [1, 2, 4, 5, 6, 7, 8, 9, 11, 12, 15, 16], '2'),
     ),
   },
+  // 7. 詐騙發票提醒：一條橫幅
   {
     id: 'fraud-notice',
     type: 'notice',
@@ -149,6 +159,7 @@ export const HOME_LAYOUT: HomeSection[] = [
       height: 96,
     },
   },
+  // 8. 官方旗艦名店：四張品牌圖
   {
     id: 'flagship-stores',
     type: 'banner-grid',
@@ -162,6 +173,7 @@ export const HOME_LAYOUT: HomeSection[] = [
       [1, 2, 3, 4].map((n) => `bt_7_707_03_P1_${n}_e2.jpg`),
     ),
   },
+  // 9. momo 店取：橫式商品卡（帶紅色促銷文字），可點進詳情頁
   {
     id: 'store-pickup',
     type: 'product-rail',
@@ -170,6 +182,7 @@ export const HOME_LAYOUT: HomeSection[] = [
     card: 'horizontal',
     perView: 3.47,
   },
+  // 10. 信用卡加碼優惠：各銀行優惠圖的輪播（沒有標題）
   {
     id: 'card-offers',
     type: 'banner-carousel',
@@ -183,6 +196,7 @@ export const HOME_LAYOUT: HomeSection[] = [
       e('bt_7_706_01', [1, 2, 3, 4, 5, 6, 7], '2'),
     ),
   },
+  // 11. 猜你想搜：商品圖 + 下方關鍵字
   {
     id: 'search-suggest',
     type: 'banner-carousel',
@@ -198,8 +212,11 @@ export const HOME_LAYOUT: HomeSection[] = [
       SEARCH_SUGGESTIONS.map(([, keyword]) => keyword),
     ),
   },
+  // 12. 限時搶購：只給標題，內容由 home/feature-flash-sale 負責（佔位中）
   { id: 'flash-sale', type: 'flash-sale', title: { text: '限時搶購' } },
+  // 13. 今日暢銷榜：只給標題，內容由 home/feature-ranking 負責（佔位中）
   { id: 'best-sellers', type: 'ranking', title: { text: '今日暢銷榜' } },
+  // 14. moPro 會員專屬價：整張做好的促銷磚，不可點
   {
     id: 'mopro',
     type: 'banner-carousel',
@@ -214,6 +231,7 @@ export const HOME_LAYOUT: HomeSection[] = [
       e('bt_7_703_02', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], '2'),
     ),
   },
+  // 15. 你可能會喜歡：只給標題，內容由 catalog/feature-recommendation 負責（佔位中）
   {
     id: 'recommendations',
     type: 'recommendation',
