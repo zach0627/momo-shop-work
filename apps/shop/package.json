@@ -31,6 +31,7 @@
     "react-router": "catalog:"
   },
   "devDependencies": {
+    "@testing-library/dom": "10.4.0",
     "tailwindcss": "catalog:"
   }
 }
