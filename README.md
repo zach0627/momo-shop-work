@@ -6,7 +6,53 @@ Mocking momoshop —— 以純前端重建 momo 電商的首頁與商品詳情�
 
 **Demo：<https://zach0627.github.io/momo-shop-work/>**（GitHub Pages；CI 通過後自動部署）
 
+[![首頁：頂部列、搜尋框、分類列與主要活動](./docs/screenshots/01-home-top.webp)](https://zach0627.github.io/momo-shop-work/)
+
+<sub>首頁最上面：固定在頂端的頂部列、搜尋框與猜你想搜的關鍵字、可展開的分類列，以及一次露出 2.57 張的主要活動輪播與右側「今日大牌」。其餘畫面在下面的 [畫面](#畫面) 一節。</sub>
+
 由一位工程師與 Claude Code 協作完成。這個 repo 想回答的不是「畫面像不像」，而是三個問題：**系統怎麼切、為什麼這樣切；和真實網站差在哪、為什麼；Human 怎麼監督 Agent、效率如何。** 每一個都有對應的文件，而且照實寫。
+
+## 畫面
+
+下面都是**這個專案**跑起來的畫面（[`docs/screenshots/`](./docs/screenshots)）；目標畫面（真實網站）的截圖在 [`docs/pictures/`](./docs/pictures)，兩邊可以對照著看。
+
+截圖由 `pnpm capture:screenshots` 產生：對 build 出來的產物（`vite preview`）在 1440px 寬的視窗、2 倍像素截圖，再縮成 1220px 寬的 WebP。裁切範圍由頁面上的元素位置算出來（不寫死座標），而且**畫面上看得到的圖沒有全部載完、或還有載入中的佔位，就不截圖**、直接以錯誤結束 —— 避免放上半張圖的截圖。
+
+### 官方優惠
+
+![官方優惠：圖示輪播、捷徑與熱搜排行、超大牌](./docs/screenshots/02-official-deals.webp)
+
+圖示輪播、左邊 5 個捷徑與右邊 9 個熱搜排行（名次顏色、上升、新上榜），再接超大牌。三塊之間緊貼：區塊之間要不要留 16px 由版位資料決定，和真站量到的一致（[這次調整的設計與量測](./openspec/changes/archive/2026-09-20-match-official-deals/design.md)）。
+
+### 降價好貨
+
+![降價好貨：可換頁的商品輪播](./docs/screenshots/03-price-drop.webp)
+
+一次 8.45 張的商品輪播，最後一張露出一半是真站的做法（提示還能往右捲）。每張卡片都可以點進詳情頁，卡片與詳情頁一定是同一件商品：版位資料只給 collection key，商品由商品目錄提供。
+
+### 限時搶購
+
+![限時搶購：倒數、限搶價與剩餘組數](./docs/screenshots/04-flash-sale.webp)
+
+每秒更新的倒數（重新整理就重新計時）、限搶價、剩餘組數與「搶」標籤；每頁 2 × 5 件可以換頁。這一區有自己的邏輯，所以是一個 feature package。
+
+### 你可能會喜歡
+
+![你可能會喜歡：最後一列與「看更多」](./docs/screenshots/05-you-may-like.webp)
+
+一次載入 3 列共 15 件，按「看更多」再載 3 列；載完之後按鈕會消失。載入中會先顯示和真卡片一樣高的佔位，商品到了版面不會跳動。
+
+### 分類面板
+
+![分類列展開後的 40 個分類](./docs/screenshots/06-category-panel.webp)
+
+分類列右側的按鈕展開後蓋住分類列，顯示 40 個分類。五列的底色是「第幾列」決定的，屬於版面，不在資料裡。
+
+### 商品詳情頁
+
+![商品詳情頁：左圖右資訊，三顆按鈕](./docs/screenshots/07-goods-detail.webp)
+
+左邊主圖、右邊標題與條列說明、促銷價與市售價，下面三顆按鈕。**三顆按鈕刻意不綁任何行為**（需求明訂到此為止），而且有測試確保它們不會被順手接上購物車或結帳。
 
 ## 狀態：兩個頁面都已完成
 
@@ -37,6 +83,11 @@ pnpm verify:fixtures                       # 商品 fixtures 與素材一致（�
 pnpm nx graph                              # 看依賴圖
 ```
 
+```bash
+pnpm nx preview shop                       # build 產物 http://localhost:4300
+pnpm capture:screenshots                   # 重新產生 README 的畫面截圖（需要上一行的網站跑著）
+```
+
 需要 Node `>=22.22.0`（React Router 8 的要求；本專案以 Node 24 開發，CI 也用 24）與 pnpm 12。`package.json` 的 `packageManager` 鎖定 `pnpm@12.4.2`，較舊的 pnpm 會自動切換到這個版本。行為規格用 [OpenSpec](https://github.com/Fission-AI/OpenSpec) 撰寫；裝了它的 CLI 才需要跑 `openspec validate --all --strict`。
 
 ## 先看這幾份
@@ -45,7 +96,7 @@ pnpm nx graph                              # 看依賴圖
 | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`docs/architecture.md`](./docs/architecture.md)                          | 系統怎麼切、為什麼這樣切、規模變大時怎麼管                                                                                                                                                                                                                                                                                                                                                                |
 | [`docs/adr/`](./docs/adr)                                                 | 8 個決策：背景、理由、**代價**、演進觸發條件                                                                                                                                                                                                                                                                                                                                                              |
-| [`docs/agent-workflow.md`](./docs/agent-workflow.md)                      | Human ↔ Agent 怎麼協作；Human 糾正 Agent 13 次、Agent 出錯 37 件、偏離計畫 55 項的完整紀錄；**協作效率評估**                                                                                                                                                                                                                                                                                              |
+| [`docs/agent-workflow.md`](./docs/agent-workflow.md)                      | Human ↔ Agent 怎麼協作；Human 糾正 Agent 13 次、Agent 出錯 39 件、偏離計畫 55 項的完整紀錄；**協作效率評估**                                                                                                                                                                                                                                                                                              |
 | [`docs/design-tokens.md`](./docs/design-tokens.md)                        | 兩層 design token（Primitive / Semantic）；每個顏色、字級、框線的數值都是從真實網站的計算樣式**量出來的**，並記錄在哪裡量到、哪些沒量到                                                                                                                                                                                                                                                                   |
 | [`openspec/specs/`](./openspec/specs)                                     | **行為規格**（OpenSpec 主規格，已全部實作）：app-layout、home-page、goods-detail、product-catalog、product-recommendation 五個頁面相關的能力，以及 image-delivery（GitHub Pages 展示用的圖片尺寸）；scenario 直接翻成測試。另有下一列的工程約束                                                                                                                                                           |
 | [`openspec/changes/archive/`](./openspec/changes/archive)                 | 已歸檔的變更，各有 `proposal.md`（為什麼做）、`design.md`（設計決策與放棄的方案）、`tasks.md`（逐項的實作與驗證紀錄，含沒驗到的）：[`2026-09-20-build-storefront-pages`](./openspec/changes/archive/2026-09-20-build-storefront-pages) 建出這兩個頁面；[`2026-09-20-optimize-demo-images`](./openspec/changes/archive/2026-09-20-optimize-demo-images) 為了 GitHub Pages 上的展示把圖片縮到顯示尺寸的兩倍 |
@@ -54,6 +105,7 @@ pnpm nx graph                              # 看依賴圖
 | [`CLAUDE.md`](./CLAUDE.md)                                                | 給 Agent 的規則：不能違反的設計規則，以及「做事的方式」—— 後者多數條目對應到一次實際發生的事故                                                                                                                                                                                                                                                                                                            |
 | [`docs/MoMO面試/`](./docs/MoMO面試)                                       | 原始的需求解析、設計筆記與逐步計畫（含每一步的完成紀錄）                                                                                                                                                                                                                                                                                                                                                  |
 | [`docs/pictures/`](./docs/pictures)                                       | 目標畫面（真實網站）的截圖，依頁面由上到下編號                                                                                                                                                                                                                                                                                                                                                            |
+| [`docs/screenshots/`](./docs/screenshots)                                 | **這個專案**的畫面，README 的「畫面」一節用的就是它們；由 `pnpm capture:screenshots` 產生                                                                                                                                                                                                                                                                                                                 |
 
 ## 技術選型
 
@@ -167,11 +219,11 @@ app → layout / page → feature → ui / data-access → util
 
 **協作方式**：先設計、後實作，設計文件是 source of truth → 行為規格（OpenSpec）的 scenario 直接翻成測試 → 一次一步，每步走「TDD 實作 → 無快取驗證 → 回報（含沒驗到的）→ Human review → commit」→ 每次事故的教訓寫回 `CLAUDE.md`，成為下一次的規則。決定權在 Human 的事（架構取捨、範圍、要不要公開某個檔案），Agent 提出建議與理由後停下來等。
 
-**數字**（時間紀錄依 Human 的要求拿掉了，所以用數得出來的東西評估）：約 95 個 commit、184 個單元與整合測試加 3 個 E2E；Human 糾正 Agent 13 次；Agent 出錯 37 件；偏離原計畫 55 項。
+**數字**（時間紀錄依 Human 的要求拿掉了，所以用數得出來的東西評估）：約 95 個 commit、184 個單元與整合測試加 3 個 E2E；Human 糾正 Agent 13 次；Agent 出錯 39 件；偏離原計畫 55 項。
 
 **三個結論**：
 
-1. **Human 的 review 和自動化檢查抓到的是不同種類的錯，互相取代不了。** 37 件事故裡，Human 抓到 10 件，其中 8 件是方向或事實層級（規格寫了沒驗證過的行為、需求其實不存在、架構的說法站不住）；測試與工具抓到的 14 件全部是實作層級。（另外 2 件是用的人才會先碰到的：Agent 的一個驗證指令掛了 20 分鐘沒發現，以及部署後的網站圖片載入很慢 —— 都是 Human 先問出來的。）
+1. **Human 的 review 和自動化檢查抓到的是不同種類的錯，互相取代不了。** 39 件事故裡，Human 抓到 10 件，其中 8 件是方向或事實層級（規格寫了沒驗證過的行為、需求其實不存在、架構的說法站不住）；測試與工具抓到的 14 件全部是實作層級。（另外 2 件是用的人才會先碰到的：Agent 的一個驗證指令掛了 20 分鐘沒發現，以及部署後的網站圖片載入很慢 —— 都是 Human 先問出來的。）
 2. **最貴的是重工，而重工幾乎都來自「沒先查證就提案」。** layout 改了三輪、`libs/` → `packages/`、design token 重量一次、一條規格與一個 package 寫了又刪 —— 起因都是沒有先對照真實網站或業界慣例。13 次糾正裡有 4 次的內容就是「去看真實網站」。如果重來，最大的效率改善不是寫得更快，而是把查證放在提案之前。
 3. **Agent 擅長把一個方向做完整，不擅長質疑方向本身。** 它明顯加速的是機械性的大範圍修改（資料夾改制、118 個檔案的註解改寫，逐 commit 保持綠燈）、到真站量測數值、scenario → 測試 → 實作的迴圈，以及文件；Human 的糾正則多半來自「這樣以後會怎樣」這種問題。
 
