@@ -1,13 +1,16 @@
 // 由 apps/shop/public/assets 的素材產生商品 fixtures。
 //   node tools/gen-fixtures.mjs           寫入檔案
 //   node tools/gen-fixtures.mjs --check   磁碟上的檔案過期時失敗
-// 決定性：名稱、價格、說明由 id 的雜湊決定，不用亂數、不讀時鐘。
-// id 是真的（來自檔名）；名稱、價格與品牌是編的。
+// 決定性：規格、價格、說明由 id 的雜湊決定，不用亂數、不讀時鐘。
+// id 是真的（來自檔名）；名稱、價格與品牌是編的，但**品項來自圖片**：
+// 每個 id 對應到哪一種商品寫在 tools/product-catalog.mjs（逐張看圖決定的）。
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as prettier from 'prettier';
+
+import { KINDS, PRODUCTS as PRODUCT_KINDS } from './product-catalog.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const assets = join(root, 'apps/shop/public/assets');
@@ -44,38 +47,15 @@ const BRANDS = [
   'ARLO',
 ];
 
-// [名稱, 規格, 最低價, 最高價]
-const TEMPLATES = [
-  ['保濕精華液', ['30ml', '50ml', '2入組'], 590, 2480],
-  ['高效防曬乳', ['SPF50+ 50ml', '2入組'], 390, 1280],
-  ['無線吸塵器', ['輕量款', '旗艦款'], 3990, 16900],
-  ['氣炸鍋', ['4L', '5.5L'], 1690, 4990],
-  ['空氣清淨機', ['8坪', '12坪'], 4990, 15900],
-  ['除濕機', ['10L', '16L'], 6990, 14900],
-  ['快煮壺', ['1.2L', '1.7L'], 590, 1990],
-  ['藍牙耳機', ['降噪版', '運動版'], 990, 6990],
-  ['智慧手錶', ['GPS版', 'LTE版'], 2990, 12900],
-  ['行動電源', ['10000mAh', '20000mAh'], 490, 1690],
-  ['機械鍵盤', ['青軸', '紅軸'], 1290, 4590],
-  ['純棉床包四件組', ['雙人', '加大'], 1290, 3990],
-  ['不鏽鋼保溫瓶', ['500ml', '750ml'], 390, 1290],
-  ['運動休閒鞋', ['男款', '女款'], 1290, 3890],
-  ['洗衣精補充包', ['1.5kg x6', '2kg x4'], 399, 990],
-  ['抽取式衛生紙', ['100抽 x24包', '110抽 x72包'], 299, 1190],
-  ['綜合堅果', ['600g', '1kg 家庭號'], 299, 890],
-  ['精選咖啡豆', ['半磅', '一磅'], 350, 990],
-  ['滴雞精', ['10入', '20入'], 990, 2990],
-  ['低敏貓砂', ['7L x3', '礦砂 10kg'], 399, 1190],
-];
-
+// 每件商品都有的服務說明。分期只給貴的商品：$30 的點數卡不該寫「分期 0 利率」
 const SERVICE_LINES = [
   '24 小時快速到貨',
   '滿額免運，可超商取貨',
-  '支援信用卡分期 0 利率',
   '七天鑑賞期，安心退換',
-  '台灣製造，品質把關',
   '限時加贈好禮，送完為止',
 ];
+const INSTALMENT_LINE = '支援信用卡分期 0 利率';
+const INSTALMENT_FROM = 3000;
 
 const DISCOUNTS = [0.62, 0.68, 0.75, 0.8, 0.85, 0.9];
 const PROMO_TEXTS = [
@@ -107,36 +87,51 @@ function hash(id, salt) {
 const pick = (list, id, salt) => list[hash(id, salt) % list.length];
 const compare = (a, b) => (a < b ? -1 : a > b ? 1 : 0); // 不受語系影響的字串比較
 
-// 由 id 的雜湊決定一件商品的名稱、價格與說明（同一個 id 永遠得到同樣的結果）
+/**
+ * 一件商品的名稱、價格與說明。**品項來自它的圖片**（`tools/product-catalog.mjs`），
+ * 規格與價格則由 id 的雜湊在該品項的範圍內決定，所以同一個 id 永遠得到同樣的結果。
+ */
 function describe(id, inFlashSale) {
-  const brand = pick(BRANDS, id, 'brand');
-  const [noun, variants, low, high] = pick(TEMPLATES, id, 'template');
-  const variant = pick(variants, id, 'variant');
+  const entry = PRODUCT_KINDS[id];
+  if (!entry) return null; // 沒有看過這張圖：由呼叫端報錯
+  const spec = typeof entry === 'string' ? { kind: entry } : entry;
+  const kind = KINDS[spec.kind];
+  if (!kind) throw new Error(`${id}: unknown kind ${spec.kind}`);
 
-  // 售價：在範本的價格區間內取值，尾數調成 9（例：1289）
-  const raw = low + (hash(id, 'price') % (high - low));
-  const price = Math.round(raw / 10) * 10 - 1;
-  // 約七成的商品有原價；限時搶購的商品一定有。原價 = 售價 ÷ 折扣，進位到十位
-  const discounted = inFlashSale || hash(id, 'discounted') % 10 < 7;
+  const index = hash(id, 'variant') % kind.variants.length;
+  const variant = spec.variant ?? kind.variants[index];
+  // 售價：品項的價格區間依規格分段，規格由小排到大，所以「72 包」不會比「12 包」便宜。
+  // 尾數調成 9（例：1289）。點數卡的價格是面額，不動
+  const [low, high] = kind.price;
+  const band = (high - low) / kind.variants.length;
+  const bandLow = low + band * index;
+  const raw = bandLow + (hash(id, 'price') % Math.max(1, Math.round(band)));
+  const price = spec.price ?? Math.round(raw / 10) * 10 - 1;
+  // 約七成的商品有原價；限時搶購的一定有。面額商品與黃金沒有原價
+  const discounted =
+    !spec.exact &&
+    !kind.noDiscount &&
+    (inFlashSale || hash(id, 'discounted') % 10 < 7);
   const originalPrice = discounted
     ? Math.ceil(price / pick(DISCOUNTS, id, 'discount') / 10) * 10
     : undefined;
 
-  // 兩行服務說明：第二行的位移是 1–4，保證和第一行不同
-  const first = hash(id, 'service') % SERVICE_LINES.length;
+  const services = [
+    ...SERVICE_LINES,
+    ...(price >= INSTALMENT_FROM ? [INSTALMENT_LINE] : []),
+  ];
+  // 兩行服務說明：第二行的位移保證和第一行不同
+  const first = hash(id, 'service') % services.length;
   const second =
-    (first + 1 + (hash(id, 'service-2') % 4)) % SERVICE_LINES.length;
+    (first + 1 + (hash(id, 'service-2') % (services.length - 1))) %
+    services.length;
 
+  const brand = kind.noBrand ? '' : `【${pick(BRANDS, id, 'brand')}】`;
   return {
-    name: `【${brand}】${noun} ${variant}`,
+    name: `${brand}${kind.noun} ${variant}`,
     price,
     ...(originalPrice ? { originalPrice } : {}),
-    description: [
-      `${brand}原廠公司貨，享完整保固`,
-      `${noun}人氣款式：${variant}`,
-      SERVICE_LINES[first],
-      SERVICE_LINES[second],
-    ],
+    description: [...kind.lines, services[first], services[second]],
   };
 }
 
@@ -193,15 +188,27 @@ if (problems.length) {
   process.exit(1);
 }
 
-const products = [...images.keys()].sort(compare).map((id) => ({
-  id,
-  imageUrl: cardImage(images.get(id)[0]),
-  images: images.get(id),
-  ...describe(id, flashSaleIds.has(id)),
-  ...(promoLineIds.has(id)
-    ? { promoText: pick(PROMO_LINES, id, 'promo-line') }
-    : {}),
-}));
+const products = [...images.keys()].sort(compare).map((id) => {
+  const described = describe(id, flashSaleIds.has(id));
+  // 沒分類過就不出貨：不然又會配出和圖片無關的名稱（Human 第 14 次糾正）
+  if (!described)
+    problems.push(
+      `${id}: not classified - look at ${images.get(id)[0]} and add it to tools/product-catalog.mjs`,
+    );
+  return {
+    id,
+    imageUrl: cardImage(images.get(id)[0]),
+    images: images.get(id),
+    ...described,
+    ...(promoLineIds.has(id)
+      ? { promoText: pick(PROMO_LINES, id, 'promo-line') }
+      : {}),
+  };
+});
+if (problems.length) {
+  for (const p of problems) console.error(`x ${p}`);
+  process.exit(1);
+}
 
 const flashSaleExtras = Object.fromEntries(
   collections[FLASH_SALE_KEY].map((id) => [
